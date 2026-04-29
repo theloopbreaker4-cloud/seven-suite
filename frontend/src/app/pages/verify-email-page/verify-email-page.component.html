@@ -1,0 +1,23 @@
+<app-site-layout>
+  <section style="max-width: 28rem; margin: 0 auto; padding: 4rem 1rem; text-align: center;">
+    <div style="border-radius: 1rem; border: 1px solid var(--border-color); background: var(--bg-secondary); padding: 2rem;">
+      <mat-icon
+        style="font-size: 48px; width: 48px; height: 48px; margin: 0 auto 1rem; display: block;"
+        [style.color]="state() === 'ok' ? 'var(--primary)' : state() === 'fail' ? '#f87171' : 'var(--text-tertiary)'">
+        {{ state() === 'ok' ? 'check_circle' : state() === 'fail' ? 'error' : 'hourglass_empty' }}
+      </mat-icon>
+
+      <h1 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem; color: var(--text-primary);">
+        {{ state() === 'ok'   ? tr('verify.ok',   'Email verified')
+         : state() === 'fail' ? tr('verify.fail', 'Verification failed')
+                              : tr('verify.wait', 'Verifying…') }}
+      </h1>
+      <p style="font-size: 0.875rem; margin-bottom: 1.5rem; color: var(--text-secondary);">{{ message() }}</p>
+
+      <a routerLink="/signin"
+         style="display: inline-block; padding: 0.5rem 1rem; border-radius: 0.5rem; color: #fff; font-size: 0.875rem; font-weight: 500; background: var(--primary); text-decoration: none;">
+        {{ tr('nav.signin', 'Sign in') }}
+      </a>
+    </div>
+  </section>
+</app-site-layout>

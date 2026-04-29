@@ -1,0 +1,23 @@
+<app-site-layout>
+  <article style="max-width: 48rem; margin: 0 auto; padding: 3rem 1rem;">
+    <a routerLink="/blog"
+       style="display: inline-flex; align-items: center; gap: 0.25rem; font-size: 0.875rem; margin-bottom: 1.5rem; color: var(--text-tertiary); text-decoration: none;">
+      ← {{ tr('nav.blog', 'Blog') }}
+    </a>
+
+    <div *ngIf="loading()" style="text-align: center; padding: 4rem 0; color: var(--text-tertiary);">{{ tr('common.loading', 'Loading…') }}</div>
+    <div *ngIf="!loading() && !post()" style="text-align: center; padding: 4rem 0; color: var(--text-tertiary);">
+      {{ tr('blog.notFound', 'Post not found') }}
+    </div>
+
+    <ng-container *ngIf="post() as p">
+      <h1 style="font-size: 2.25rem; font-weight: 700; margin-bottom: 0.75rem; color: var(--text-primary); line-height: 1.2;">
+        {{ pick(p.title) }}
+      </h1>
+      <p style="font-size: 0.875rem; margin-bottom: 2rem; color: var(--text-tertiary);">{{ formatDate(p.createdAt) }}</p>
+      <img *ngIf="p.coverImage" [src]="p.coverImage" [alt]="pick(p.title)"
+           style="width: 100%; border-radius: 1rem; margin-bottom: 2rem; display: block;" />
+      <div style="color: var(--text-secondary); line-height: 1.75; font-size: 1rem;" [innerHTML]="pick(p.content)"></div>
+    </ng-container>
+  </article>
+</app-site-layout>

@@ -1,0 +1,26 @@
+<app-site-layout>
+  <section style="max-width: 42rem; margin: 0 auto; padding: 4rem 1rem;">
+    <h1 style="font-size: 2rem; font-weight: 700; margin-bottom: 0.5rem; color: var(--text-primary);">
+      {{ tr('faq.title', 'FAQ') }}
+    </h1>
+    <p style="font-size: 0.875rem; margin-bottom: 2rem; color: var(--text-secondary);">
+      {{ tr('faq.subtitle', 'Answers to common questions about SevenCMS.') }}
+    </p>
+
+    <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+      <div *ngFor="let item of items(); let i = index"
+           style="border-radius: 0.75rem; border: 1px solid var(--border-color); background: var(--bg-secondary); overflow: hidden;">
+        <button (click)="toggle(i)"
+                style="width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 0.75rem 1rem; text-align: left; font-size: 0.875rem; font-weight: 500; background: transparent; border: none; cursor: pointer; color: var(--text-primary);">
+          <span>{{ item.q }}</span>
+          <mat-icon style="font-size: 18px; width: 18px; height: 18px; line-height: 1; transition: transform 0.2s;"
+                    [style.transform]="open() === i ? 'rotate(180deg)' : 'rotate(0deg)'">expand_more</mat-icon>
+        </button>
+        <div *ngIf="open() === i"
+             style="padding: 0 1rem 1rem; font-size: 0.875rem; color: var(--text-secondary); line-height: 1.6;">
+          {{ item.a }}
+        </div>
+      </div>
+    </div>
+  </section>
+</app-site-layout>

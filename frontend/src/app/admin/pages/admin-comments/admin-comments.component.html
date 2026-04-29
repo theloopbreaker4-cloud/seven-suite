@@ -1,0 +1,69 @@
+<div class="p-6">
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <h1 class="text-xl font-semibold text-[--text-primary]">Comments</h1>
+      <p class="text-sm text-[--text-secondary]">Moderate user comments</p>
+    </div>
+    <div class="flex gap-2">
+      <button *ngFor="let f of filters"
+              (click)="filter.set(f)"
+              [class]="filter() === f
+                ? 'px-3 py-1.5 rounded-lg text-sm font-medium bg-[--primary] text-white'
+                : 'px-3 py-1.5 rounded-lg text-sm font-medium bg-[--bg-tertiary] text-[--text-secondary] hover:bg-[--bg-secondary]'">
+        {{ f | titlecase }}
+      </button>
+    </div>
+  </div>
+
+  <div *ngIf="error()" class="mb-4 px-4 py-3 rounded-lg bg-red-500/10 text-red-400 text-sm">{{ error() }}</div>
+
+  <div class="rounded-xl border border-[--border-color] overflow-hidden">
+    <table class="w-full text-sm">
+      <thead class="bg-[--bg-secondary]">
+        <tr>
+          <th class="px-4 py-3 text-left font-medium text-[--text-secondary]">Author</th>
+          <th class="px-4 py-3 text-left font-medium text-[--text-secondary]">Comment</th>
+          <th class="px-4 py-3 text-left font-medium text-[--text-secondary]">Status</th>
+          <th class="px-4 py-3 text-left font-medium text-[--text-secondary]">Date</th>
+          <th class="px-4 py-3"></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngIf="loading()">
+          <td colspan="5" class="px-4 py-8 text-center text-[--text-tertiary]">Loading…</td>
+        </tr>
+        <tr *ngIf="!loading() && filtered().length === 0">
+          <td colspan="5" class="px-4 py-8 text-center text-[--text-tertiary]">No comments found</td>
+        </tr>
+        <tr *ngFor="let c of filtered()" class="border-t border-[--border-color] hover:bg-[--bg-secondary] transition-colors">
+          <td class="px-4 py-3">
+            <div class="font-medium text-[--text-primary]">{{ c.authorName }}</div>
+            <div class="text-xs text-[--text-tertiary]">{{ c.authorEmail }}</div>
+          </td>
+          <td class="px-4 py-3 text-[--text-secondary] max-w-xs">
+            <span class="line-clamp-2">{{ c.body }}</span>
+          </td>
+          <td class="px-4 py-3">
+            <span [class]="c.isApproved
+              ? 'inline-flex px-2 py-0.5 rounded-full text-[11px] font-medium bg-emerald-500/15 text-emerald-400'
+              : 'inline-flex px-2 py-0.5 rounded-full text-[11px] font-medium bg-amber-500/15 text-amber-400'">
+              {{ c.isApproved ? 'Approved' : 'Pending' }}
+            </span>
+          </td>
+          <td class="px-4 py-3 text-xs text-[--text-tertiary]">{{ fmt(c.createdAt) }}</td>
+          <td class="px-4 py-3">
+            <div class="flex items-center justify-end gap-1">
+              <button *ngIf="!c.isApproved" (click)="approve(c)"
+                      class="p-1.5 rounded-md text-emerald-400 hover:bg-emerald-500/10 transition-colors" title="Approve">
+                <mat-icon class="text-[16px]">check_circle</mat-icon>
+              </button>
+              <button (click)="delete(c)" class="p-1.5 rounded-md text-[--text-tertiary] hover:text-red-400 hover:bg-red-500/10 transition-colors">
+                <mat-icon class="text-[16px]">delete</mat-icon>
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

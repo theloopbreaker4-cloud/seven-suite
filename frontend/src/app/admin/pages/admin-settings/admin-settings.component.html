@@ -1,0 +1,146 @@
+<div class="p-6 space-y-6">
+
+  <!-- Page header -->
+  <div>
+    <h1 class="text-xl font-semibold text-[--text-primary]">Settings</h1>
+    <p class="text-sm text-[--text-secondary] mt-0.5">Configure application settings and preferences</p>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+
+    <!-- General Settings -->
+    <div class="rounded-2xl bg-[--bg-secondary] border border-[--border-color]">
+      <div class="px-5 py-4 border-b border-[--border-color] flex items-center gap-3">
+        <div class="w-8 h-8 rounded-lg bg-[--primary]/10 flex items-center justify-center">
+          <svg class="w-4 h-4 text-[--primary]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+        </div>
+        <h2 class="font-semibold text-[--text-primary] text-sm">General</h2>
+      </div>
+      <div class="p-5 space-y-4">
+        <div>
+          <label class="block text-xs font-medium text-[--text-secondary] mb-1.5 uppercase tracking-wide">Site Name</label>
+          <input [(ngModel)]="siteName"
+                 class="w-full px-3 py-2.5 rounded-xl border border-[--border-color] bg-[--bg-primary] text-[--text-primary] text-sm focus:outline-none focus:ring-2 focus:ring-[--primary]/20 focus:border-[--primary] transition-all" />
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-[--text-secondary] mb-1.5 uppercase tracking-wide">Site Description</label>
+          <textarea [(ngModel)]="siteDescription" rows="3"
+                    class="w-full px-3 py-2.5 rounded-xl border border-[--border-color] bg-[--bg-primary] text-[--text-primary] text-sm focus:outline-none focus:ring-2 focus:ring-[--primary]/20 focus:border-[--primary] transition-all resize-none"></textarea>
+        </div>
+        <label class="flex items-center justify-between cursor-pointer py-1">
+          <div>
+            <p class="text-sm font-medium text-[--text-primary]">Maintenance Mode</p>
+            <p class="text-xs text-[--text-tertiary]">Show a maintenance page to visitors</p>
+          </div>
+          <button type="button" (click)="maintenanceMode = !maintenanceMode"
+                  [class]="maintenanceMode ? 'relative inline-flex h-5 w-9 items-center rounded-full bg-[--primary] transition-colors' : 'relative inline-flex h-5 w-9 items-center rounded-full bg-[--bg-tertiary] border border-[--border-color] transition-colors'">
+            <span [class]="maintenanceMode ? 'translate-x-4 w-4 h-4 rounded-full bg-white shadow transition-transform inline-block' : 'translate-x-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform inline-block'"></span>
+          </button>
+        </label>
+        <label class="flex items-center justify-between cursor-pointer py-1">
+          <div>
+            <p class="text-sm font-medium text-[--text-primary]">Allow Registration</p>
+            <p class="text-xs text-[--text-tertiary]">Allow new users to sign up</p>
+          </div>
+          <button type="button" (click)="allowRegistration = !allowRegistration"
+                  [class]="allowRegistration ? 'relative inline-flex h-5 w-9 items-center rounded-full bg-[--primary] transition-colors' : 'relative inline-flex h-5 w-9 items-center rounded-full bg-[--bg-tertiary] border border-[--border-color] transition-colors'">
+            <span [class]="allowRegistration ? 'translate-x-4 w-4 h-4 rounded-full bg-white shadow transition-transform inline-block' : 'translate-x-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform inline-block'"></span>
+          </button>
+        </label>
+      </div>
+      <div class="px-5 py-3.5 border-t border-[--border-color]">
+        <button (click)="saveGeneralSettings()"
+                class="px-4 py-2 rounded-lg bg-[--primary] text-white text-sm font-medium hover:bg-[--primary-hover] transition-colors">
+          Save Changes
+        </button>
+      </div>
+    </div>
+
+    <!-- Email Settings -->
+    <div class="rounded-2xl bg-[--bg-secondary] border border-[--border-color]">
+      <div class="px-5 py-4 border-b border-[--border-color] flex items-center gap-3">
+        <div class="w-8 h-8 rounded-lg bg-violet-500/10 flex items-center justify-center">
+          <svg class="w-4 h-4 text-violet-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        </div>
+        <h2 class="font-semibold text-[--text-primary] text-sm">Email / SMTP</h2>
+      </div>
+      <div class="p-5 space-y-4">
+        <label class="flex items-center justify-between cursor-pointer py-1">
+          <p class="text-sm font-medium text-[--text-primary]">Enable Email Notifications</p>
+          <button type="button" (click)="emailEnabled = !emailEnabled"
+                  [class]="emailEnabled ? 'relative inline-flex h-5 w-9 items-center rounded-full bg-[--primary] transition-colors' : 'relative inline-flex h-5 w-9 items-center rounded-full bg-[--bg-tertiary] border border-[--border-color] transition-colors'">
+            <span [class]="emailEnabled ? 'translate-x-4 w-4 h-4 rounded-full bg-white shadow transition-transform inline-block' : 'translate-x-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform inline-block'"></span>
+          </button>
+        </label>
+        <div>
+          <label class="block text-xs font-medium text-[--text-secondary] mb-1.5 uppercase tracking-wide">SMTP Host</label>
+          <input [(ngModel)]="smtpHost" [disabled]="!emailEnabled"
+                 class="w-full px-3 py-2.5 rounded-xl border border-[--border-color] bg-[--bg-primary] text-[--text-primary] text-sm focus:outline-none focus:ring-2 focus:ring-[--primary]/20 focus:border-[--primary] disabled:opacity-50 disabled:cursor-not-allowed transition-all" />
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-medium text-[--text-secondary] mb-1.5 uppercase tracking-wide">Port</label>
+            <input [(ngModel)]="smtpPort" type="number" [disabled]="!emailEnabled"
+                   class="w-full px-3 py-2.5 rounded-xl border border-[--border-color] bg-[--bg-primary] text-[--text-primary] text-sm focus:outline-none focus:ring-2 focus:ring-[--primary]/20 focus:border-[--primary] disabled:opacity-50 disabled:cursor-not-allowed transition-all" />
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-[--text-secondary] mb-1.5 uppercase tracking-wide">Username</label>
+            <input [(ngModel)]="smtpUser" [disabled]="!emailEnabled"
+                   class="w-full px-3 py-2.5 rounded-xl border border-[--border-color] bg-[--bg-primary] text-[--text-primary] text-sm focus:outline-none focus:ring-2 focus:ring-[--primary]/20 focus:border-[--primary] disabled:opacity-50 disabled:cursor-not-allowed transition-all" />
+          </div>
+        </div>
+      </div>
+      <div class="px-5 py-3.5 border-t border-[--border-color] flex items-center gap-2">
+        <button (click)="saveEmailSettings()"
+                class="px-4 py-2 rounded-lg bg-[--primary] text-white text-sm font-medium hover:bg-[--primary-hover] transition-colors">
+          Save
+        </button>
+        <button (click)="testEmailConnection()" [disabled]="!emailEnabled"
+                class="px-4 py-2 rounded-lg border border-[--border-color] text-[--text-secondary] text-sm font-medium hover:bg-[--bg-tertiary] disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+          Test Connection
+        </button>
+      </div>
+    </div>
+
+    <!-- Security Settings -->
+    <div class="rounded-2xl bg-[--bg-secondary] border border-[--border-color] lg:col-span-2">
+      <div class="px-5 py-4 border-b border-[--border-color] flex items-center gap-3">
+        <div class="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center">
+          <svg class="w-4 h-4 text-emerald-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <h2 class="font-semibold text-[--text-primary] text-sm">Security</h2>
+      </div>
+      <div class="p-5">
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+          <label class="flex items-center justify-between cursor-pointer py-1 sm:col-span-1">
+            <div>
+              <p class="text-sm font-medium text-[--text-primary]">Require 2FA</p>
+              <p class="text-xs text-[--text-tertiary]">Force all users to enable two-factor auth</p>
+            </div>
+            <button type="button" (click)="twoFactorRequired = !twoFactorRequired"
+                    [class]="twoFactorRequired ? 'relative inline-flex h-5 w-9 items-center rounded-full bg-[--primary] transition-colors ml-4' : 'relative inline-flex h-5 w-9 items-center rounded-full bg-[--bg-tertiary] border border-[--border-color] transition-colors ml-4'">
+              <span [class]="twoFactorRequired ? 'translate-x-4 w-4 h-4 rounded-full bg-white shadow transition-transform inline-block' : 'translate-x-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform inline-block'"></span>
+            </button>
+          </label>
+          <div>
+            <label class="block text-xs font-medium text-[--text-secondary] mb-1.5 uppercase tracking-wide">Session Timeout (min)</label>
+            <input [(ngModel)]="sessionTimeout" type="number"
+                   class="w-full px-3 py-2.5 rounded-xl border border-[--border-color] bg-[--bg-primary] text-[--text-primary] text-sm focus:outline-none focus:ring-2 focus:ring-[--primary]/20 focus:border-[--primary] transition-all" />
+            <p class="text-[11px] text-[--text-tertiary] mt-1">Auto-logout inactive users</p>
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-[--text-secondary] mb-1.5 uppercase tracking-wide">Min Password Length</label>
+            <input [(ngModel)]="passwordMinLength" type="number" min="6" max="32"
+                   class="w-full px-3 py-2.5 rounded-xl border border-[--border-color] bg-[--bg-primary] text-[--text-primary] text-sm focus:outline-none focus:ring-2 focus:ring-[--primary]/20 focus:border-[--primary] transition-all" />
+          </div>
+        </div>
+      </div>
+      <div class="px-5 py-3.5 border-t border-[--border-color]">
+        <button (click)="saveSecuritySettings()"
+                class="px-4 py-2 rounded-lg bg-[--primary] text-white text-sm font-medium hover:bg-[--primary-hover] transition-colors">
+          Save Changes
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

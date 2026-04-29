@@ -1,0 +1,34 @@
+{
+  "nav": {
+    "home": "Ana Səhifə", "blog": "Blog", "signin": "Daxil ol",
+    "signout": "Çıxış", "register": "Qeydiyyat", "dashboard": "Panel"
+  },
+  "auth": {
+    "signin": "Daxil ol", "signup": "Qeydiyyat", "email": "Email",
+    "password": "Şifrə", "confirmPassword": "Şifrəni təsdiqlə",
+    "firstName": "Ad", "lastName": "Soyad", "userName": "İstifadəçi adı",
+    "submit": "Göndər", "noAccount": "Hesabınız yoxdur?",
+    "hasAccount": "Hesabınız var?", "forgotPassword": "Şifrəni unutdunuz?",
+    "resetPassword": "Şifrəni sıfırla", "recoverPassword": "Şifrəni bərpa et",
+    "sendResetLink": "Sıfırlama linki göndər", "backToSignin": "Girişə qayıt",
+    "newPassword": "Yeni şifrə", "tokenExpired": "Sıfırlama linki vaxtı keçib."
+  },
+  "blog": {
+    "title": "Blog", "readMore": "Daha çox oxu",
+    "noPostsYet": "Hələ yazı yoxdur.", "backToList": "Bloqa qayıt"
+  },
+  "page": { "notFound": "Səhifə tapılmadı.", "notFoundDesc": "Axtardığınız səhifə mövcud deyil." },
+  "validation": {
+    "emptyFields": "Zəhmət olmasa bütün sahələri doldurun.",
+    "userNotFound": "İstifadəçi tapılmadı.", "wrongPass": "Yanlış şifrə.",
+    "inactive": "Hesab deaktivdir.", "emailExists": "Email artıq qeydiyyatdan keçib.",
+    "userExists": "İstifadəçi adı artıq tutulub.", "passwordsMismatch": "Şifrələr uyğun gəlmir.",
+    "invalidEmail": "Yanlış email.", "tooShort": "Çox qısadır."
+  },
+  "lang": {
+    "en": "İngilis", "ru": "Rus", "ka": "Gürcü",
+    "uk": "Ukrayna", "az": "Azərbaycan", "hy": "Erməni",
+    "be": "Belarus", "de": "Alman", "fr": "Fransız"
+  },
+  "meta": { "description": "SevenCMS — müasir çoxdilli məzmun idarəetmə sistemi." }
+}

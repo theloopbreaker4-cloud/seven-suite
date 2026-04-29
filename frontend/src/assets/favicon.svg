@@ -1,0 +1,51 @@
+<svg width="256" height="256" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg2" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#021F1F"/>
+      <stop offset="100%" stop-color="#003333"/>
+    </linearGradient>
+    <linearGradient id="main2" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#00FFE0"/>
+      <stop offset="100%" stop-color="#00BFA6"/>
+    </linearGradient>
+    <filter id="textGlow">
+      <feGaussianBlur stdDeviation="2.5" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="256" height="256" rx="48" fill="url(#bg2)"/>
+
+  <!-- 7 shape -->
+  <path d="M75 75 H180 L120 185"
+        stroke="url(#main2)"
+        stroke-width="22"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        fill="none"/>
+
+  <!-- Divider — at vertical center of 7 -->
+  <line x1="70" y1="140" x2="186" y2="140"
+        stroke="#00FFE0"
+        stroke-opacity="0.2"
+        stroke-width="2"/>
+
+  <!-- Text — centered on 7 body (x=148 = midpoint of diagonal, y=134 = above divider) -->
+  <text x="148" y="134"
+        text-anchor="middle"
+        font-size="26"
+        font-family="Inter, Poppins, Arial, sans-serif"
+        font-weight="500"
+        fill="#66FFF0"
+        letter-spacing="2.5"
+        filter="url(#textGlow)">
+    seven
+  </text>
+
+  <!-- Accent dot -->
+  <circle cx="148" cy="155" r="4.5" fill="#00FFE0" opacity="0.6"/>
+</svg>

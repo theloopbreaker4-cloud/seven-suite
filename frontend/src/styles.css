@@ -1,0 +1,112 @@
+@import "tailwindcss";
+
+/* Explicit scan — Tailwind v4 needs this for Angular .html templates. */
+@source "../src/**/*.{html,ts}";
+
+/* ========== Design Tokens ========== */
+@theme {
+  --color-primary-50:  #f5f7ff;
+  --color-primary-100: #ebf0ff;
+  --color-primary-200: #d6e0ff;
+  --color-primary-300: #b3c7ff;
+  --color-primary-400: #8aa6ff;
+  --color-primary-500: #667eea;
+  --color-primary-600: #5568d3;
+  --color-primary-700: #4453b8;
+  --color-primary-800: #343f8f;
+  --color-primary-900: #242d66;
+
+  --color-secondary-400: #9b6dc0;
+  --color-secondary-500: #764ba2;
+  --color-secondary-600: #653d8a;
+
+  --color-success: #10b981;
+  --color-error:   #ef4444;
+  --color-warning: #f59e0b;
+  --color-info:    #3b82f6;
+}
+
+/* ========== Light Theme ========== */
+:root,
+[data-theme="light"] {
+  --bg-primary:    #ffffff;
+  --bg-secondary:  #f8fafc;
+  --bg-tertiary:   #f1f5f9;
+  --text-primary:  #0f172a;
+  --text-secondary:#475569;
+  --text-tertiary: #94a3b8;
+  --border-color:  #e2e8f0;
+  --primary:       #667eea;
+  --primary-hover: #5568d3;
+  --secondary:     #764ba2;
+  --secondary-hover:#653d8a;
+}
+
+/* ========== Dark Theme ========== */
+[data-theme="dark"] {
+  --bg-primary:    #0b0f19;
+  --bg-secondary:  #111827;
+  --bg-tertiary:   #1e2535;
+  --text-primary:  #f1f5f9;
+  --text-secondary:#94a3b8;
+  --text-tertiary: #64748b;
+  --border-color:  #1e2d3d;
+  --primary:       #818cf8;
+  --primary-hover: #667eea;
+  --secondary:     #c084fc;
+  --secondary-hover:#a855f7;
+}
+
+/* ========== Reset ========== */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  min-height: 100vh;
+}
+
+/* ========== Scrollbar ========== */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-tertiary); }
+
+/* ========== Selection ========== */
+::selection { background: var(--primary); color: #fff; }
+
+/* ========== Theme Transition ========== */
+body, header, aside, nav, footer, main,
+[class*="bg-["], [class*="border-["], [class*="text-["] {
+  transition: background-color 200ms ease, border-color 200ms ease, color 200ms ease;
+}
+
+/* ========== Focus Ring ========== */
+:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ========== Links ========== */
+a { text-decoration: none; }
+
+/* ========== Animations ========== */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-fadein { animation: fadeIn 250ms ease forwards; }

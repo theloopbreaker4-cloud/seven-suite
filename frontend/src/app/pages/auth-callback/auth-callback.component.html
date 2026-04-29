@@ -1,0 +1,10 @@
+<app-site-layout>
+  <section style="max-width: 28rem; margin: 0 auto; padding: 5rem 1rem; text-align: center;">
+    <mat-icon style="font-size: 48px; width: 48px; height: 48px; margin: 0 auto 1rem; display: block; color: var(--primary); animation: spin 1s linear infinite;">sync</mat-icon>
+    <p style="font-size: 0.875rem; color: var(--text-secondary);">{{ error() || tr('errors.signingIn', 'Signing you in…') }}</p>
+  </section>
+</app-site-layout>
+
+<style>
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+</style>

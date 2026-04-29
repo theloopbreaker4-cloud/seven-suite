@@ -1,0 +1,39 @@
+<app-site-layout>
+  <section style="max-width: 42rem; margin: 0 auto; padding: 4rem 1rem;">
+    <h1 style="font-size: 2rem; font-weight: 700; margin-bottom: 0.5rem; color: var(--text-primary);">
+      {{ tr('support.title', 'Support') }}
+    </h1>
+    <p style="font-size: 0.875rem; margin-bottom: 2rem; color: var(--text-secondary);">
+      {{ tr('support.subtitle', 'Need help? Pick the channel that fits best.') }}
+    </p>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem;">
+      <a href="mailto:support@sevencms.com"
+         style="padding: 1.25rem; border-radius: 1rem; border: 1px solid var(--border-color); background: var(--bg-secondary); display: flex; gap: 0.75rem; align-items: flex-start; text-decoration: none; color: inherit;">
+        <mat-icon style="font-size: 24px; width: 24px; height: 24px; color: var(--primary);">mail</mat-icon>
+        <div>
+          <h3 style="font-weight: 600; margin-bottom: 0.25rem; color: var(--text-primary);">
+            {{ tr('support.emailTitle', 'Email') }}
+          </h3>
+          <p style="font-size: 0.75rem; color: var(--text-secondary);">support&#64;sevencms.com</p>
+          <p style="font-size: 0.75rem; margin-top: 0.25rem; color: var(--text-tertiary);">
+            {{ tr('support.emailReply', 'Response within 24 hours') }}
+          </p>
+        </div>
+      </a>
+
+      <a href="https://github.com/prgera/seven-cms/issues" target="_blank" rel="noopener"
+         style="padding: 1.25rem; border-radius: 1rem; border: 1px solid var(--border-color); background: var(--bg-secondary); display: flex; gap: 0.75rem; align-items: flex-start; text-decoration: none; color: inherit;">
+        <mat-icon style="font-size: 24px; width: 24px; height: 24px; color: var(--primary);">bug_report</mat-icon>
+        <div>
+          <h3 style="font-weight: 600; margin-bottom: 0.25rem; color: var(--text-primary);">
+            {{ tr('support.githubTitle', 'GitHub Issues') }}
+          </h3>
+          <p style="font-size: 0.75rem; color: var(--text-secondary);">
+            {{ tr('support.githubDesc', 'Report bugs or request features') }}
+          </p>
+        </div>
+      </a>
+    </div>
+  </section>
+</app-site-layout>

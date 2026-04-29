@@ -1,0 +1,15 @@
+<app-site-layout>
+  <section style="max-width: 28rem; margin: 0 auto; padding: 6rem 1rem; text-align: center;">
+    <p style="font-size: 4rem; font-weight: 700; margin-bottom: 1rem; color: var(--primary); line-height: 1;">404</p>
+    <h1 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem; color: var(--text-primary);">
+      {{ tr('error404.title', 'Page not found') }}
+    </h1>
+    <p style="font-size: 0.875rem; margin-bottom: 1.5rem; color: var(--text-secondary);">
+      {{ tr('error404.subtitle', "The page you are looking for doesn't exist or was moved.") }}
+    </p>
+    <a routerLink="/"
+       style="display: inline-block; padding: 0.625rem 1.25rem; border-radius: 0.5rem; color: #fff; font-size: 0.875rem; font-weight: 500; background: var(--primary); text-decoration: none;">
+      {{ tr('error404.home', 'Go home') }}
+    </a>
+  </section>
+</app-site-layout>

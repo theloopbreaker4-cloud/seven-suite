@@ -1,0 +1,64 @@
+<app-site-layout>
+  <section style="max-width: 28rem; margin: 0 auto; padding: 4rem 1rem;">
+    <div style="border-radius: 1rem; border: 1px solid var(--border-color); background: var(--bg-secondary); padding: 2rem;">
+      <h1 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--text-primary);">
+        {{ tr('signup.title', 'Create account') }}
+      </h1>
+      <p style="font-size: 0.875rem; margin-bottom: 1.5rem; color: var(--text-secondary);">
+        {{ tr('signup.subtitle', 'Join SevenCMS — it takes less than a minute.') }}
+      </p>
+
+      <form [formGroup]="form" (ngSubmit)="submit()" style="display: flex; flex-direction: column; gap: 1rem;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+          <div>
+            <label style="display: block; font-size: 0.75rem; font-weight: 500; margin-bottom: 0.375rem; color: var(--text-secondary);">
+              {{ tr('signup.firstName', 'First name') }}
+            </label>
+            <input formControlName="firstName" type="text" autocomplete="given-name"
+                   style="width: 100%; padding: 0.625rem 0.75rem; border-radius: 0.5rem; border: 1px solid var(--border-color); background: var(--bg-primary); color: var(--text-primary); font-size: 0.875rem; box-sizing: border-box;" />
+          </div>
+          <div>
+            <label style="display: block; font-size: 0.75rem; font-weight: 500; margin-bottom: 0.375rem; color: var(--text-secondary);">
+              {{ tr('signup.lastName', 'Last name') }}
+            </label>
+            <input formControlName="lastName" type="text" autocomplete="family-name"
+                   style="width: 100%; padding: 0.625rem 0.75rem; border-radius: 0.5rem; border: 1px solid var(--border-color); background: var(--bg-primary); color: var(--text-primary); font-size: 0.875rem; box-sizing: border-box;" />
+          </div>
+        </div>
+
+        <div>
+          <label style="display: block; font-size: 0.75rem; font-weight: 500; margin-bottom: 0.375rem; color: var(--text-secondary);">
+            {{ tr('signup.email', 'Email') }}
+          </label>
+          <input formControlName="email" type="email" autocomplete="email"
+                 style="width: 100%; padding: 0.625rem 0.75rem; border-radius: 0.5rem; border: 1px solid var(--border-color); background: var(--bg-primary); color: var(--text-primary); font-size: 0.875rem; box-sizing: border-box;" />
+        </div>
+
+        <div>
+          <label style="display: block; font-size: 0.75rem; font-weight: 500; margin-bottom: 0.375rem; color: var(--text-secondary);">
+            {{ tr('signup.password', 'Password') }}
+          </label>
+          <input formControlName="password" type="password" autocomplete="new-password"
+                 style="width: 100%; padding: 0.625rem 0.75rem; border-radius: 0.5rem; border: 1px solid var(--border-color); background: var(--bg-primary); color: var(--text-primary); font-size: 0.875rem; box-sizing: border-box;" />
+        </div>
+
+        <div *ngIf="error()" style="padding: 0.5rem 0.75rem; border-radius: 0.5rem; font-size: 0.75rem; background: rgba(239,68,68,0.1); color: #f87171;">
+          {{ error() }}
+        </div>
+
+        <button type="submit" [disabled]="form.invalid || loading()"
+                style="width: 100%; padding: 0.625rem; border-radius: 0.5rem; color: #fff; font-size: 0.875rem; font-weight: 500; background: var(--primary); border: none; cursor: pointer;"
+                [style.opacity]="(form.invalid || loading()) ? '0.5' : '1'">
+          {{ loading() ? tr('signup.creating', 'Creating…') : tr('signup.submit', 'Create account') }}
+        </button>
+
+        <p style="text-align: center; font-size: 0.75rem; padding-top: 0.5rem; color: var(--text-tertiary);">
+          {{ tr('signup.hasAccount', 'Already have an account?') }}
+          <a routerLink="/signin" style="margin-left: 0.25rem; text-decoration: none; color: var(--primary);">
+            {{ tr('nav.signin', 'Sign in') }}
+          </a>
+        </p>
+      </form>
+    </div>
+  </section>
+</app-site-layout>

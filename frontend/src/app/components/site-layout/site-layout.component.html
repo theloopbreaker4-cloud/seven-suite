@@ -1,0 +1,84 @@
+<div style="min-height: 100vh; display: flex; flex-direction: column; background: var(--bg-primary); color: var(--text-primary);">
+
+  <header style="position: sticky; top: 0; z-index: 20; border-bottom: 1px solid var(--border-color); background: var(--bg-secondary); backdrop-filter: blur(8px);">
+    <nav style="max-width: 72rem; margin: 0 auto; padding: 0 1rem; height: 3.5rem; display: flex; align-items: center; justify-content: space-between;">
+
+      <a routerLink="/" style="display: flex; align-items: center; gap: 0.5rem; text-decoration: none;">
+        <img src="/brand.svg" alt="SevenCMS" width="28" height="28"
+             style="width: 28px; height: 28px; border-radius: 0.375rem;" />
+        <span style="font-weight: 700; font-size: 0.875rem; color: var(--primary);">SevenCMS</span>
+      </a>
+
+      <ul style="display: flex; align-items: center; gap: 1rem; font-size: 0.875rem; list-style: none; margin: 0; padding: 0;">
+        <li><a routerLink="/"     routerLinkActive="active-link" [routerLinkActiveOptions]="{exact:true}"
+               style="color: var(--text-primary); text-decoration: none;">{{ tr('nav.home', 'Home') }}</a></li>
+        <li><a routerLink="/blog" routerLinkActive="active-link"
+               style="color: var(--text-primary); text-decoration: none;">{{ tr('nav.blog', 'Blog') }}</a></li>
+        <li><a routerLink="/faq"  routerLinkActive="active-link"
+               style="color: var(--text-primary); text-decoration: none;">{{ tr('nav.faq', 'FAQ') }}</a></li>
+        <li><a routerLink="/support" routerLinkActive="active-link"
+               style="color: var(--text-primary); text-decoration: none;">{{ tr('nav.support', 'Support') }}</a></li>
+
+        <ng-container *ngIf="!auth.isAuthenticated()">
+          <li><a routerLink="/signin"
+                 style="color: var(--text-primary); text-decoration: none;">{{ tr('nav.signin', 'Sign in') }}</a></li>
+          <li>
+            <a routerLink="/signup"
+               style="padding: 0.375rem 0.75rem; border-radius: 0.5rem; color: #fff; font-weight: 500; background: var(--primary); text-decoration: none;">
+              {{ tr('nav.register', 'Register') }}
+            </a>
+          </li>
+        </ng-container>
+
+        <ng-container *ngIf="auth.isAuthenticated()">
+          <li><a routerLink="/dashboard"
+                 style="color: var(--text-primary); text-decoration: none;">{{ tr('nav.dashboard', 'Dashboard') }}</a></li>
+          <li>
+            <button (click)="signout()"
+                    style="padding: 0.375rem 0.75rem; border-radius: 0.5rem; border: 1px solid var(--border-color); background: transparent; color: var(--text-primary); font-size: 0.875rem; cursor: pointer;">
+              {{ tr('nav.signout', 'Sign out') }}
+            </button>
+          </li>
+        </ng-container>
+
+        <!-- Lang switcher -->
+        <li style="position: relative;">
+          <button (click)="langOpen.set(!langOpen())"
+                  style="width: 2rem; height: 2rem; display: flex; align-items: center; justify-content: center; border-radius: 0.5rem; background: var(--bg-tertiary); border: none; color: var(--text-primary); text-transform: uppercase; font-size: 0.75rem; font-weight: 600; cursor: pointer;">
+            {{ currentLang() }}
+          </button>
+          <div *ngIf="langOpen()"
+               style="position: absolute; right: 0; margin-top: 0.5rem; width: 7rem; border-radius: 0.5rem; border: 1px solid var(--border-color); background: var(--bg-secondary); overflow: hidden; box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);">
+            <button *ngFor="let l of langs" (click)="setLang(l)"
+                    [style.background]="l === currentLang() ? 'var(--bg-tertiary)' : 'transparent'"
+                    [style.font-weight]="l === currentLang() ? '700' : '400'"
+                    style="width: 100%; text-align: left; padding: 0.375rem 0.75rem; font-size: 0.75rem; text-transform: uppercase; border: none; color: var(--text-primary); cursor: pointer;">
+              {{ l }}
+            </button>
+          </div>
+        </li>
+
+        <!-- Theme toggle -->
+        <li>
+          <button (click)="toggleTheme()"
+                  style="width: 2rem; height: 2rem; display: flex; align-items: center; justify-content: center; border-radius: 0.5rem; background: var(--bg-tertiary); border: none; color: var(--text-primary); cursor: pointer;"
+                  [title]="theme() === 'dark' ? 'Light mode' : 'Dark mode'">
+            <mat-icon style="font-size: 16px; width: 16px; height: 16px; line-height: 1;">{{ theme() === 'dark' ? 'light_mode' : 'dark_mode' }}</mat-icon>
+          </button>
+        </li>
+      </ul>
+    </nav>
+  </header>
+
+  <main style="flex: 1;">
+    <ng-content></ng-content>
+  </main>
+
+  <footer style="border-top: 1px solid var(--border-color); padding: 1.5rem; text-align: center; font-size: 0.875rem; background: var(--bg-secondary); color: var(--text-tertiary);">
+    &copy; {{ year }} SevenCMS
+  </footer>
+</div>
+
+<style>
+  .active-link { color: var(--primary) !important; }
+</style>

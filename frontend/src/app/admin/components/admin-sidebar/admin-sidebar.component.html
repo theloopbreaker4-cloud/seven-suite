@@ -1,0 +1,67 @@
+<div class="admin-sidebar flex flex-col h-full bg-[--bg-secondary] border-r border-[--border-color]">
+
+  <!-- Logo -->
+  <a routerLink="/admin/dashboard" class="flex items-center gap-3 px-5 py-4 border-b border-[--border-color] no-underline">
+    <img src="/brand.svg" alt="Seven" class="w-9 h-9 shrink-0" onerror="this.style.display='none'" />
+    <span class="text-[--text-primary] font-semibold text-base tracking-wide">Seven CMS</span>
+  </a>
+
+  <!-- Navigation -->
+  <nav class="flex-1 overflow-y-auto py-3 px-2 space-y-4">
+
+    <!-- Overview -->
+    <div>
+      <p class="px-3 mb-1 text-[10px] font-semibold uppercase tracking-widest text-[--text-tertiary]">Overview</p>
+      <a *ngFor="let item of overviewItems"
+         [routerLink]="item.route"
+         routerLinkActive="bg-[--primary]/10 text-[--primary]"
+         class="flex items-center gap-3 px-3 py-2.5 rounded-lg mb-0.5 text-[--text-secondary] hover:bg-[--bg-tertiary] hover:text-[--text-primary] transition-colors no-underline text-sm font-medium">
+        <mat-icon class="text-[18px] w-[18px] h-[18px] leading-none shrink-0">{{ item.icon }}</mat-icon>
+        <span class="flex-1">{{ item.label }}</span>
+      </a>
+    </div>
+
+    <!-- Content -->
+    <div>
+      <p class="px-3 mb-1 text-[10px] font-semibold uppercase tracking-widest text-[--text-tertiary]">Content</p>
+      <a *ngFor="let item of contentItems"
+         [routerLink]="item.route"
+         routerLinkActive="bg-[--primary]/10 text-[--primary]"
+         class="flex items-center gap-3 px-3 py-2.5 rounded-lg mb-0.5 text-[--text-secondary] hover:bg-[--bg-tertiary] hover:text-[--text-primary] transition-colors no-underline text-sm font-medium">
+        <mat-icon class="text-[18px] w-[18px] h-[18px] leading-none shrink-0">{{ item.icon }}</mat-icon>
+        <span class="flex-1">{{ item.label }}</span>
+        <span *ngIf="item.badge" class="text-[10px] font-semibold bg-[--primary]/20 text-[--primary] rounded-full px-1.5 py-0.5">{{ item.badge }}</span>
+      </a>
+    </div>
+
+    <!-- Structure -->
+    <div>
+      <p class="px-3 mb-1 text-[10px] font-semibold uppercase tracking-widest text-[--text-tertiary]">Structure</p>
+      <a *ngFor="let item of structureItems"
+         [routerLink]="item.route"
+         routerLinkActive="bg-[--primary]/10 text-[--primary]"
+         class="flex items-center gap-3 px-3 py-2.5 rounded-lg mb-0.5 text-[--text-secondary] hover:bg-[--bg-tertiary] hover:text-[--text-primary] transition-colors no-underline text-sm font-medium">
+        <mat-icon class="text-[18px] w-[18px] h-[18px] leading-none shrink-0">{{ item.icon }}</mat-icon>
+        <span>{{ item.label }}</span>
+      </a>
+    </div>
+
+    <!-- System -->
+    <div>
+      <p class="px-3 mb-1 text-[10px] font-semibold uppercase tracking-widest text-[--text-tertiary]">System</p>
+      <a *ngFor="let item of systemItems"
+         [routerLink]="item.route"
+         routerLinkActive="bg-[--primary]/10 text-[--primary]"
+         class="flex items-center gap-3 px-3 py-2.5 rounded-lg mb-0.5 text-[--text-secondary] hover:bg-[--bg-tertiary] hover:text-[--text-primary] transition-colors no-underline text-sm font-medium">
+        <mat-icon class="text-[18px] w-[18px] h-[18px] leading-none shrink-0">{{ item.icon }}</mat-icon>
+        <span>{{ item.label }}</span>
+      </a>
+    </div>
+
+  </nav>
+
+  <!-- Footer -->
+  <div class="border-t border-[--border-color] px-4 py-3 text-[11px] text-[--text-tertiary]">
+    Seven CMS &copy; {{ year }}
+  </div>
+</div>

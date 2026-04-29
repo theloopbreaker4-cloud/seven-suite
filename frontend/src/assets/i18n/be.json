@@ -1,0 +1,34 @@
+{
+  "nav": {
+    "home": "Галоўная", "blog": "Блог", "signin": "Увайсці",
+    "signout": "Выйсці", "register": "Рэгістрацыя", "dashboard": "Панэль"
+  },
+  "auth": {
+    "signin": "Увайсці", "signup": "Рэгістрацыя", "email": "Email",
+    "password": "Пароль", "confirmPassword": "Пацвердзіць пароль",
+    "firstName": "Імя", "lastName": "Прозвішча", "userName": "Імя карыстальніка",
+    "submit": "Адправіць", "noAccount": "Няма акаўнта?",
+    "hasAccount": "Ужо ёсць акаўнт?", "forgotPassword": "Забылі пароль?",
+    "resetPassword": "Скід пароля", "recoverPassword": "Аднавіць пароль",
+    "sendResetLink": "Адправіць спасылку", "backToSignin": "Назад да ўваходу",
+    "newPassword": "Новы пароль", "tokenExpired": "Спасылка для скіду пароля састарэла."
+  },
+  "blog": {
+    "title": "Блог", "readMore": "Чытаць далей",
+    "noPostsYet": "Публікацый пакуль няма.", "backToList": "Назад да блога"
+  },
+  "page": { "notFound": "Старонка не знойдзена.", "notFoundDesc": "Запытаная старонка не існуе." },
+  "validation": {
+    "emptyFields": "Калі ласка, запоўніце ўсе палі.",
+    "userNotFound": "Карыстальнік не знойдзены.", "wrongPass": "Няправільны пароль.",
+    "inactive": "Акаўнт адключаны.", "emailExists": "Email ужо зарэгістраваны.",
+    "userExists": "Імя карыстальніка ўжо занята.", "passwordsMismatch": "Паролі не супадаюць.",
+    "invalidEmail": "Няправільны email.", "tooShort": "Занадта кароткі."
+  },
+  "lang": {
+    "en": "Англійская", "ru": "Руская", "ka": "Грузінская",
+    "uk": "Украінская", "az": "Азербайджанская", "hy": "Армянская",
+    "be": "Беларуская", "de": "Нямецкая", "fr": "Французская"
+  },
+  "meta": { "description": "SevenCMS — сучасная шматмоўная сістэма кіравання кантэнтам." }
+}

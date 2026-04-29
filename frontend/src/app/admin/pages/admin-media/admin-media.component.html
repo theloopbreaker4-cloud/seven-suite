@@ -1,0 +1,41 @@
+<div class="p-6">
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <h1 class="text-xl font-semibold text-[--text-primary]">Media Library</h1>
+      <p class="text-sm text-[--text-secondary]">Images and files uploaded by administrators</p>
+    </div>
+    <label class="flex items-center gap-2 px-4 py-2 rounded-lg bg-[--primary] text-white text-sm font-medium hover:bg-[--primary-hover] cursor-pointer transition-colors"
+           [class.opacity-60]="uploading()">
+      <mat-icon class="text-[18px] leading-none">cloud_upload</mat-icon>
+      <span>{{ uploading() ? 'Uploading…' : 'Upload' }}</span>
+      <input type="file" class="hidden" (change)="onFileSelected($event)" [disabled]="uploading()" />
+    </label>
+  </div>
+
+  <div *ngIf="error()" class="mb-4 px-4 py-3 rounded-lg bg-red-500/10 text-red-400 text-sm">{{ error() }}</div>
+
+  <div *ngIf="loading()" class="text-center py-12 text-[--text-tertiary]">Loading…</div>
+
+  <div *ngIf="!loading() && items().length === 0" class="text-center py-16 rounded-xl border border-dashed border-[--border-color] text-sm text-[--text-tertiary]">
+    No media yet. Click "Upload" to add the first file.
+  </div>
+
+  <div *ngIf="items().length > 0" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3">
+    <div *ngFor="let m of items()"
+         class="group relative rounded-xl overflow-hidden border border-[--border-color] bg-[--bg-secondary] hover:border-[--primary]/40 transition-colors">
+      <div class="aspect-square flex items-center justify-center bg-[--bg-tertiary]">
+        <img *ngIf="isImage(m)" [src]="m.url" [alt]="m.originalName" class="w-full h-full object-cover" loading="lazy" />
+        <mat-icon *ngIf="!isImage(m)" class="text-[--text-tertiary] text-[48px] w-12 h-12">insert_drive_file</mat-icon>
+      </div>
+      <div class="p-2">
+        <p class="text-xs font-medium text-[--text-primary] truncate" [title]="m.originalName">{{ m.originalName }}</p>
+        <p class="text-[10px] text-[--text-tertiary]">{{ humanSize(m.size) }}</p>
+      </div>
+      <button (click)="delete(m)"
+              class="absolute top-2 right-2 p-1.5 rounded-md bg-black/60 text-white opacity-0 group-hover:opacity-100 hover:bg-red-600 transition-all"
+              title="Delete">
+        <mat-icon class="text-[14px] w-3.5 h-3.5 leading-none">delete</mat-icon>
+      </button>
+    </div>
+  </div>
+</div>

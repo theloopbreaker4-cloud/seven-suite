@@ -1,0 +1,48 @@
+# Node
+node_modules/
+**/node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# dist outputs (Angular & Nest)
+dist/
+**/dist/
+**/build/
+out/
+
+# Angular build and temporary files
+frontend/.angular/
+frontend/.angular-cache/
+frontend/.cache/
+frontend/.env
+
+# IDE/editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Environment files
+*.env
+.env.local
+.env.production
+.env.development
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+
+# Coverage reports
+coverage/
+**/coverage/
+
+# Gulp output cache (if any)
+gulpfile.js.map
+
+# Optional: TypeScript build cache
+*.tsbuildinfo
