@@ -1,10 +1,8 @@
+/** Seven Suite — github.com/theloopbreaker4-cloud/seven-suite */
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { ServerPlatformModule } from '@seven/server-platform';
 
 @Module({
-  imports: [],
-  controllers: [AppController],
-  providers: [AppService],
+  imports: [ServerPlatformModule],
 })
 export class AppModule {}

@@ -67,3 +67,6 @@ out
 .claude/
 CLAUDE.md
 DEV_NOTES.md
+
+# Generated Prisma client (pnpm install runs prisma generate)
+libs/server/platform/src/generated/

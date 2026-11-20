@@ -1,0 +1,13 @@
+// Seven Suite — Prisma entry point. Each module keeps its models in its own file in this
+// folder and its tables in its own PostgreSQL schema (docs/04-data-model.md).
+
+generator client {
+  provider     = "prisma-client"
+  output       = "../../libs/server/platform/src/generated/prisma"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "postgresql"
+  schemas  = ["platform"]
+}

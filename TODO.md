@@ -57,21 +57,21 @@ the VPS works with one command.
 
 ### Platform kernel (`libs/server/platform`)
 
-- [ ] Prisma: multi-file schema, Postgres schema per module, migration workflow, seed runner
+- [x] Prisma 7: multi-file schema, Postgres schema per module (`platform`), migration workflow — _seed runner pending_
 - [ ] Request context (AsyncLocalStorage): requestId, orgId, userId, locale
-- [ ] Tenancy: org resolution (subdomain / domain / header), `SET app.org_id`, RLS policy helper + test with two tenants
+- [x] Tenancy: RLS policies + `PrismaService.withOrg()` (`app.org_id` per transaction) + integration test with two tenants — _org resolution from request pending_
 - [ ] Transactions helper (unit of work) shared by repositories
 - [ ] Outbox: `outbox_event` written in-transaction; dispatcher in worker; `processed_event` idempotency; retries + dead-letter
 - [ ] BullMQ setup: queues, repeatable jobs (scheduler), dashboard (Bull Board) behind admin auth
 - [ ] Cache + rate limiter (Redis)
-- [ ] Structured logging (pino), request logging, error filter → `{ error, code, fields }`
-- [ ] Health endpoints (`/health/live`, `/health/ready`)
+- [x] Structured logging (pino), request ids, credential redaction — _error filter → `{ error, code, fields }` pending_
+- [x] Health endpoints (`/api/v1/health/live`, `/ready` checks PostgreSQL + Redis)
 - [ ] OpenAPI generation + `libs/api-client` generation script
 - [ ] Module manifest system: id, requires, permissions, settings schema, menu entries; enable/disable per org with dependency checks
 
 ### Identity & access
 
-- [ ] User, Organization, Membership, Role, Permission tables + migrations
+- [x] User, Organization, Membership, Role (permissions as `module:entity:action` strings), RefreshToken tables + migrations
 - [ ] Sign-up (create org), login, logout, email verification, password reset (hashed one-time tokens)
 - [ ] JWT access + rotating refresh (httpOnly cookie, replay detection revokes family)
 - [ ] TOTP 2FA + recovery codes

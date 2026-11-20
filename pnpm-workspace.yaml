@@ -8,5 +8,7 @@ allowBuilds:
   sharp: false
   unrs-resolver: false
   '@nestjs/core': false
+  '@prisma/engines': true
+  prisma: true
 overrides:
   '@angular-devkit/architect': '0.2202.8'
