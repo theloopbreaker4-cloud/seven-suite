@@ -72,13 +72,13 @@ the VPS works with one command.
 ### Identity & access
 
 - [x] User, Organization, Membership, Role (permissions as `module:entity:action` strings), RefreshToken tables + migrations
-- [ ] Sign-up (create org), login, logout, email verification, password reset (hashed one-time tokens)
-- [ ] JWT access + rotating refresh (httpOnly cookie, replay detection revokes family)
+- [x] Sign-up (creates org + system roles owner/admin/member), login, logout, `/auth/me` — *email verification and password reset pending*
+- [x] JWT access (HS256 via jose, 15 min) + rotating refresh in an httpOnly SameSite=Strict cookie; reuse revokes the whole family; refresh/logout need `X-Requested-With` (CSRF)
 - [ ] TOTP 2FA + recovery codes
 - [ ] Invite members by email; switch organization
-- [ ] RBAC guard + `@RequirePermission('crm:deal:write')`; record-rule hook for ownership
+- [x] Deny-by-default global guard, `@Public()`, `@RequirePermission(...)` with `*` wildcards — *record-rule hook pending*
 - [ ] API keys (hashed, scoped)
-- [ ] Login/refresh/reset rate limits; audit of auth events
+- [x] Login rate limits in Redis (5 per account+IP, 30 per IP / 15 min); timing-safe login for unknown emails — *refresh/reset limits and full auth audit pending*
 - [ ] Security headers, CORS policy, CSP for admin and web
 
 ### Admin shell (Angular)

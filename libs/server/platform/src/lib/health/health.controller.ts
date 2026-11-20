@@ -1,5 +1,6 @@
 /** Seven Suite — github.com/theloopbreaker4-cloud/seven-suite */
 import { Controller, Get, ServiceUnavailableException } from '@nestjs/common';
+import { Public } from '../auth/decorators';
 import { PrismaService } from '../db/prisma.service';
 import { RedisService } from '../redis/redis.service';
 
@@ -10,6 +11,7 @@ type Check = 'ok' | 'fail';
  *  live  — the process is up (no dependencies checked);
  *  ready — PostgreSQL and Redis answer; 503 otherwise, with which one failed.
  */
+@Public()
 @Controller('health')
 export class HealthController {
   constructor(

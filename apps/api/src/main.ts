@@ -4,14 +4,13 @@ loadDotenv({ path: `${process.cwd()}/.env`, quiet: true }); // dev only; product
 
 import { NestFactory } from '@nestjs/core';
 import { Logger } from 'nestjs-pino';
-import { ENV, type Env } from '@seven/server-platform';
+import { ENV, configureApp, type Env } from '@seven/server-platform';
 import { AppModule } from './app/app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { bufferLogs: true });
   app.useLogger(app.get(Logger));
-  app.setGlobalPrefix('api/v1');
-  app.enableShutdownHooks();
+  configureApp(app);
 
   const env = app.get<Env>(ENV);
   await app.listen(env.API_PORT, '127.0.0.1');
