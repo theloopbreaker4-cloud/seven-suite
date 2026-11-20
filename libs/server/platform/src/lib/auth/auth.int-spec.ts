@@ -1,12 +1,12 @@
 /** Seven Suite — github.com/theloopbreaker4-cloud/seven-suite */
 import { randomUUID } from 'node:crypto';
 import type { INestApplication } from '@nestjs/common';
-import { Test } from '@nestjs/testing';
-import request from 'supertest';
-import { configureApp } from '../configure-app';
-import { PrismaService } from '../db/prisma.service';
-import { RedisService } from '../redis/redis.service';
-import { ServerPlatformModule } from '../server-platform.module';
+import type request from 'supertest';
+import {
+  cleanupTestRun,
+  createTestApp,
+  http as httpOf,
+} from '../../../test/test-app';
 
 /**
  * The whole auth flow over HTTP against real PostgreSQL and Redis, wired exactly like the
@@ -14,7 +14,7 @@ import { ServerPlatformModule } from '../server-platform.module';
  */
 describe('auth (HTTP)', () => {
   let app: INestApplication;
-  let http: ReturnType<typeof request>;
+  let http: ReturnType<typeof httpOf>;
   const run = randomUUID().slice(0, 8);
   const email = `owner-${run}@test.seven`;
   const password = 'correct horse battery';
@@ -29,39 +29,12 @@ describe('auth (HTTP)', () => {
   };
 
   beforeAll(async () => {
-    const testUrl = process.env['DATABASE_TEST_URL'];
-    if (!testUrl) throw new Error('DATABASE_TEST_URL is not set');
-    process.env['DATABASE_URL'] = testUrl;
-    process.env['DATABASE_APP_URL'] = testUrl;
-    process.env['JWT_SECRET'] ??= 'test-secret-'.repeat(5);
-    process.env['WEB_SERVICE_KEY'] ??= 'k'.repeat(32);
-    process.env['LOG_LEVEL'] = 'fatal';
-    process.env['NODE_ENV'] = 'test';
-
-    const moduleRef = await Test.createTestingModule({
-      imports: [ServerPlatformModule],
-    }).compile();
-    app = moduleRef.createNestApplication({ logger: false });
-    configureApp(app);
-    await app.init();
-    http = request(app.getHttpServer());
+    app = await createTestApp();
+    http = httpOf(app);
   });
 
   afterAll(async () => {
-    const db = app.get(PrismaService).system;
-    const users = await db.user.findMany({
-      where: { email: { endsWith: `-${run}@test.seven` } },
-    });
-    const memberships = await db.membership.findMany({
-      where: { userId: { in: users.map((u) => u.id) } },
-    });
-    await db.organization.deleteMany({
-      where: { id: { in: memberships.map((m) => m.orgId) } },
-    });
-    await db.user.deleteMany({ where: { id: { in: users.map((u) => u.id) } } });
-    const redis = app.get(RedisService).client;
-    const keys = await redis.keys('rl:login:*');
-    if (keys.length) await redis.del(...keys);
+    await cleanupTestRun(app, run);
     await app.close();
   });
 

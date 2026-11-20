@@ -19,6 +19,8 @@ export const envSchema = z.object({
 
   API_PORT: z.coerce.number().int().positive().default(4000),
   API_PUBLIC_URL: url.default('http://127.0.0.1:4000'),
+  /** Where links in emails point (verify, reset, invitation). */
+  ADMIN_URL: url.default('http://127.0.0.1:4200'),
   JWT_SECRET: z.string().min(48, 'JWT_SECRET must be at least 48 characters'),
   WEB_SERVICE_KEY: z
     .string()

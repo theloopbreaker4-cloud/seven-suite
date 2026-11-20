@@ -102,7 +102,7 @@ export class AuthService {
         );
       throw e;
     });
-    return this.issueSession(userId, orgId, client, randomUUID());
+    return this.startSession(userId, orgId, client, randomUUID());
   }
 
   async login(input: LoginInput, client: ClientInfo): Promise<Session> {
@@ -151,7 +151,7 @@ export class AuthService {
           : {}),
       },
     });
-    return this.issueSession(user.id, membership.orgId, client, randomUUID());
+    return this.startSession(user.id, membership.orgId, client, randomUUID());
   }
 
   /**
@@ -193,7 +193,7 @@ export class AuthService {
         'session_expired',
       );
     }
-    return this.issueSession(row.userId, row.orgId, client, row.familyId);
+    return this.startSession(row.userId, row.orgId, client, row.familyId);
   }
 
   async logout(token: string | undefined): Promise<void> {
@@ -203,6 +203,29 @@ export class AuthService {
       select: { familyId: true },
     });
     if (row) await this.revokeFamily(row.familyId);
+  }
+
+  /** Move the session to another organization the user belongs to (new session family). */
+  async switchOrganization(
+    auth: AuthContext,
+    slug: string,
+    client: ClientInfo,
+  ): Promise<Session> {
+    const membership = await this.prisma.system.membership.findFirst({
+      where: { userId: auth.userId, isActive: true, organization: { slug } },
+      select: { orgId: true },
+    });
+    if (!membership)
+      throw DomainError.forbidden(
+        'You are not a member of this organization',
+        'no_organization',
+      );
+    return this.startSession(
+      auth.userId,
+      membership.orgId,
+      client,
+      randomUUID(),
+    );
   }
 
   /** The signed-in user, their organization and every organization they can switch to. */
@@ -241,7 +264,8 @@ export class AuthService {
     };
   }
 
-  private async issueSession(
+  /** Issue an access token and a new refresh token in `familyId` for this membership. */
+  async startSession(
     userId: string,
     orgId: string,
     client: ClientInfo,

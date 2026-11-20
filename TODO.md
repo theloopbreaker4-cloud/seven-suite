@@ -72,10 +72,10 @@ the VPS works with one command.
 ### Identity & access
 
 - [x] User, Organization, Membership, Role (permissions as `module:entity:action` strings), RefreshToken tables + migrations
-- [x] Sign-up (creates org + system roles owner/admin/member), login, logout, `/auth/me` — *email verification and password reset pending*
+- [x] Sign-up (creates org + system roles owner/admin/member), login, logout, `/auth/me`, email verification, password reset (single-use hashed tokens; reset signs out every session)
 - [x] JWT access (HS256 via jose, 15 min) + rotating refresh in an httpOnly SameSite=Strict cookie; reuse revokes the whole family; refresh/logout need `X-Requested-With` (CSRF)
 - [ ] TOTP 2FA + recovery codes
-- [ ] Invite members by email; switch organization
+- [x] Invite members by email (cannot grant more than you have), accept as new or existing user, switch organization
 - [x] Deny-by-default global guard, `@Public()`, `@RequirePermission(...)` with `*` wildcards — *record-rule hook pending*
 - [ ] API keys (hashed, scoped)
 - [x] Login rate limits in Redis (5 per account+IP, 30 per IP / 15 min); timing-safe login for unknown emails — *refresh/reset limits and full auth audit pending*
@@ -126,7 +126,7 @@ attach files and notes to anything, and every list/form in the admin is generate
 - [ ] Timeline ("chatter") on any entity: notes, @mentions, attachments, change history
 - [ ] Audit log (before/after) + admin viewer
 - [ ] Notifications: in-app + email; per-user preferences
-- [ ] Email: provider interface (SMTP, Resend), templates per language, outbox-backed sending, Mailpit in dev
+- [ ] Email: provider interface (SMTP, Resend), templates per language, outbox-backed sending, Mailpit in dev — *done: SMTP via nodemailer, Mailpit in dev, in-memory capture in tests, English templates*
 - [ ] Global search (Postgres FTS across Party, Product, documents)
 - [ ] Import/export CSV/XLSX with mapping + dry-run (Party, Product first)
 - [ ] Outgoing webhooks: subscriptions per org, HMAC-signed, retries, delivery log

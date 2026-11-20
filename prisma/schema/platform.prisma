@@ -3,41 +3,43 @@
 // protected by row-level security (see the RLS migration); `user` is global.
 
 model Organization {
-  id              String   @id @default(uuid(7)) @db.Uuid
-  slug            String   @unique
-  name            String
-  legalName       String?  @map("legal_name")
-  country         String   @default("GE") @db.Char(2)
-  baseCurrency    String   @default("GEL") @map("base_currency") @db.Char(3)
-  timezone        String   @default("Asia/Tbilisi")
-  locale          String   @default("ka")
-  languages       String[] @default(["ka", "en", "ru"])
-  modulesEnabled  String[] @default(["core"]) @map("modules_enabled")
-  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
-  updatedAt       DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+  id             String   @id @default(uuid(7)) @db.Uuid
+  slug           String   @unique
+  name           String
+  legalName      String?  @map("legal_name")
+  country        String   @default("GE") @db.Char(2)
+  baseCurrency   String   @default("GEL") @map("base_currency") @db.Char(3)
+  timezone       String   @default("Asia/Tbilisi")
+  locale         String   @default("ka")
+  languages      String[] @default(["ka", "en", "ru"])
+  modulesEnabled String[] @default(["core"]) @map("modules_enabled")
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt      DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
 
   memberships Membership[]
   roles       Role[]
+  invitations Invitation[]
 
   @@map("organization")
   @@schema("platform")
 }
 
 model User {
-  id             String    @id @default(uuid(7)) @db.Uuid
-  email          String    @unique
-  passwordHash   String    @map("password_hash")
-  name           String
-  locale         String    @default("en")
-  emailVerified  DateTime? @map("email_verified") @db.Timestamptz(3)
-  totpSecret     String?   @map("totp_secret")
-  isActive       Boolean   @default(true) @map("is_active")
-  lastLoginAt    DateTime? @map("last_login_at") @db.Timestamptz(3)
-  createdAt      DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
-  updatedAt      DateTime  @updatedAt @map("updated_at") @db.Timestamptz(3)
+  id            String    @id @default(uuid(7)) @db.Uuid
+  email         String    @unique
+  passwordHash  String    @map("password_hash")
+  name          String
+  locale        String    @default("en")
+  emailVerified DateTime? @map("email_verified") @db.Timestamptz(3)
+  totpSecret    String?   @map("totp_secret")
+  isActive      Boolean   @default(true) @map("is_active")
+  lastLoginAt   DateTime? @map("last_login_at") @db.Timestamptz(3)
+  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt     DateTime  @updatedAt @map("updated_at") @db.Timestamptz(3)
 
   memberships   Membership[]
   refreshTokens RefreshToken[]
+  tokens        UserToken[]
 
   @@map("user")
   @@schema("platform")
@@ -55,6 +57,7 @@ model Role {
 
   organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
   memberships  Membership[]
+  invitations  Invitation[]
 
   @@unique([orgId, key])
   @@map("role")
@@ -82,17 +85,17 @@ model Membership {
 /// Rotating refresh tokens. Only a hash is stored; a reused (already rotated) token revokes
 /// its whole family (replay detection).
 model RefreshToken {
-  id         String    @id @default(uuid(7)) @db.Uuid
-  userId     String    @map("user_id") @db.Uuid
+  id        String    @id @default(uuid(7)) @db.Uuid
+  userId    String    @map("user_id") @db.Uuid
   /// Organization the session is signed into; refresh keeps it.
-  orgId      String    @map("org_id") @db.Uuid
-  familyId   String    @map("family_id") @db.Uuid
-  tokenHash  String    @unique @map("token_hash") @db.Char(64)
-  userAgent  String?   @map("user_agent")
-  expiresAt  DateTime  @map("expires_at") @db.Timestamptz(3)
-  rotatedAt  DateTime? @map("rotated_at") @db.Timestamptz(3)
-  revokedAt  DateTime? @map("revoked_at") @db.Timestamptz(3)
-  createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  orgId     String    @map("org_id") @db.Uuid
+  familyId  String    @map("family_id") @db.Uuid
+  tokenHash String    @unique @map("token_hash") @db.Char(64)
+  userAgent String?   @map("user_agent")
+  expiresAt DateTime  @map("expires_at") @db.Timestamptz(3)
+  rotatedAt DateTime? @map("rotated_at") @db.Timestamptz(3)
+  revokedAt DateTime? @map("revoked_at") @db.Timestamptz(3)
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -145,5 +148,43 @@ model AuditLog {
 
   @@index([orgId, entityType, entityId])
   @@map("audit_log")
+  @@schema("platform")
+}
+
+/// One-time tokens sent by email (verify address, reset password). Only the hash is stored.
+model UserToken {
+  id        String    @id @default(uuid(7)) @db.Uuid
+  userId    String    @map("user_id") @db.Uuid
+  purpose   String
+  tokenHash String    @unique @map("token_hash") @db.Char(64)
+  expiresAt DateTime  @map("expires_at") @db.Timestamptz(3)
+  usedAt    DateTime? @map("used_at") @db.Timestamptz(3)
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, purpose])
+  @@map("user_token")
+  @@schema("platform")
+}
+
+/// An emailed invitation to join an organization with a role.
+model Invitation {
+  id          String    @id @default(uuid(7)) @db.Uuid
+  orgId       String    @map("org_id") @db.Uuid
+  email       String
+  roleId      String    @map("role_id") @db.Uuid
+  invitedById String    @map("invited_by_id") @db.Uuid
+  tokenHash   String    @unique @map("token_hash") @db.Char(64)
+  expiresAt   DateTime  @map("expires_at") @db.Timestamptz(3)
+  acceptedAt  DateTime? @map("accepted_at") @db.Timestamptz(3)
+  revokedAt   DateTime? @map("revoked_at") @db.Timestamptz(3)
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  role         Role         @relation(fields: [roleId], references: [id])
+
+  @@index([orgId, email])
+  @@map("invitation")
   @@schema("platform")
 }

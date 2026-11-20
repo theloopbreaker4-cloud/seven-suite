@@ -9,34 +9,46 @@ import {
   Req,
   Res,
 } from '@nestjs/common';
-import type { CookieOptions, Request, Response } from 'express';
+import type { Request, Response } from 'express';
 import { ENV } from '../config/config.module';
 import type { Env } from '../config/env';
 import { DomainError } from '../errors/domain-error';
 import { ZodPipe } from '../validation/zod.pipe';
-import { AuthService, type ClientInfo, type Session } from './auth.service';
+import { AccountService } from './account.service';
+import { AuthService } from './auth.service';
 import {
+  forgotPasswordSchema,
   loginSchema,
+  resetPasswordSchema,
   signupSchema,
+  switchOrganizationSchema,
+  tokenSchema,
+  type ForgotPasswordInput,
   type LoginInput,
+  type ResetPasswordInput,
   type SignupInput,
+  type SwitchOrganizationInput,
+  type TokenInput,
 } from './auth.schemas';
 import { CurrentAuth, Public } from './decorators';
+import {
+  clientInfo,
+  REFRESH_COOKIE,
+  refreshCookieOptions,
+  requireXhr,
+  sessionResponse,
+} from './session-cookie';
 import type { AuthContext } from './tokens';
 
-export const REFRESH_COOKIE = 'seven_rt';
-const COOKIE_PATH = '/api/v1/auth';
-
 /**
- * The refresh token lives only in an httpOnly, SameSite=Strict cookie scoped to the auth
- * routes; the access token is returned in the body and kept in memory by the client.
- * Cookie-authenticated routes (refresh, logout) also require `X-Requested-With`, a header a
- * cross-site form can't send — so they can't be triggered by CSRF.
+ * Sessions and account recovery. The refresh token only ever travels in the httpOnly cookie;
+ * the access token is returned in the body and kept in memory by the client.
  */
 @Controller('auth')
 export class AuthController {
   constructor(
     private readonly auth: AuthService,
+    private readonly account: AccountService,
     @Inject(ENV) private readonly env: Env,
   ) {}
 
@@ -47,7 +59,9 @@ export class AuthController {
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ) {
-    return this.respond(res, await this.auth.signup(body, client(req)));
+    const session = await this.auth.signup(body, clientInfo(req));
+    await this.account.sendVerification(session.auth.userId);
+    return sessionResponse(res, session, this.env);
   }
 
   @Public()
@@ -58,7 +72,11 @@ export class AuthController {
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ) {
-    return this.respond(res, await this.auth.login(body, client(req)));
+    return sessionResponse(
+      res,
+      await this.auth.login(body, clientInfo(req)),
+      this.env,
+    );
   }
 
   @Public()
@@ -77,9 +95,13 @@ export class AuthController {
       );
     }
     try {
-      return this.respond(res, await this.auth.refresh(token, client(req)));
+      return sessionResponse(
+        res,
+        await this.auth.refresh(token, clientInfo(req)),
+        this.env,
+      );
     } catch (e) {
-      res.clearCookie(REFRESH_COOKIE, this.cookieOptions());
+      res.clearCookie(REFRESH_COOKIE, refreshCookieOptions(this.env));
       throw e;
     }
   }
@@ -93,7 +115,7 @@ export class AuthController {
   ): Promise<void> {
     requireXhr(req);
     await this.auth.logout(req.cookies?.[REFRESH_COOKIE]);
-    res.clearCookie(REFRESH_COOKIE, this.cookieOptions());
+    res.clearCookie(REFRESH_COOKIE, refreshCookieOptions(this.env));
   }
 
   @Get('me')
@@ -101,39 +123,65 @@ export class AuthController {
     return this.auth.me(auth);
   }
 
-  private respond(res: Response, session: Session) {
-    res.cookie(REFRESH_COOKIE, session.refreshToken, {
-      ...this.cookieOptions(),
-      expires: session.refreshExpiresAt,
-    });
-    return {
-      accessToken: session.accessToken,
-      expiresIn: session.expiresIn,
-      organizationId: session.auth.orgId,
-      role: session.auth.roleKey,
-      permissions: session.auth.permissions,
-    };
-  }
-
-  private cookieOptions(): CookieOptions {
-    return {
-      httpOnly: true,
-      sameSite: 'strict',
-      secure: this.env.NODE_ENV === 'production',
-      path: COOKIE_PATH,
-    };
-  }
-}
-
-function client(req: Request): ClientInfo {
-  return { ip: req.ip ?? 'unknown', userAgent: req.headers['user-agent'] };
-}
-
-function requireXhr(req: Request): void {
-  if (!req.headers['x-requested-with']) {
-    throw DomainError.forbidden(
-      'Missing X-Requested-With header',
-      'csrf_check_failed',
+  @Post('switch-organization')
+  @HttpCode(200)
+  async switchOrganization(
+    @CurrentAuth() auth: AuthContext,
+    @Body(new ZodPipe(switchOrganizationSchema)) body: SwitchOrganizationInput,
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const session = await this.auth.switchOrganization(
+      auth,
+      body.organization,
+      clientInfo(req),
     );
+    await this.auth.logout(req.cookies?.[REFRESH_COOKIE]); // the old organization's session ends
+    return sessionResponse(res, session, this.env);
+  }
+
+  @Post('verify-email/request')
+  @HttpCode(202)
+  async requestVerification(@CurrentAuth() auth: AuthContext): Promise<void> {
+    await this.account.sendVerification(auth.userId);
+  }
+
+  @Public()
+  @Post('verify-email')
+  @HttpCode(204)
+  async verifyEmail(
+    @Body(new ZodPipe(tokenSchema)) body: TokenInput,
+  ): Promise<void> {
+    await this.account.verifyEmail(body.token);
+  }
+
+  @Public()
+  @Post('password/forgot')
+  @HttpCode(202)
+  async forgotPassword(
+    @Body(new ZodPipe(forgotPasswordSchema)) body: ForgotPasswordInput,
+    @Req() req: Request,
+  ) {
+    await this.account.forgotPassword(body.email, clientInfo(req).ip);
+    return {
+      message:
+        'If an account exists for this email, a reset link is on its way.',
+    };
+  }
+
+  @Public()
+  @Post('password/reset')
+  @HttpCode(204)
+  async resetPassword(
+    @Body(new ZodPipe(resetPasswordSchema)) body: ResetPasswordInput,
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<void> {
+    await this.account.resetPassword(
+      body.token,
+      body.password,
+      clientInfo(req).ip,
+    );
+    res.clearCookie(REFRESH_COOKIE, refreshCookieOptions(this.env));
   }
 }

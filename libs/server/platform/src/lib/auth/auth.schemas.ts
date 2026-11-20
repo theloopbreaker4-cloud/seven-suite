@@ -27,3 +27,33 @@ export const loginSchema = z.object({
   organization: z.string().trim().max(64).optional(),
 });
 export type LoginInput = z.infer<typeof loginSchema>;
+
+export const tokenSchema = z.object({ token: z.string().min(16).max(200) });
+export type TokenInput = z.infer<typeof tokenSchema>;
+
+export const forgotPasswordSchema = z.object({ email });
+export type ForgotPasswordInput = z.infer<typeof forgotPasswordSchema>;
+
+export const resetPasswordSchema = z.object({
+  token: z.string().min(16).max(200),
+  password,
+});
+export type ResetPasswordInput = z.infer<typeof resetPasswordSchema>;
+
+export const switchOrganizationSchema = z.object({
+  organization: z.string().trim().min(1).max(64),
+});
+export type SwitchOrganizationInput = z.infer<typeof switchOrganizationSchema>;
+
+export const inviteSchema = z.object({
+  email,
+  role: z.string().trim().min(1).max(40),
+});
+export type InviteInput = z.infer<typeof inviteSchema>;
+
+export const acceptInvitationSchema = z.object({
+  token: z.string().min(16).max(200),
+  name: z.string().trim().min(1).max(100).optional(),
+  password: z.string().max(200).optional(),
+});
+export type AcceptInvitationInput = z.infer<typeof acceptInvitationSchema>;

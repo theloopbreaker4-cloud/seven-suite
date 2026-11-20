@@ -27,6 +27,7 @@ jobs:
     env:
       DATABASE_URL: postgresql://seven:seven_ci_password@localhost:5432/seven_suite_test
       DATABASE_TEST_URL: postgresql://seven:seven_ci_password@localhost:5432/seven_suite_test
+      DATABASE_APP_URL: postgresql://seven_app:seven_app_ci_password@localhost:5432/seven_suite_test
       REDIS_URL: redis://localhost:6379
       JWT_SECRET: ci-only-secret-ci-only-secret-ci-only-secret-ci-only-secret-1234
     steps:

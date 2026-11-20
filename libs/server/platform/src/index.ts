@@ -14,3 +14,8 @@ export * from './lib/auth/auth.service';
 export * from './lib/auth/decorators';
 export * from './lib/auth/permissions';
 export * from './lib/auth/tokens';
+export * from './lib/mail/mail.service';
+export * from './lib/redis/rate-limiter';
+export * from './lib/auth/account.service';
+export * from './lib/auth/invitation.service';
+export * from './lib/auth/session-cookie';
