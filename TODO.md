@@ -100,9 +100,9 @@ the VPS works with one command.
 
 ### Deploy
 
-- [ ] Dockerfiles (multi-stage) for api, worker, web, admin (static via nginx)
-- [ ] `docker/compose.prod.yml`, nginx config, Cloudflare real-IP
-- [ ] Deploy script (build → push → migrate → restart), rollback note
+- [ ] Docker images — _done: `docker/api.Dockerfile` (Node 22 slim + pruned prod deps + Prisma CLI, healthcheck); admin is static behind nginx; worker and web images pending_
+- [x] nginx site (SPA fallback, `/api` proxy, Cloudflare real IP, security headers, cache rules); API container on host network with memory limit — _HTTPS once DNS for suite.toolpix.dev exists_
+- [x] Deploy script `d:/Works/tools/seven-suite-deploy.sh` (local build → ~300 KB upload → image built on the server → migrate → container swap → health wait → admin swap); server setup `seven-suite-server-setup.sh` (DB + roles in shared PostgreSQL, secrets generated on the server). Rollback: `docker run` the previous `seven-suite-api:<sha>` tag
 - [ ] Nightly backups: `pg_dump` + object storage mirror; restore drill documented
 - [ ] Staging instance on the VPS (subdomain), demo org with seed data
 
