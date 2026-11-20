@@ -240,10 +240,7 @@ export class MembersPage implements OnInit {
     if (this.inviteForm.invalid) return;
     const ok = await this.inviteState.run(() =>
       firstValueFrom(
-        this.http.post(
-          '/api/v1/org/invitations',
-          this.inviteForm.getRawValue(),
-        ),
+        this.http.post('api/v1/org/invitations', this.inviteForm.getRawValue()),
       ),
     );
     if (ok) {
@@ -260,9 +257,7 @@ export class MembersPage implements OnInit {
   async changeRole(m: Member, role: string): Promise<void> {
     await this.act(
       () =>
-        firstValueFrom(
-          this.http.patch(`/api/v1/org/members/${m.id}`, { role }),
-        ),
+        firstValueFrom(this.http.patch(`api/v1/org/members/${m.id}`, { role })),
       'members.roleChanged',
     );
   }
@@ -271,14 +266,14 @@ export class MembersPage implements OnInit {
     if (!confirm(this.t.translate('members.confirmRemove', { name: m.name })))
       return;
     await this.act(
-      () => firstValueFrom(this.http.delete(`/api/v1/org/members/${m.id}`)),
+      () => firstValueFrom(this.http.delete(`api/v1/org/members/${m.id}`)),
       'members.removed',
     );
   }
 
   async revoke(i: Invitation): Promise<void> {
     await this.act(
-      () => firstValueFrom(this.http.delete(`/api/v1/org/invitations/${i.id}`)),
+      () => firstValueFrom(this.http.delete(`api/v1/org/invitations/${i.id}`)),
       'members.revoked',
     );
   }
@@ -300,12 +295,12 @@ export class MembersPage implements OnInit {
     try {
       const [members, roles, invitations] = await Promise.all([
         firstValueFrom(
-          this.http.get<{ items: Member[] }>('/api/v1/org/members'),
+          this.http.get<{ items: Member[] }>('api/v1/org/members'),
         ),
-        firstValueFrom(this.http.get<{ items: Role[] }>('/api/v1/org/roles')),
+        firstValueFrom(this.http.get<{ items: Role[] }>('api/v1/org/roles')),
         this.store.can('platform:member:read')
           ? firstValueFrom(
-              this.http.get<{ items: Invitation[] }>('/api/v1/org/invitations'),
+              this.http.get<{ items: Invitation[] }>('api/v1/org/invitations'),
             )
           : Promise.resolve({ items: [] }),
       ]);

@@ -56,8 +56,8 @@ describe('admin auth', () => {
 
   it('sends the token, cookies and the CSRF header to the API', () => {
     store.accessToken.set('tok-1');
-    void firstValueFrom(http.get('/api/v1/org/members'));
-    const req = backend.expectOne('/api/v1/org/members');
+    void firstValueFrom(http.get('api/v1/org/members'));
+    const req = backend.expectOne('api/v1/org/members');
     expect(req.request.headers.get('Authorization')).toBe('Bearer tok-1');
     expect(req.request.headers.get('X-Requested-With')).toBe('seven-admin');
     expect(req.request.withCredentials).toBe(true);
@@ -75,27 +75,25 @@ describe('admin auth', () => {
   it('on 401 refreshes once and replays the request with the new token', async () => {
     store.accessToken.set('expired');
     const result = firstValueFrom(
-      http.get<{ ok: boolean }>('/api/v1/org/members'),
+      http.get<{ ok: boolean }>('api/v1/org/members'),
     );
 
     backend
-      .expectOne('/api/v1/org/members')
+      .expectOne('api/v1/org/members')
       .flush(
         { error: 'x', code: 'unauthorized' },
         { status: 401, statusText: 'Unauthorized' },
       );
     await settle();
-    backend
-      .expectOne('/api/v1/auth/refresh')
-      .flush({
-        accessToken: 'fresh',
-        expiresIn: 900,
-        organizationId: 'o',
-        role: 'member',
-        permissions: [],
-      });
+    backend.expectOne('api/v1/auth/refresh').flush({
+      accessToken: 'fresh',
+      expiresIn: 900,
+      organizationId: 'o',
+      role: 'member',
+      permissions: [],
+    });
     await settle();
-    const retry = backend.expectOne('/api/v1/org/members');
+    const retry = backend.expectOne('api/v1/org/members');
     expect(retry.request.headers.get('Authorization')).toBe('Bearer fresh');
     retry.flush({ ok: true });
 
@@ -103,28 +101,28 @@ describe('admin auth', () => {
   });
 
   it('does not retry a failed login (wrong password is not an expired session)', async () => {
-    const result = firstValueFrom(http.post('/api/v1/auth/login', {}));
+    const result = firstValueFrom(http.post('api/v1/auth/login', {}));
     backend
-      .expectOne('/api/v1/auth/login')
+      .expectOne('api/v1/auth/login')
       .flush(
         { error: 'x', code: 'invalid_credentials' },
         { status: 401, statusText: 'Unauthorized' },
       );
     await expect(result).rejects.toBeTruthy();
-    backend.expectNone('/api/v1/auth/refresh');
+    backend.expectNone('api/v1/auth/refresh');
   });
 
   it('sends to /login when the refresh fails', async () => {
     const navigate = jest
       .spyOn(TestBed.inject(Router), 'navigate')
       .mockResolvedValue(true);
-    const result = firstValueFrom(http.get('/api/v1/org/members'));
+    const result = firstValueFrom(http.get('api/v1/org/members'));
     backend
-      .expectOne('/api/v1/org/members')
+      .expectOne('api/v1/org/members')
       .flush({}, { status: 401, statusText: 'Unauthorized' });
     await settle();
     backend
-      .expectOne('/api/v1/auth/refresh')
+      .expectOne('api/v1/auth/refresh')
       .flush({}, { status: 401, statusText: 'Unauthorized' });
     await expect(result).rejects.toBeTruthy();
     expect(navigate).toHaveBeenCalledWith(['/login'], expect.anything());
@@ -134,15 +132,13 @@ describe('admin auth', () => {
   it('shares one refresh between concurrent callers (the server rotates the token)', async () => {
     const a = store.refresh();
     const b = store.refresh();
-    backend
-      .expectOne('/api/v1/auth/refresh')
-      .flush({
-        accessToken: 'n',
-        expiresIn: 900,
-        organizationId: 'o',
-        role: 'r',
-        permissions: [],
-      });
+    backend.expectOne('api/v1/auth/refresh').flush({
+      accessToken: 'n',
+      expiresIn: 900,
+      organizationId: 'o',
+      role: 'r',
+      permissions: [],
+    });
     await expect(Promise.all([a, b])).resolves.toEqual([true, true]);
     expect(store.accessToken()).toBe('n');
   });

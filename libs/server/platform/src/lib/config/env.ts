@@ -21,6 +21,17 @@ export const envSchema = z.object({
   /** Interface to listen on: loopback by default (nginx proxies); 0.0.0.0 inside a bridged container. */
   API_HOST: z.string().default('127.0.0.1'),
   API_PUBLIC_URL: url.default('http://127.0.0.1:4000'),
+  /**
+   * Path prefix the app is served under behind the proxy (e.g. /suite on seven.toolpix.dev);
+   * the proxy strips it, but cookies must carry it in their Path.
+   */
+  PUBLIC_BASE_PATH: z
+    .string()
+    .regex(
+      /^(\/[a-z0-9-]+)*$/,
+      'PUBLIC_BASE_PATH must look like /suite (or be empty)',
+    )
+    .default(''),
   /** Where links in emails point (verify, reset, invitation). */
   ADMIN_URL: url.default('http://127.0.0.1:4200'),
   JWT_SECRET: z.string().min(48, 'JWT_SECRET must be at least 48 characters'),

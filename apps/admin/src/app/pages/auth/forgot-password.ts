@@ -76,7 +76,7 @@ export class ForgotPasswordPage {
     if (this.form.invalid) return;
     const ok = await this.state.run(() =>
       firstValueFrom(
-        this.http.post('/api/v1/auth/password/forgot', this.form.getRawValue()),
+        this.http.post('api/v1/auth/password/forgot', this.form.getRawValue()),
       ),
     );
     if (ok) this.sent.set(true);

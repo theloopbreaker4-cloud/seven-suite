@@ -132,7 +132,7 @@ export class InvitationPage implements OnInit {
     await this.loader.run(async () =>
       this.preview.set(
         await firstValueFrom(
-          this.http.get<Preview>('/api/v1/auth/invitations/preview', {
+          this.http.get<Preview>('api/v1/auth/invitations/preview', {
             params: { token: this.token },
           }),
         ),

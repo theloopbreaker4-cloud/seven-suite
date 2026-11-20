@@ -64,7 +64,7 @@ export class AuthStore {
     organization?: string;
   }): Promise<void> {
     await this.start(
-      this.http.post<SessionResponse>('/api/v1/auth/login', body),
+      this.http.post<SessionResponse>('api/v1/auth/login', body),
     );
   }
 
@@ -75,7 +75,7 @@ export class AuthStore {
     organizationName: string;
   }): Promise<void> {
     await this.start(
-      this.http.post<SessionResponse>('/api/v1/auth/signup', body),
+      this.http.post<SessionResponse>('api/v1/auth/signup', body),
     );
   }
 
@@ -85,13 +85,13 @@ export class AuthStore {
     password?: string;
   }): Promise<void> {
     await this.start(
-      this.http.post<SessionResponse>('/api/v1/auth/invitations/accept', body),
+      this.http.post<SessionResponse>('api/v1/auth/invitations/accept', body),
     );
   }
 
   async switchOrganization(slug: string): Promise<void> {
     await this.start(
-      this.http.post<SessionResponse>('/api/v1/auth/switch-organization', {
+      this.http.post<SessionResponse>('api/v1/auth/switch-organization', {
         organization: slug,
       }),
     );
@@ -103,7 +103,7 @@ export class AuthStore {
    */
   refresh(): Promise<boolean> {
     this.refreshing ??= firstValueFrom(
-      this.http.post<SessionResponse>('/api/v1/auth/refresh', {}),
+      this.http.post<SessionResponse>('api/v1/auth/refresh', {}),
     )
       .then((s) => {
         this.accessToken.set(s.accessToken);
@@ -118,14 +118,14 @@ export class AuthStore {
   }
 
   async logout(): Promise<void> {
-    await firstValueFrom(this.http.post('/api/v1/auth/logout', {})).catch(
+    await firstValueFrom(this.http.post('api/v1/auth/logout', {})).catch(
       () => undefined,
     );
     this.clear();
   }
 
   async loadMe(): Promise<void> {
-    this.me.set(await firstValueFrom(this.http.get<Me>('/api/v1/auth/me')));
+    this.me.set(await firstValueFrom(this.http.get<Me>('api/v1/auth/me')));
   }
 
   clear(): void {

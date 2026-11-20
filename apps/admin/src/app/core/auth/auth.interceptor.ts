@@ -11,14 +11,15 @@ import { AuthStore } from './auth.store';
 
 /** Auth endpoints answer 401 for wrong credentials; retrying them after a refresh is wrong. */
 const NO_RETRY =
-  /\/api\/v1\/auth\/(login|signup|refresh|logout|password|verify-email$|invitations)/;
+  /^api\/v1\/auth\/(login|signup|refresh|logout|password|verify-email$|invitations)/;
 
 /**
+ * API URLs are relative to <base href> (`api/v1/…`), so the admin works at / and under /suite/.
  * For every API call: mark it as XHR (the API's CSRF check for cookie routes), send cookies,
  * attach the access token. On 401, refresh once and replay; if that fails, go to the login page.
  */
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
-  if (!req.url.startsWith('/api/')) return next(req);
+  if (!req.url.startsWith('api/')) return next(req);
   const store = inject(AuthStore);
   const router = inject(Router);
 

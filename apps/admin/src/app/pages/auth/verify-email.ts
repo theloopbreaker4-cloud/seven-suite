@@ -50,7 +50,7 @@ export class VerifyEmailPage implements OnInit {
   async ngOnInit(): Promise<void> {
     const ok = await this.state.run(() =>
       firstValueFrom(
-        this.http.post('/api/v1/auth/verify-email', { token: this.token }),
+        this.http.post('api/v1/auth/verify-email', { token: this.token }),
       ),
     );
     this.done.set(ok);

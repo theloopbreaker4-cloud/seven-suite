@@ -76,7 +76,7 @@ export class DashboardPage {
 
   async resendVerification(): Promise<void> {
     const ok = await this.resend.run(() =>
-      firstValueFrom(this.http.post('/api/v1/auth/verify-email/request', {})),
+      firstValueFrom(this.http.post('api/v1/auth/verify-email/request', {})),
     );
     if (ok) this.toast.success(this.t.translate('dashboard.resent'));
     else this.toast.error(this.resend.message() ?? '');

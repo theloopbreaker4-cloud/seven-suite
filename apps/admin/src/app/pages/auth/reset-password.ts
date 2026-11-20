@@ -75,7 +75,7 @@ export class ResetPasswordPage {
     if (this.form.invalid) return;
     const ok = await this.state.run(() =>
       firstValueFrom(
-        this.http.post('/api/v1/auth/password/reset', {
+        this.http.post('api/v1/auth/password/reset', {
           token: this.token,
           ...this.form.getRawValue(),
         }),

@@ -5,7 +5,8 @@ import { DomainError } from '../errors/domain-error';
 import type { ClientInfo, Session } from './auth.service';
 
 export const REFRESH_COOKIE = 'seven_rt';
-const COOKIE_PATH = '/api/v1/auth';
+/** Where the browser sees the auth routes: behind /suite the proxy strips the prefix, the cookie must not. */
+const cookiePath = (env: Env) => `${env.PUBLIC_BASE_PATH}/api/v1/auth`;
 
 /** httpOnly + SameSite=Strict, scoped to the auth routes; Secure in production. */
 export function refreshCookieOptions(env: Env): CookieOptions {
@@ -13,7 +14,7 @@ export function refreshCookieOptions(env: Env): CookieOptions {
     httpOnly: true,
     sameSite: 'strict',
     secure: env.NODE_ENV === 'production',
-    path: COOKIE_PATH,
+    path: cookiePath(env),
   };
 }
 

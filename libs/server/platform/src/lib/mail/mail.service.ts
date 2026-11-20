@@ -35,6 +35,14 @@ export class MailService {
       this.sent.push(message);
       return;
     }
+    if (isReservedRecipient(message.to)) {
+      // RFC 2606/6761 names never receive mail; sending would only bounce and hurt the
+      // sender reputation (smoke tests on production use such addresses).
+      this.log.log(
+        `Skipping "${message.subject}" to reserved address ${message.to}`,
+      );
+      return;
+    }
     if (!this.transport) {
       this.log.warn(
         `SMTP_URL not set — not sending "${message.subject}" to ${message.to}`,
@@ -49,4 +57,13 @@ export class MailService {
       );
     }
   }
+}
+
+/** example.com/.net/.org and the .test/.example/.invalid/.localhost TLDs (RFC 2606, RFC 6761). */
+export function isReservedRecipient(address: string): boolean {
+  const domain = address.split('@').pop()?.toLowerCase() ?? '';
+  return (
+    /^(.+\.)?example\.(com|net|org)$/.test(domain) ||
+    /\.(test|example|invalid|localhost)$/.test(domain)
+  );
 }

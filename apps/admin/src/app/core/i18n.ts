@@ -8,6 +8,6 @@ import { Translation, TranslocoLoader } from '@jsverse/transloco';
 export class HttpTranslationLoader implements TranslocoLoader {
   private readonly http = inject(HttpClient);
   getTranslation(lang: string) {
-    return this.http.get<Translation>(`/i18n/${lang}.json`);
+    return this.http.get<Translation>(`i18n/${lang}.json`);
   }
 }
