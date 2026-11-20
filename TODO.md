@@ -101,7 +101,7 @@ the VPS works with one command.
 ### Deploy
 
 - [ ] Docker images — _done: `docker/api.Dockerfile` (Node 22 slim + pruned prod deps + Prisma CLI, healthcheck); admin is static behind nginx; worker and web images pending_
-- [x] nginx site (SPA fallback, `/api` proxy, Cloudflare real IP, security headers, cache rules); API container on host network with memory limit — _HTTPS once DNS for suite.toolpix.dev exists_
+- [x] nginx site (SPA fallback, `/api` proxy, Cloudflare real IP, security headers, cache rules); API container on host network with memory limit — _live at https://seven.toolpix.dev/suite/ (path on the showcase domain: `PUBLIC_BASE_PATH=/suite`, admin built with `--base-href=/suite/`, nginx strips the prefix for the API); Playwright smoke passes against production_
 - [x] Deploy script `d:/Works/tools/seven-suite-deploy.sh` (local build → ~300 KB upload → image built on the server → migrate → container swap → health wait → admin swap); server setup `seven-suite-server-setup.sh` (DB + roles in shared PostgreSQL, secrets generated on the server). Rollback: `docker run` the previous `seven-suite-api:<sha>` tag
 - [ ] Nightly backups — _done: `/usr/local/bin/vps-db-backup` (source `d:/Works/tools/vps-db-backup.sh`) dumps every database in the shared PostgreSQL at 03:30, verifies each archive, keeps 14 days (min 3), `--drill <db>` restores into a scratch DB and compares tables (passed for toolpix, seven_projects, seven_suite); off-site copy pending (needs a bucket, e.g. Cloudflare R2)_
 - [ ] Staging instance on the VPS (subdomain), demo org with seed data
