@@ -14,6 +14,8 @@ import {
 import { InvitationService } from './invitation.service';
 import { LoginLimiter } from './login-limiter';
 import { TokenService } from './tokens';
+import { MemberController } from '../org/member.controller';
+import { MemberService } from '../org/member.service';
 
 /** Identity: sessions, account recovery, invitations, and the deny-by-default guard. */
 @Module({
@@ -21,11 +23,13 @@ import { TokenService } from './tokens';
     AuthController,
     InvitationController,
     InvitationAcceptController,
+    MemberController,
   ],
   providers: [
     AuthService,
     AccountService,
     InvitationService,
+    MemberService,
     TokenService,
     LoginLimiter,
     RateLimiter,

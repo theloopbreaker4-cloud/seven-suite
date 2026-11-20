@@ -19,3 +19,4 @@ export * from './lib/redis/rate-limiter';
 export * from './lib/auth/account.service';
 export * from './lib/auth/invitation.service';
 export * from './lib/auth/session-cookie';
+export * from './lib/org/member.service';
