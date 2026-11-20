@@ -33,7 +33,7 @@ Rough total to 1.0: **10–12 months**. CRM (M3) is sellable after ~2.5 months.
 - [x] Conventions → `docs/06-conventions.md`
 - [x] Decisions (ADR-001…009) → `docs/07-decisions.md`
 - [x] Seven Shop plans merged → `docs/archive/seven-shop/`
-- [ ] Archive the `seven-shop` repository on GitHub (Settings → Archive) — **owner action**
+- [x] Archive the `seven-shop` repository on GitHub
 - [ ] OD-1: choose a licence before the first public release
 
 ---
@@ -52,8 +52,8 @@ the VPS works with one command.
 - [x] NX tags + `enforce-module-boundaries` rules per layer and scope (verified to fail on a violation)
 - [ ] TS strict, ESLint, Prettier, commit hooks (lint-staged), conventional commits
 - [x] `docker/compose.dev.yml`: PostgreSQL 16 (+ RLS app role, test DB), Redis 7, S3 (SeaweedFS), Mailpit
-- [ ] `.env.example` for every app; config module with schema validation (fails fast on missing vars) — _done: root `.env.example`; config validation pending_
-- [ ] GitHub Actions: lint · typecheck · unit · integration (Testcontainers) · build · fresh-install — _done: lint · typecheck · unit · build via `nx affected`; integration + fresh-install pending_
+- [x] `.env.example`; config module with zod schema validation (fails fast, lists every problem)
+- [ ] GitHub Actions: lint · typecheck · unit · integration · build · fresh-install — _done: everything except the fresh-install job; integration runs on a real PostgreSQL + Redis service as the RLS-bound app role_
 
 ### Platform kernel (`libs/server/platform`)
 
@@ -63,8 +63,8 @@ the VPS works with one command.
 - [ ] Transactions helper (unit of work) shared by repositories
 - [ ] Outbox: `outbox_event` written in-transaction; dispatcher in worker; `processed_event` idempotency; retries + dead-letter
 - [ ] BullMQ setup: queues, repeatable jobs (scheduler), dashboard (Bull Board) behind admin auth
-- [ ] Cache + rate limiter (Redis)
-- [x] Structured logging (pino), request ids, credential redaction — _error filter → `{ error, code, fields }` pending_
+- [ ] Cache + rate limiter (Redis) — _done: `RateLimiter` (fixed window); cache pending_
+- [x] Structured logging (pino), request ids, credential redaction; error filter → `{ error, code, fields }` (500s never leak details)
 - [x] Health endpoints (`/api/v1/health/live`, `/ready` checks PostgreSQL + Redis)
 - [ ] OpenAPI generation + `libs/api-client` generation script
 - [ ] Module manifest system: id, requires, permissions, settings schema, menu entries; enable/disable per org with dependency checks
