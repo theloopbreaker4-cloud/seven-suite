@@ -18,6 +18,8 @@ export const envSchema = z.object({
   REDIS_URL: url,
 
   API_PORT: z.coerce.number().int().positive().default(4000),
+  /** Interface to listen on: loopback by default (nginx proxies); 0.0.0.0 inside a bridged container. */
+  API_HOST: z.string().default('127.0.0.1'),
   API_PUBLIC_URL: url.default('http://127.0.0.1:4000'),
   /** Where links in emails point (verify, reset, invitation). */
   ADMIN_URL: url.default('http://127.0.0.1:4200'),

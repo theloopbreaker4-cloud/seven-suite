@@ -13,7 +13,7 @@ async function bootstrap() {
   configureApp(app);
 
   const env = app.get<Env>(ENV);
-  await app.listen(env.API_PORT, '127.0.0.1');
+  await app.listen(env.API_PORT, env.API_HOST);
 
   // Lets `nx serve` know the server is ready.
   if (process.env['NX_READY_SIGNAL_SOCKET']) {
@@ -28,7 +28,7 @@ async function bootstrap() {
   }
   app
     .get(Logger)
-    .log(`API listening on http://127.0.0.1:${env.API_PORT}/api/v1`);
+    .log(`API listening on http://${env.API_HOST}:${env.API_PORT}/api/v1`);
 }
 
 bootstrap();

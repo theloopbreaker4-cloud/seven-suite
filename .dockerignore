@@ -1,0 +1,5 @@
+# Docker builds only need the API bundle and migrations.
+*
+!dist/apps/api/**
+!prisma/**
+!prisma.config.ts
