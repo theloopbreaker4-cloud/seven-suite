@@ -1,76 +1,41 @@
 # Seven Suite
 
-> **CRM + Billing + ERP** — a unified business operations platform. Three Angular apps, one NestJS backend, shared domain models.
+> **All-in-one business platform** — website, shop, marketplace, CRM, billing, accounting and
+> inventory on one data model. Built for small and medium businesses in Georgia, the Caucasus and
+> the CIS: UI in en, ru, ka, uk, az, hy, local payment gateways, Georgian tax compliance.
 >
-> **Status: planning.** This folder is being repurposed from an old CMS clone into a separate product. No code for the new direction has been written yet.
+> **Status: M0 done (analysis and plan). Next: M1 foundation.** The `backend/`, `frontend/`,
+> `shared/` and `doc/` folders are a legacy CMS clone and will be removed in M1 — don't extend them.
 
-## What it is
+## Modules
 
-Three tightly-coupled apps that share a single backend and core domain models:
+| Module | What it does |
+|---|---|
+| Core | organizations, users, roles, parties (customers/vendors/contacts), products, files, timeline, numbering, audit |
+| Content | pages, blog, menus, forms, SEO — the public website |
+| Commerce | catalog, cart, checkout, orders, payments, shipping, digital goods |
+| Marketplace | vendors, commissions, split orders, balances, payouts |
+| CRM | leads, deals, pipelines, activities, quotes, email |
+| Billing | plans, subscriptions, invoices, dunning, customer portal |
+| Accounting | double-entry ledger, AR/AP, bank reconciliation, VAT, reports |
+| Inventory & Procurement | warehouses, stock ledger, valuation, purchase orders, vendor bills |
+| Localization GE | Georgian chart of accounts, VAT, RS.ge e-invoices and waybills |
 
-- **CRM** — sales pipeline, leads, deals, activities. For sales teams.
-- **Billing** — recurring subscriptions, invoices, payments, dunning. For finance.
-- **ERP** — accounting (GL), inventory, procurement, taxes, payroll. For operations.
+## Stack
 
-The three apps model the lifecycle of a customer relationship: **lead → deal won → subscription → invoice → GL entry**.
-
-## Why one platform instead of three products
-
-- Real-world entities don't split cleanly between CRM/Billing/ERP. A customer is a customer in all three views; an invoice posted in Billing must show up in ERP's books; a deal won in CRM must trigger a subscription in Billing.
-- Sharing models (`Party`, `Product`, `Document`) eliminates serialization mismatches and double-entry of master data.
-- Three Angular apps in an NX monorepo means users only download the JS for the apps they have access to.
-
-## What's NOT here
-
-- **A CMS.** That's `sevenPHP` — a separate product in the same workspace.
-- **A standalone e-commerce store.** That's `sevenVUE` — also separate.
-- **Marketing automation, helpdesk, recruiting.** External tool integrations.
-
-## Stack (target)
-
-- **Frontend:** Angular 20 in an NX monorepo (`apps/crm`, `apps/billing`, `apps/erp`)
-- **Backend:** NestJS 11 (`apps/api`, modular per domain)
-- **DB:** MongoDB (Postgres for ERP if transactions get painful)
-- **Auth:** JWT + refresh tokens, RBAC per app
-- **Tailwind 4** with theme tokens matching the rest of the workspace
-
-## Repository layout
-
-```
-sevenAngular.io/
-├── CLAUDE.md          guidance for Claude Code
-├── TODO.md            roadmap
-├── README.md          this file
-├── .claude/rules/     per-topic rules (architecture, data-model, conventions, …)
-├── backend/           legacy CMS-clone NestJS (will be removed)
-├── frontend/          legacy CMS-clone Angular (will be removed)
-└── shared/            legacy shared types
-```
-
-When the rewrite begins, an NX workspace will be scaffolded in a `suite/` subfolder, and the legacy folders will be removed once enough new code exists.
-
-## Getting started (legacy code only — for now)
-
-```bash
-# Backend (legacy NestJS)
-cd backend && npm run start:dev          # port 3000
-
-# Frontend (legacy Angular)
-cd frontend && npm run start             # port 4200
-```
-
-These run the **old** CMS-clone code. They're left in place for reference until the rewrite begins. **Don't extend them.**
+NX monorepo · **NestJS** API + worker (modular monolith) · **PostgreSQL** + **Redis/BullMQ** ·
+**Angular** admin · **Next.js** public site and storefront (SSR) · Prisma · Tailwind 4 · Docker.
 
 ## Documentation
 
-- [`CLAUDE.md`](CLAUDE.md) — project overview for Claude Code
-- [`TODO.md`](TODO.md) — phase-by-phase roadmap
-- [`.claude/rules/product-vision.md`](.claude/rules/product-vision.md) — what CRM, Billing, ERP mean here
-- [`.claude/rules/architecture.md`](.claude/rules/architecture.md) — NX monorepo + NestJS module layout
-- [`.claude/rules/data-model.md`](.claude/rules/data-model.md) — Party, Product, Subscription, Invoice, GL — the core entities
-- [`.claude/rules/conventions.md`](.claude/rules/conventions.md) — naming, code style, API format
-- [`.claude/rules/workflow.md`](.claude/rules/workflow.md) — commands, deployment
+Start with [`docs/README.md`](docs/README.md). The roadmap is in [`TODO.md`](TODO.md).
+
+## Related projects
+
+- **Seven CMS** (PHP) — a separate, lightweight CMS: [seven-cms-php](https://github.com/theloopbreaker4-cloud/seven-cms-php)
+- **Seven Projects** — the showcase site: [seven.toolpix.dev](https://seven.toolpix.dev)
+- **Seven Shop** — merged into this repository as the Commerce module (archived)
 
 ## License
 
-ISC.
+To be decided before the first public release (see `docs/07-decisions.md`, OD-1).
