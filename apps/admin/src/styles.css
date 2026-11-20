@@ -1,1 +1,93 @@
-/* You can add global styles to this file, and also import other style files */
+@import 'tailwindcss';
+
+/*
+ * Design tokens. Components use the semantic names (bg, surface, text, muted, border, primary,
+ * danger…) — never raw colours — so light/dark and future org themes only change these values.
+ */
+:root,
+[data-theme='light'] {
+  --sv-bg: #f6f7f9;
+  --sv-surface: #ffffff;
+  --sv-surface-2: #f1f3f6;
+  --sv-text: #111827;
+  --sv-muted: #6b7280;
+  --sv-border: #e5e7eb;
+  --sv-primary: #4f46e5;
+  --sv-primary-hover: #4338ca;
+  --sv-primary-text: #ffffff;
+  --sv-danger: #dc2626;
+  --sv-success: #16a34a;
+  --sv-warning: #d97706;
+  --sv-focus: rgb(79 70 229 / 0.35);
+}
+
+[data-theme='dark'] {
+  --sv-bg: #0b0d12;
+  --sv-surface: #141821;
+  --sv-surface-2: #1b2030;
+  --sv-text: #e5e7eb;
+  --sv-muted: #9ca3af;
+  --sv-border: #273044;
+  --sv-primary: #818cf8;
+  --sv-primary-hover: #a5b4fc;
+  --sv-primary-text: #0b0d12;
+  --sv-danger: #f87171;
+  --sv-success: #4ade80;
+  --sv-warning: #fbbf24;
+  --sv-focus: rgb(129 140 248 / 0.4);
+}
+
+@theme inline {
+  --color-bg: var(--sv-bg);
+  --color-surface: var(--sv-surface);
+  --color-surface-2: var(--sv-surface-2);
+  --color-text: var(--sv-text);
+  --color-muted: var(--sv-muted);
+  --color-border: var(--sv-border);
+  --color-primary: var(--sv-primary);
+  --color-primary-hover: var(--sv-primary-hover);
+  --color-primary-text: var(--sv-primary-text);
+  --color-danger: var(--sv-danger);
+  --color-success: var(--sv-success);
+  --color-warning: var(--sv-warning);
+  --font-sans:
+    'Inter', 'Noto Sans Georgian', 'Noto Sans Armenian', system-ui, sans-serif;
+}
+
+html,
+body {
+  @apply bg-bg text-text font-sans antialiased;
+  height: 100%;
+}
+
+/* Shared building blocks, kept as classes so templates stay readable. */
+@layer components {
+  .sv-input {
+    @apply w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text
+      placeholder:text-muted focus:border-primary focus:outline-none;
+  }
+  .sv-input:focus {
+    box-shadow: 0 0 0 3px var(--sv-focus);
+  }
+  .sv-input[aria-invalid='true'] {
+    @apply border-danger;
+  }
+  .sv-btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-60 bg-primary text-primary-text hover:bg-primary-hover;
+  }
+  .sv-btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-60 border border-border bg-surface text-text hover:bg-surface-2;
+  }
+  .sv-btn-danger {
+    @apply inline-flex items-center justify-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-60 text-danger hover:bg-surface-2;
+  }
+  .sv-card {
+    @apply rounded-lg border border-border bg-surface;
+  }
+  .sv-label {
+    @apply mb-1 block text-sm font-medium text-text;
+  }
+  .sv-link {
+    @apply text-primary hover:underline;
+  }
+}

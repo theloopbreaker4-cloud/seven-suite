@@ -76,19 +76,21 @@ the VPS works with one command.
 - [x] JWT access (HS256 via jose, 15 min) + rotating refresh in an httpOnly SameSite=Strict cookie; reuse revokes the whole family; refresh/logout need `X-Requested-With` (CSRF)
 - [ ] TOTP 2FA + recovery codes
 - [x] Invite members by email (cannot grant more than you have), accept as new or existing user, switch organization
-- [x] Deny-by-default global guard, `@Public()`, `@RequirePermission(...)` with `*` wildcards — *record-rule hook pending*
+- [x] Deny-by-default global guard, `@Public()`, `@RequirePermission(...)` with `*` wildcards — _record-rule hook pending_
 - [ ] API keys (hashed, scoped)
-- [x] Login rate limits in Redis (5 per account+IP, 30 per IP / 15 min); timing-safe login for unknown emails — *refresh/reset limits and full auth audit pending*
+- [x] Login rate limits in Redis (5 per account+IP, 30 per IP / 15 min); timing-safe login for unknown emails — _refresh/reset limits and full auth audit pending_
 - [ ] Security headers, CORS policy, CSP for admin and web
 
 ### Admin shell (Angular)
 
-- [ ] Layout: sidebar from module menus, top bar (org switcher, search, notifications, user)
-- [ ] Auth flows: login, 2FA, invite accept, password reset
-- [ ] HTTP interceptor (token, refresh, error toasts), permission directive `*can="'crm:deal:read'"`
-- [ ] Theme tokens (light/dark), Tailwind 4, base components: button, input, select, date, money, table, dialog, toast, empty state
-- [ ] i18n with Transloco (en, ru, ka first; az, hy, uk files present) + CI missing-key check (OD-7)
-- [ ] Settings area: organization profile, members, roles, API keys
+- [x] Layout: sidebar filtered by permission, top bar (org switcher, language, theme, user, sign out), mobile menu — _search and notifications come with M2_
+- [x] Auth flows: sign-up, login, forgot/reset password, email verification, invitation accept; session restored from the refresh cookie on reload — _2FA screen comes with TOTP_
+- [x] HTTP interceptor (token, CSRF header, one shared refresh then replay, redirect to login), `*svCan` permission directive, API error codes shown in the UI language
+- [ ] Theme tokens (light/dark), Tailwind 4, base components — _done: tokens, light/dark, buttons, inputs, field, card, toast; date/money/table/dialog/empty state with M2 meta-UI_
+- [ ] i18n with Transloco — _done: en, ru, ka complete (same keys); uk, az, hy fall back to English until translated; CI missing-key check pending_
+- [ ] Settings area — _done: members (invite, roles, remove, pending invitations); organization profile, role editor, API keys pending_
+
+- [ ] Move the Playwright smoke test (`d:/Works/tools/seven-suite-e2e/admin-smoke.mjs`, 8 steps, passing) into `apps/admin-e2e` and run it in CI
 
 ### Web shell (Next.js)
 
@@ -126,7 +128,7 @@ attach files and notes to anything, and every list/form in the admin is generate
 - [ ] Timeline ("chatter") on any entity: notes, @mentions, attachments, change history
 - [ ] Audit log (before/after) + admin viewer
 - [ ] Notifications: in-app + email; per-user preferences
-- [ ] Email: provider interface (SMTP, Resend), templates per language, outbox-backed sending, Mailpit in dev — *done: SMTP via nodemailer, Mailpit in dev, in-memory capture in tests, English templates*
+- [ ] Email: provider interface (SMTP, Resend), templates per language, outbox-backed sending, Mailpit in dev — _done: SMTP via nodemailer, Mailpit in dev, in-memory capture in tests, English templates_
 - [ ] Global search (Postgres FTS across Party, Product, documents)
 - [ ] Import/export CSV/XLSX with mapping + dry-run (Party, Product first)
 - [ ] Outgoing webhooks: subscriptions per org, HMAC-signed, retries, delivery log

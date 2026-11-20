@@ -1,13 +1,15 @@
-import { Component } from '@angular/core';
-import { RouterModule } from '@angular/router';
-import { NxWelcome } from './nx-welcome';
+/** Seven Suite — github.com/theloopbreaker4-cloud/seven-suite */
+import { Component, inject } from '@angular/core';
+import { RouterOutlet } from '@angular/router';
+import { PreferencesService } from './core/preferences.service';
+import { ToastHost } from './ui/toast';
 
 @Component({
-  imports: [NxWelcome, RouterModule],
   selector: 'sv-root',
-  templateUrl: './app.html',
-  styleUrl: './app.css',
+  imports: [RouterOutlet, ToastHost],
+  template: `<router-outlet /><sv-toast-host />`,
 })
 export class App {
-  protected title = 'admin';
+  // Instantiated here so theme and language apply before the first page renders.
+  protected readonly prefs = inject(PreferencesService);
 }

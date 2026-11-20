@@ -1,0 +1,112 @@
+{
+  "common": {
+    "wait": "Please wait…",
+    "continue": "Continue",
+    "language": "Language",
+    "lightTheme": "Light theme",
+    "darkTheme": "Dark theme",
+    "remove": "Remove"
+  },
+  "auth": {
+    "email": "Email",
+    "password": "Password",
+    "newPassword": "New password",
+    "passwordHint": "At least 10 characters",
+    "name": "Your name",
+    "organization": "Company name",
+    "backToLogin": "Back to sign in",
+    "login": {
+      "title": "Sign in",
+      "subtitle": "Welcome back to Seven Suite",
+      "forgot": "Forgot password?",
+      "submit": "Sign in",
+      "noAccount": "No account yet?",
+      "link": "Sign in"
+    },
+    "signup": {
+      "title": "Create your workspace",
+      "subtitle": "Your company gets its own space; you become its owner.",
+      "submit": "Create account",
+      "haveAccount": "Already have an account?",
+      "link": "Create one"
+    },
+    "forgot": {
+      "title": "Reset password",
+      "subtitle": "We will email you a link to choose a new password.",
+      "submit": "Send link",
+      "sent": "If an account exists for this email, a reset link is on its way. Check your inbox."
+    },
+    "reset": {
+      "title": "Choose a new password",
+      "submit": "Save password",
+      "done": "Your password has been changed and you have been signed out everywhere. Sign in with the new password."
+    },
+    "verify": {
+      "title": "Email confirmation",
+      "done": "Your email address is confirmed."
+    },
+    "invite": {
+      "title": "Join a workspace",
+      "intro": "You have been invited to {{organization}} as {{role}}.",
+      "existing": "You already have an account — enter its password.",
+      "submit": "Accept and continue"
+    }
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "settings": "Settings",
+    "members": "Members"
+  },
+  "shell": {
+    "organization": "Organization",
+    "logout": "Sign out"
+  },
+  "dashboard": {
+    "hello": "Hello, {{name}}",
+    "verifyBanner": "Please confirm your email address {{email}}.",
+    "resend": "Send again",
+    "resent": "Confirmation email sent.",
+    "membersHint": "Invite your team and choose their roles.",
+    "comingSoon": "Coming soon",
+    "shop": "Shop"
+  },
+  "members": {
+    "invite": "Invite someone",
+    "role": "Role",
+    "send": "Send invitation",
+    "you": "you",
+    "unverified": "unconfirmed",
+    "lastLogin": "Last sign-in",
+    "pending": "Pending invitations",
+    "expires": "expires",
+    "revoke": "Revoke",
+    "sent": "Invitation sent to {{email}}.",
+    "roleChanged": "Role changed.",
+    "removed": "Member removed.",
+    "revoked": "Invitation revoked.",
+    "confirmRemove": "Remove {{name}} from the organization?",
+    "name": "Name"
+  },
+  "errors": {
+    "invalid_credentials": "Wrong email or password.",
+    "rate_limited": "Too many attempts. Please try again later.",
+    "email_taken": "An account with this email already exists.",
+    "invalid_token": "This link is invalid or has expired.",
+    "session_expired": "Your session has expired. Please sign in again.",
+    "no_organization": "You are not a member of this organization.",
+    "account_disabled": "This account is disabled.",
+    "role_too_powerful": "You cannot give more access than you have.",
+    "already_member": "This person is already a member.",
+    "own_role": "You cannot change your own role.",
+    "remove_self": "You cannot remove yourself.",
+    "last_owner": "An organization needs at least one owner.",
+    "forbidden": "You do not have access to this.",
+    "unauthorized": "Please sign in.",
+    "network": "Cannot reach the server. Check your connection."
+  },
+  "roles": {
+    "owner": "Owner",
+    "admin": "Administrator",
+    "member": "Member"
+  }
+}
