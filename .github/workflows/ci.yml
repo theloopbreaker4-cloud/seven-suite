@@ -1,0 +1,43 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  main:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: seven_suite_test
+          POSTGRES_USER: seven
+          POSTGRES_PASSWORD: seven_ci_password
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U seven" --health-interval 5s --health-retries 10
+      redis:
+        image: redis:7-alpine
+        ports: ['6379:6379']
+    env:
+      DATABASE_URL: postgresql://seven:seven_ci_password@localhost:5432/seven_suite_test
+      DATABASE_TEST_URL: postgresql://seven:seven_ci_password@localhost:5432/seven_suite_test
+      REDIS_URL: redis://localhost:6379
+      JWT_SECRET: ci-only-secret-ci-only-secret-ci-only-secret-ci-only-secret-1234
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - uses: nrwl/nx-set-shas@v4
+      - run: pnpm exec nx affected -t lint typecheck test build --parallel=3

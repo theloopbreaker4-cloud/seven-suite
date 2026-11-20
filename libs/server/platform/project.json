@@ -1,0 +1,13 @@
+{
+  "name": "server-platform",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/server/platform/src",
+  "projectType": "library",
+  "tags": [
+    "type:lib",
+    "platform:server",
+    "scope:platform"
+  ],
+  "// targets": "to see all targets run: nx show project server-platform --web",
+  "targets": {}
+}

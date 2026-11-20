@@ -1,0 +1,11 @@
+{
+  "identities": [
+    {
+      "name": "seven-dev",
+      "credentials": [
+        { "accessKey": "seven", "secretKey": "seven_dev_password" }
+      ],
+      "actions": ["Admin", "Read", "Write", "List", "Tagging"]
+    }
+  ]
+}

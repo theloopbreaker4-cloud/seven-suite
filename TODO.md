@@ -4,20 +4,20 @@ Milestones are in build order. **Each one ends with something usable on its own*
 can demo or sell — so the project never sits half-finished. Estimates are for one developer working
 full time; treat them as ranges, not promises. Background: [`docs/`](docs/README.md).
 
-| Milestone | Delivers | Estimate |
-|---|---|---|
-| M0 | Analysis, decisions, plan (this) | done |
-| M1 | Foundation: monorepo, platform kernel, auth, tenants, admin + web shells, CI, deploy | 3–4 weeks |
-| M2 | Core business data: Party, Product, files, timeline, numbering, settings, meta-UI | 3 weeks |
-| M3 | **CRM** — first sellable product | 3–4 weeks |
-| M4 | **Content + Web** — the organization's website | 2–3 weeks |
-| M5 | **Commerce** — online shop with local gateways | 5–6 weeks |
-| M6 | **Billing** — invoices, subscriptions, dunning | 3–4 weeks |
-| M7 | **Accounting** + Georgian localization | 5–6 weeks |
-| M8 | **Inventory + Procurement** | 4–5 weeks |
-| M9 | **Marketplace** | 4–5 weeks |
-| M10 | Platform power: custom fields, automation, search, reports | 4 weeks |
-| M11 | HR & payroll (GE), cloud SaaS, 1.0 | 4+ weeks |
+| Milestone | Delivers                                                                             | Estimate  |
+| --------- | ------------------------------------------------------------------------------------ | --------- |
+| M0        | Analysis, decisions, plan (this)                                                     | done      |
+| M1        | Foundation: monorepo, platform kernel, auth, tenants, admin + web shells, CI, deploy | 3–4 weeks |
+| M2        | Core business data: Party, Product, files, timeline, numbering, settings, meta-UI    | 3 weeks   |
+| M3        | **CRM** — first sellable product                                                     | 3–4 weeks |
+| M4        | **Content + Web** — the organization's website                                       | 2–3 weeks |
+| M5        | **Commerce** — online shop with local gateways                                       | 5–6 weeks |
+| M6        | **Billing** — invoices, subscriptions, dunning                                       | 3–4 weeks |
+| M7        | **Accounting** + Georgian localization                                               | 5–6 weeks |
+| M8        | **Inventory + Procurement**                                                          | 4–5 weeks |
+| M9        | **Marketplace**                                                                      | 4–5 weeks |
+| M10       | Platform power: custom fields, automation, search, reports                           | 4 weeks   |
+| M11       | HR & payroll (GE), cloud SaaS, 1.0                                                   | 4+ weeks  |
 
 Rough total to 1.0: **10–12 months**. CRM (M3) is sellable after ~2.5 months.
 
@@ -45,16 +45,18 @@ create an organization, invite a teammate with a role, log in with 2FA; CI is gr
 the VPS works with one command.
 
 ### Repository & tooling
-- [ ] Remove legacy CMS clone: `backend/`, `frontend/`, `shared/`, `doc/`, `tests/`, `gulpfile.js`, `index.html`, old `package.json`
-- [ ] Scaffold NX workspace at the repo root (pnpm): `apps/api`, `apps/worker`, `apps/admin`, `apps/web`
-- [ ] Libraries: `libs/shared`, `libs/api-client`, `libs/server/platform`, `libs/server/core`, `libs/admin/ui`, `libs/admin/meta-ui`, `libs/web/ui`
-- [ ] NX tags + `enforce-module-boundaries` rules per scope
+
+- [x] Remove legacy CMS clone: `backend/`, `frontend/`, `shared/`, `doc/`, `tests/`, `gulpfile.js`, `index.html`, old `package.json`
+- [x] Scaffold NX 24 workspace at the repo root (pnpm, integrated layout): `apps/api`, `apps/worker`, `apps/admin`, `apps/web`
+- [ ] Libraries: `libs/shared`, `libs/api-client`, `libs/server/platform`, `libs/server/core`, `libs/admin/ui`, `libs/admin/meta-ui`, `libs/web/ui` — _done: shared, server/platform, server/core; rest when first used_
+- [x] NX tags + `enforce-module-boundaries` rules per layer and scope (verified to fail on a violation)
 - [ ] TS strict, ESLint, Prettier, commit hooks (lint-staged), conventional commits
-- [ ] `docker/compose.dev.yml`: PostgreSQL 16, Redis 7, MinIO, Mailpit
-- [ ] `.env.example` for every app; config module with schema validation (fails fast on missing vars)
-- [ ] GitHub Actions: lint · typecheck · unit · integration (Testcontainers) · build · fresh-install
+- [x] `docker/compose.dev.yml`: PostgreSQL 16 (+ RLS app role, test DB), Redis 7, S3 (SeaweedFS), Mailpit
+- [ ] `.env.example` for every app; config module with schema validation (fails fast on missing vars) — _done: root `.env.example`; config validation pending_
+- [ ] GitHub Actions: lint · typecheck · unit · integration (Testcontainers) · build · fresh-install — _done: lint · typecheck · unit · build via `nx affected`; integration + fresh-install pending_
 
 ### Platform kernel (`libs/server/platform`)
+
 - [ ] Prisma: multi-file schema, Postgres schema per module, migration workflow, seed runner
 - [ ] Request context (AsyncLocalStorage): requestId, orgId, userId, locale
 - [ ] Tenancy: org resolution (subdomain / domain / header), `SET app.org_id`, RLS policy helper + test with two tenants
@@ -68,6 +70,7 @@ the VPS works with one command.
 - [ ] Module manifest system: id, requires, permissions, settings schema, menu entries; enable/disable per org with dependency checks
 
 ### Identity & access
+
 - [ ] User, Organization, Membership, Role, Permission tables + migrations
 - [ ] Sign-up (create org), login, logout, email verification, password reset (hashed one-time tokens)
 - [ ] JWT access + rotating refresh (httpOnly cookie, replay detection revokes family)
@@ -79,6 +82,7 @@ the VPS works with one command.
 - [ ] Security headers, CORS policy, CSP for admin and web
 
 ### Admin shell (Angular)
+
 - [ ] Layout: sidebar from module menus, top bar (org switcher, search, notifications, user)
 - [ ] Auth flows: login, 2FA, invite accept, password reset
 - [ ] HTTP interceptor (token, refresh, error toasts), permission directive `*can="'crm:deal:read'"`
@@ -87,15 +91,17 @@ the VPS works with one command.
 - [ ] Settings area: organization profile, members, roles, API keys
 
 ### Web shell (Next.js)
+
 - [ ] App Router, next-intl, org resolution by domain, server-side API client with service key
 - [ ] Layout, theme tokens, 404/500, health
 - [ ] Customer session plumbing (httpOnly cookie held by Next)
 
 ### Deploy
+
 - [ ] Dockerfiles (multi-stage) for api, worker, web, admin (static via nginx)
 - [ ] `docker/compose.prod.yml`, nginx config, Cloudflare real-IP
 - [ ] Deploy script (build → push → migrate → restart), rollback note
-- [ ] Nightly backups: `pg_dump` + MinIO mirror; restore drill documented
+- [ ] Nightly backups: `pg_dump` + object storage mirror; restore drill documented
 - [ ] Staging instance on the VPS (subdomain), demo org with seed data
 
 ---
@@ -106,6 +112,7 @@ the VPS works with one command.
 attach files and notes to anything, and every list/form in the admin is generated from metadata.
 
 ### Core entities
+
 - [ ] Party (+ addresses, contact links, tags, roles), merge duplicates (`core.party.merged`)
 - [ ] Product master, variants, units of measure
 - [ ] Currencies + FX rates (manual + daily fetch job; NBG rates for GEL)
@@ -114,6 +121,7 @@ attach files and notes to anything, and every list/form in the admin is generate
 - [ ] Settings per module (schema-validated, admin UI)
 
 ### Cross-cutting
+
 - [ ] Files: upload (MIME sniffing, server-chosen extension, size limits), public/private buckets, signed URLs, image thumbnails job
 - [ ] Timeline ("chatter") on any entity: notes, @mentions, attachments, change history
 - [ ] Audit log (before/after) + admin viewer
@@ -124,6 +132,7 @@ attach files and notes to anything, and every list/form in the admin is generate
 - [ ] Outgoing webhooks: subscriptions per org, HMAC-signed, retries, delivery log
 
 ### Meta-UI
+
 - [ ] Entity metadata format (fields, types, relations, permissions, list/form layout, filters)
 - [ ] Generic list (sort, filter, saved views, column chooser, bulk actions, export)
 - [ ] Generic form (validation from zod schema, i18n fields editor, money/date/relation pickers)
@@ -177,6 +186,7 @@ PayPal and at least one Georgian gateway, ships, refunds, and the customer can s
 download purchases. (Merged plan from Seven Shop — see `docs/archive/seven-shop/`.)
 
 ### Catalog
+
 - [ ] Catalog presentation over core Product: slugs, status, visibility, categories tree, attributes, images
 - [ ] Price lists (base + customer groups), compare-at price, per-currency prices
 - [ ] Storefront: category listing with filters (category, price, attributes), sorting, pagination
@@ -184,6 +194,7 @@ download purchases. (Merged plan from Seven Shop — see `docs/archive/seven-sho
 - [ ] Search (Postgres FTS; Meilisearch adapter later)
 
 ### Cart & checkout
+
 - [ ] Cart (guest token + customer), merge on login, recalculated prices, expiry
 - [ ] Pricing service: single source of truth for lines, discounts, tax, shipping (unit-tested)
 - [ ] Checkout workflow (saga): address → shipping method → payment → place order; compensations on failure
@@ -192,6 +203,7 @@ download purchases. (Merged plan from Seven Shop — see `docs/archive/seven-sho
 - [ ] Taxes from core tax rates; inclusive/exclusive display
 
 ### Payments
+
 - [ ] Gateway interface in core (authorize, capture, refund, webhook verify, idempotency)
 - [ ] Stripe, PayPal adapters
 - [ ] Georgian gateways: Bank of Georgia (iPay), TBC — at least one in M5, the other right after
@@ -199,6 +211,7 @@ download purchases. (Merged plan from Seven Shop — see `docs/archive/seven-sho
 - [ ] Webhooks: signature verification, `gateway_ref` uniqueness, underpaid guard, replay safety
 
 ### Orders
+
 - [ ] Orders with three statuses; snapshots of lines; admin list/detail, notes, timeline
 - [ ] Fulfilment: shipments, tracking numbers, partial shipments
 - [ ] Refunds (full/partial) workflow → credit note (M6) / reversal

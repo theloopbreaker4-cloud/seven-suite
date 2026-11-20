@@ -18,7 +18,7 @@ transactions and extra ops.
 | Admin UI | **Angular 20** (standalone, signals), one app with lazy routes per module | strong for large form/table-heavy business apps; DI and typed reactive forms |
 | Web UI | **Next.js** (App Router, SSR/ISR) | SEO site and storefront; data fetched server-side from the API over the internal network |
 | Styling | Tailwind 4 with shared design tokens | same tokens in Admin and Web |
-| Files | S3-compatible storage (MinIO locally / on the VPS) | public bucket for media, private bucket for invoices, digital goods |
+| Files | S3-compatible storage (SeaweedFS in dev and on the VPS; MinIO stopped publishing open images in 2025) | public bucket for media, private bucket for invoices, digital goods |
 | Search | PostgreSQL full-text first; Meilisearch later for the storefront | no extra service until needed |
 | Email | provider interface: SMTP, Resend | already used in ToolPix |
 | Tests | Vitest/Jest (unit), Testcontainers Postgres (integration), Playwright (e2e) | real database in integration tests |
@@ -145,8 +145,8 @@ Custom fields (M10) plug into the same metadata.
 Cloudflare ─► nginx ─┬─► web (Next.js)      :3000
                       └─► api (NestJS)       :4000  (/api/*)
                            worker (NestJS)          (no port)
-                           PostgreSQL  Redis  MinIO (internal network only)
+                           PostgreSQL  Redis  S3 (internal network only)
 ```
 
 Docker Compose for dev and the VPS; CI builds images on push; migrations run before the new API
-starts; health checks; nightly `pg_dump` + MinIO sync to off-site storage.
+starts; health checks; nightly `pg_dump` + object-storage sync to off-site storage.

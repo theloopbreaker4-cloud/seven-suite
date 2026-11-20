@@ -4,22 +4,50 @@
 > inventory on one data model. Built for small and medium businesses in Georgia, the Caucasus and
 > the CIS: UI in en, ru, ka, uk, az, hy, local payment gateways, Georgian tax compliance.
 >
-> **Status: M0 done (analysis and plan). Next: M1 foundation.** The `backend/`, `frontend/`,
-> `shared/` and `doc/` folders are a legacy CMS clone and will be removed in M1 — don't extend them.
+> **Status: M1 foundation in progress.** Workspace scaffolded (NX 24: Nest API + worker, Angular
+> admin, Next.js web, shared libs); dev services in Docker. Next: platform kernel and auth.
+
+## Quick start (development)
+
+Requirements: Node 22, pnpm, Docker (Docker Desktop or Docker inside WSL).
+
+```bash
+pnpm install
+cp .env.example .env
+pnpm dev:services        # PostgreSQL :5434, Redis :6380, S3 :9100, Mailpit UI :8026
+pnpm api                 # NestJS API
+pnpm admin               # Angular admin
+pnpm web                 # Next.js site
+pnpm check               # lint + typecheck + test + build, all projects
+```
+
+| Path                   | What                                                                        |
+| ---------------------- | --------------------------------------------------------------------------- |
+| `apps/api`             | NestJS HTTP API                                                             |
+| `apps/worker`          | NestJS background worker (queues, schedules)                                |
+| `apps/admin`           | Angular admin (CRM, Billing, Accounting, …)                                 |
+| `apps/web`             | Next.js public site, storefront, customer portal                            |
+| `libs/shared`          | isomorphic types and helpers (`@seven/shared`)                              |
+| `libs/server/platform` | server kernel: config, db, events, auth, tenancy (`@seven/server-platform`) |
+| `libs/server/core`     | Party, Product, numbering, timeline (`@seven/server-core`)                  |
+| `docker/`              | dev services                                                                |
+
+Module boundaries are enforced by lint (`eslint.config.mjs`): server, admin and web code can only
+import their own layer plus `shared`; `platform` sits below `core`, and `core` below every module.
 
 ## Modules
 
-| Module | What it does |
-|---|---|
-| Core | organizations, users, roles, parties (customers/vendors/contacts), products, files, timeline, numbering, audit |
-| Content | pages, blog, menus, forms, SEO — the public website |
-| Commerce | catalog, cart, checkout, orders, payments, shipping, digital goods |
-| Marketplace | vendors, commissions, split orders, balances, payouts |
-| CRM | leads, deals, pipelines, activities, quotes, email |
-| Billing | plans, subscriptions, invoices, dunning, customer portal |
-| Accounting | double-entry ledger, AR/AP, bank reconciliation, VAT, reports |
-| Inventory & Procurement | warehouses, stock ledger, valuation, purchase orders, vendor bills |
-| Localization GE | Georgian chart of accounts, VAT, RS.ge e-invoices and waybills |
+| Module                  | What it does                                                                                                   |
+| ----------------------- | -------------------------------------------------------------------------------------------------------------- |
+| Core                    | organizations, users, roles, parties (customers/vendors/contacts), products, files, timeline, numbering, audit |
+| Content                 | pages, blog, menus, forms, SEO — the public website                                                            |
+| Commerce                | catalog, cart, checkout, orders, payments, shipping, digital goods                                             |
+| Marketplace             | vendors, commissions, split orders, balances, payouts                                                          |
+| CRM                     | leads, deals, pipelines, activities, quotes, email                                                             |
+| Billing                 | plans, subscriptions, invoices, dunning, customer portal                                                       |
+| Accounting              | double-entry ledger, AR/AP, bank reconciliation, VAT, reports                                                  |
+| Inventory & Procurement | warehouses, stock ledger, valuation, purchase orders, vendor bills                                             |
+| Localization GE         | Georgian chart of accounts, VAT, RS.ge e-invoices and waybills                                                 |
 
 ## Stack
 

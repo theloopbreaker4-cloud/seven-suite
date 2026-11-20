@@ -1,0 +1,46 @@
+# Seven Suite — local services for development.
+#   docker compose -f docker/compose.dev.yml up -d
+# Ports are shifted so they don't collide with other projects on the same machine
+# (ToolPix uses 5433/6379).
+name: seven-suite
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: seven_suite
+      POSTGRES_USER: seven
+      POSTGRES_PASSWORD: seven_dev_password
+    ports: ['127.0.0.1:5434:5432']
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+      - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U seven -d seven_suite']
+      interval: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    command: ['redis-server', '--appendonly', 'yes']
+    ports: ['127.0.0.1:6380:6379']
+    volumes: [redis-data:/data]
+
+  # S3-compatible object storage. MinIO no longer publishes open images (2025), so dev uses
+  # SeaweedFS; the app only speaks the S3 API, so any S3 provider works in production.
+  s3:
+    image: chrislusf/seaweedfs:latest
+    command: server -dir=/data -s3 -s3.port=8333 -s3.config=/etc/seaweedfs/s3.json
+    ports: ['127.0.0.1:9100:8333']
+    volumes:
+      - s3-data:/data
+      - ./seaweedfs/s3.json:/etc/seaweedfs/s3.json:ro
+
+  mailpit:
+    image: axllent/mailpit:latest
+    ports: ['127.0.0.1:1026:1025', '127.0.0.1:8026:8025']
+
+volumes:
+  pg-data:
+  redis-data:
+  s3-data:

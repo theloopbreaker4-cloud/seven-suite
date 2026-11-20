@@ -1,48 +1,69 @@
-# Node
-node_modules/
-**/node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
+# See https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files for more about ignoring files.
 
-# dist outputs (Angular & Nest)
-dist/
-**/dist/
-**/build/
-out/
+# compiled output
+dist
+tmp
+out-tsc
 
-# Angular build and temporary files
-frontend/.angular/
-frontend/.angular-cache/
-frontend/.cache/
-frontend/.env
+# dependencies
+node_modules
 
-# IDE/editor files
-.idea/
-.vscode/
-*.swp
-*.swo
+# IDEs and editors
+/.idea
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
 
-# Environment files
-*.env
-.env.local
-.env.production
-.env.development
+# IDE - VSCode
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
 
-# OS
+# misc
+/.sass-cache
+/connect.lock
+/coverage
+/libpeerconnection.log
+npm-debug.log
+yarn-error.log
+testem.log
+/typings
+
+# System Files
 .DS_Store
 Thumbs.db
 
-# Logs
-logs/
-*.log
+.nx/cache
+.nx/workspace-data
+.cursor/rules/nx-rules.mdc
+.github/instructions/nx.instructions.md
 
-# Coverage reports
-coverage/
-**/coverage/
+.angular
+.claude/settings.local.json
+.claude/worktrees
+.playwright-mcp
 
-# Gulp output cache (if any)
-gulpfile.js.map
+vite.config.*.timestamp*
+vitest.config.*.timestamp*
 
-# Optional: TypeScript build cache
-*.tsbuildinfo
+.nx/polygraph
+.nx/self-healing
+.nx/migrate-runs
+
+# Next.js
+.next
+out
+# Environment
+.env
+.env.*
+!.env.example
+
+# Claude Code workspace files (kept locally, not committed)
+.claude/
+CLAUDE.md
+DEV_NOTES.md
