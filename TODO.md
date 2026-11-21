@@ -79,7 +79,7 @@ the VPS works with one command.
 - [x] Deny-by-default global guard, `@Public()`, `@RequirePermission(...)` with `*` wildcards — _record-rule hook pending_
 - [ ] API keys (hashed, scoped)
 - [x] Login rate limits in Redis (5 per account+IP, 30 per IP / 15 min); timing-safe login for unknown emails — _refresh/reset limits and full auth audit pending_
-- [ ] Security headers, CORS policy, CSP for admin and web
+- [x] Security headers, CORS policy, CSP for admin — _API: CSP `default-src 'none'`, nosniff, frame deny, no-store, no CORS (tested); admin: strict CSP + HSTS in nginx; web (Next.js) when it ships_
 
 ### Admin shell (Angular)
 
