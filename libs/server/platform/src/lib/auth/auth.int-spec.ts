@@ -42,6 +42,18 @@ describe('auth (HTTP)', () => {
     await http.get('/api/v1/health/live').expect(200);
   });
 
+  it('sends locked-down security headers', async () => {
+    const res = await http.get('/api/v1/health/live').expect(200);
+    expect(res.headers['content-security-policy']).toBe(
+      "default-src 'none'; frame-ancestors 'none'",
+    );
+    expect(res.headers['x-content-type-options']).toBe('nosniff');
+    expect(res.headers['x-frame-options']).toBe('DENY');
+    expect(res.headers['cache-control']).toBe('no-store');
+    expect(res.headers['x-powered-by']).toBeUndefined();
+    expect(res.headers['access-control-allow-origin']).toBeUndefined();
+  });
+
   let accessToken: string;
   let refreshCookie: string;
 
