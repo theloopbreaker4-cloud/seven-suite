@@ -50,6 +50,11 @@
       "intro": "You have been invited to {{organization}} as {{role}}.",
       "existing": "You already have an account — enter its password.",
       "submit": "Accept and continue"
+    },
+    "demo": {
+      "title": "Live demo",
+      "hint": "Shared demo account — data resets every hour. Sign-up, mail and membership changes are off.",
+      "signIn": "Sign in to the demo"
     }
   },
   "nav": {
@@ -102,7 +107,8 @@
     "last_owner": "An organization needs at least one owner.",
     "forbidden": "You do not have access to this.",
     "unauthorized": "Please sign in.",
-    "network": "Cannot reach the server. Check your connection."
+    "network": "Cannot reach the server. Check your connection.",
+    "demo_locked": "This is disabled in the demo. Everything else is yours to try — data resets every hour."
   },
   "roles": {
     "owner": "Owner",

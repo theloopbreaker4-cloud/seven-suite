@@ -25,7 +25,12 @@ import {
   type InviteInput,
   type TokenInput,
 } from './auth.schemas';
-import { CurrentAuth, Public, RequirePermission } from './decorators';
+import {
+  CurrentAuth,
+  DemoLocked,
+  Public,
+  RequirePermission,
+} from './decorators';
 import { InvitationService } from './invitation.service';
 import { clientInfo, sessionResponse } from './session-cookie';
 import type { AuthContext } from './tokens';
@@ -41,6 +46,7 @@ export class InvitationController {
     return this.invitations.list(auth);
   }
 
+  @DemoLocked()
   @Post()
   @RequirePermission('platform:member:invite')
   invite(
@@ -75,6 +81,7 @@ export class InvitationAcceptController {
     return this.invitations.preview(query.token);
   }
 
+  @DemoLocked()
   @Public()
   @Post('accept')
   @HttpCode(200)

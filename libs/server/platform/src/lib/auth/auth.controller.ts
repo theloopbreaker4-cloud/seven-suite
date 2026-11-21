@@ -30,7 +30,7 @@ import {
   type SwitchOrganizationInput,
   type TokenInput,
 } from './auth.schemas';
-import { CurrentAuth, Public } from './decorators';
+import { CurrentAuth, DemoLocked, Public } from './decorators';
 import {
   clientInfo,
   REFRESH_COOKIE,
@@ -52,6 +52,20 @@ export class AuthController {
     @Inject(ENV) private readonly env: Env,
   ) {}
 
+  /** Public demo: whether this is one, and the shared account to sign in with. */
+  @Public()
+  @Get('demo')
+  demo() {
+    return this.env.DEMO_MODE
+      ? {
+          enabled: true,
+          email: this.env.DEMO_EMAIL,
+          password: this.env.DEMO_PASSWORD,
+        }
+      : { enabled: false };
+  }
+
+  @DemoLocked()
   @Public()
   @Post('signup')
   async signup(
@@ -140,6 +154,7 @@ export class AuthController {
     return sessionResponse(res, session, this.env);
   }
 
+  @DemoLocked()
   @Post('verify-email/request')
   @HttpCode(202)
   async requestVerification(@CurrentAuth() auth: AuthContext): Promise<void> {
@@ -155,6 +170,7 @@ export class AuthController {
     await this.account.verifyEmail(body.token);
   }
 
+  @DemoLocked()
   @Public()
   @Post('password/forgot')
   @HttpCode(202)
@@ -169,6 +185,7 @@ export class AuthController {
     };
   }
 
+  @DemoLocked()
   @Public()
   @Post('password/reset')
   @HttpCode(204)

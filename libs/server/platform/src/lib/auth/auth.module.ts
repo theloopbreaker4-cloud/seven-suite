@@ -6,6 +6,7 @@ import { RateLimiter } from '../redis/rate-limiter';
 import { AccountService } from './account.service';
 import { AuthController } from './auth.controller';
 import { AuthGuard } from './auth.guard';
+import { DemoGuard } from './demo.guard';
 import { AuthService } from './auth.service';
 import {
   InvitationAcceptController,
@@ -35,6 +36,7 @@ import { MemberService } from '../org/member.service';
     RateLimiter,
     MailService,
     { provide: APP_GUARD, useClass: AuthGuard },
+    { provide: APP_GUARD, useClass: DemoGuard },
   ],
   exports: [AuthService, TokenService, MailService, RateLimiter],
 })

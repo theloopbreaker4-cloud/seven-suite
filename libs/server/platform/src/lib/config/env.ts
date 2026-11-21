@@ -49,6 +49,17 @@ export const envSchema = z.object({
   SMTP_URL: z.string().optional(),
   MAIL_FROM: z.string().default('Seven Suite <no-reply@seven.local>'),
 
+  /**
+   * Public demo instance: routes marked @DemoLocked() (credentials, mail, membership) answer
+   * 403 demo_locked, and the sign-in page shows the shared demo account.
+   */
+  DEMO_MODE: z
+    .enum(['true', 'false'])
+    .default('false')
+    .transform((v) => v === 'true'),
+  DEMO_EMAIL: z.string().default('demo@example.com'),
+  DEMO_PASSWORD: z.string().default('seven-demo-2026'),
+
   LOG_LEVEL: z
     .enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace'])
     .default('info'),

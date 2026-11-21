@@ -10,7 +10,7 @@ import {
   Patch,
 } from '@nestjs/common';
 import { z } from 'zod';
-import { CurrentAuth, RequirePermission } from '../auth/decorators';
+import { CurrentAuth, DemoLocked, RequirePermission } from '../auth/decorators';
 import type { AuthContext } from '../auth/tokens';
 import { ZodPipe } from '../validation/zod.pipe';
 import { MemberService } from './member.service';
@@ -33,6 +33,7 @@ export class MemberController {
     return this.members.roles(auth);
   }
 
+  @DemoLocked()
   @Patch('members/:id')
   @HttpCode(204)
   @RequirePermission('platform:member:update')
@@ -44,6 +45,7 @@ export class MemberController {
     await this.members.changeRole(auth, id, body.role);
   }
 
+  @DemoLocked()
   @Delete('members/:id')
   @HttpCode(204)
   @RequirePermission('platform:member:remove')

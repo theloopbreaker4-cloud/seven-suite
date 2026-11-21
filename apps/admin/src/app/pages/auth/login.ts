@@ -1,5 +1,6 @@
 /** Seven Suite — github.com/theloopbreaker4-cloud/seven-suite */
-import { Component, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { TranslocoPipe } from '@jsverse/transloco';
@@ -17,6 +18,23 @@ import { FormState } from '../../ui/form-state';
       [title]="'auth.login.title' | transloco"
       [subtitle]="'auth.login.subtitle' | transloco"
     >
+      @if (demo(); as d) {
+        <div
+          class="mb-5 rounded-md border border-border bg-surface-2 px-4 py-3 text-sm"
+        >
+          <p class="mb-1 font-medium">{{ 'auth.demo.title' | transloco }}</p>
+          <p class="mb-2 text-muted">{{ 'auth.demo.hint' | transloco }}</p>
+          <p class="mb-3 font-mono text-xs">{{ d.email }} / {{ d.password }}</p>
+          <button
+            type="button"
+            class="sv-btn-primary w-full"
+            [disabled]="state.busy()"
+            (click)="useDemo(d.email, d.password)"
+          >
+            {{ 'auth.demo.signIn' | transloco }}
+          </button>
+        </div>
+      }
       <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
         <sv-field
           [label]="'auth.email' | transloco"
@@ -67,12 +85,14 @@ import { FormState } from '../../ui/form-state';
           {{ (state.busy() ? 'common.wait' : 'auth.login.submit') | transloco }}
         </button>
       </form>
-      <p class="mt-5 text-center text-sm text-muted">
-        {{ 'auth.login.noAccount' | transloco }}
-        <a class="sv-link" routerLink="/signup">{{
-          'auth.signup.link' | transloco
-        }}</a>
-      </p>
+      @if (!demo()) {
+        <p class="mt-5 text-center text-sm text-muted">
+          {{ 'auth.login.noAccount' | transloco }}
+          <a class="sv-link" routerLink="/signup">{{
+            'auth.signup.link' | transloco
+          }}</a>
+        </p>
+      }
     </sv-auth-layout>
   `,
 })
@@ -85,6 +105,30 @@ export class LoginPage {
     email: ['', [Validators.required, Validators.email]],
     password: ['', Validators.required],
   });
+
+  /** Set on the public demo instance: the shared account to sign in with. */
+  protected readonly demo = signal<{ email: string; password: string } | null>(
+    null,
+  );
+
+  constructor() {
+    inject(HttpClient)
+      .get<{ enabled: boolean; email?: string; password?: string }>(
+        'api/v1/auth/demo',
+      )
+      .subscribe({
+        next: (d) => {
+          if (d.enabled && d.email && d.password)
+            this.demo.set({ email: d.email, password: d.password });
+        },
+        error: () => undefined,
+      });
+  }
+
+  useDemo(email: string, password: string): void {
+    this.form.setValue({ email, password });
+    void this.submit();
+  }
 
   async submit(): Promise<void> {
     if (this.form.invalid) return;
