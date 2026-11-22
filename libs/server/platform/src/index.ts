@@ -30,3 +30,5 @@ export * from './lib/auth/api-key.service';
 export * from './lib/auth/two-factor.service';
 export * from './lib/auth/totp';
 export * from './lib/queue/scheduler';
+export * from './lib/db/unit-of-work';
+export * from './lib/redis/cache.service';

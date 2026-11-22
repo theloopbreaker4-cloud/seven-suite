@@ -8,6 +8,8 @@ import { ErrorFilter } from './errors/error.filter';
 import { HealthController } from './health/health.controller';
 import { PlatformLoggingModule } from './logging/logging.module';
 import { RedisService } from './redis/redis.service';
+import { CacheService } from './redis/cache.service';
+import { UnitOfWork } from './db/unit-of-work';
 import { QueueService } from './queue/queue.service';
 import { QueueController } from './queue/queue.controller';
 import { SchedulerService } from './queue/scheduler';
@@ -26,6 +28,8 @@ import { OutboxDispatcher } from './events/outbox-dispatcher';
   providers: [
     PrismaService,
     RedisService,
+    CacheService,
+    UnitOfWork,
     QueueService,
     // Inert until the worker calls start(); the API only produces (outbox) and reads stats.
     EventBus,
@@ -39,6 +43,8 @@ import { OutboxDispatcher } from './events/outbox-dispatcher';
     PlatformLoggingModule,
     PrismaService,
     RedisService,
+    CacheService,
+    UnitOfWork,
     QueueService,
     EventBus,
     OutboxDispatcher,

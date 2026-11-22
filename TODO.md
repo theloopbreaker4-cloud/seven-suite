@@ -60,10 +60,10 @@ the VPS works with one command.
 - [x] Prisma 7: multi-file schema, Postgres schema per module (`platform`), migration workflow — _seed runner pending_
 - [x] Request context (AsyncLocalStorage): requestId, orgId, userId, locale — _also actor (user/API key) and ip; X-Request-Id echoed_
 - [x] Tenancy: RLS policies + `PrismaService.withOrg()` (`app.org_id` per transaction) + integration test with two tenants — _org resolution from request pending_
-- [ ] Transactions helper (unit of work) shared by repositories
+- [x] Transactions helper (unit of work) shared by repositories — _`UnitOfWork.run/tx/afterCommit`, nested calls join, org switch refused_
 - [x] Outbox: `outbox_event` written in-transaction; dispatcher in worker; `processed_event` idempotency; retries + dead-letter — _`emitEvent(tx,…)`, `EventBus.subscribe()`, 7-day retention_
 - [x] BullMQ setup: queues, repeatable jobs (scheduler), dashboard (Bull Board) behind admin auth — _own System → Queues page instead of Bull Board (strict CSP), operators only (PLATFORM_ADMINS)_
-- [ ] Cache + rate limiter (Redis) — _done: `RateLimiter` (fixed window); cache pending_
+- [x] Cache + rate limiter (Redis) — _`RateLimiter`; `CacheService.wrap/get/set/del/clearScope`, per-scope keys, no stampede, Redis down = no cache_
 - [x] Structured logging (pino), request ids, credential redaction; error filter → `{ error, code, fields }` (500s never leak details)
 - [x] Health endpoints (`/api/v1/health/live`, `/ready` checks PostgreSQL + Redis)
 - [ ] OpenAPI generation + `libs/api-client` generation script
