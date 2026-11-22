@@ -162,6 +162,6 @@ export class OpenApiController {
   @Get('openapi.json')
   @Header('Cache-Control', 'public, max-age=300')
   spec() {
-    return this.builder.build(process.env['npm_package_version'] ?? process.env['APP_VERSION'] ?? '0.2.0');
+    return this.builder.build(process.env['npm_package_version'] ?? process.env['APP_VERSION'] ?? '0.3.0');
   }
 }

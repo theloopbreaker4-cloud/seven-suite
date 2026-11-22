@@ -4,8 +4,9 @@
 > inventory on one data model. Built for small and medium businesses in Georgia, the Caucasus and
 > the CIS: UI in en, ru, ka, uk, az, hy, local payment gateways, Georgian tax compliance.
 >
-> **Status: 0.2.0 — foundation preview.** Sign-in with optional two-factor codes, organizations,
-> members, roles, invitations, API keys and reliable events (outbox + worker) work end to end;
+> **Status: 0.3.0 — foundation preview.** Sign-in with optional two-factor codes, organizations,
+> members, custom roles, modules, invitations, API keys, reliable events (outbox + worker), OpenAPI
+> docs and the storefront shell work end to end;
 > business modules land milestone by milestone ([TODO.md](TODO.md),
 > [CHANGELOG.md](CHANGELOG.md)).
 >

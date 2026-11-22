@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "Seven Suite API",
-    "version": "0.2.0",
+    "version": "0.3.0",
     "description": "All-in-one business platform API. Authenticate with a session access token (`Authorization: Bearer <jwt>`) or an organization API key (`X-Api-Key: sv_…`). Errors always look like `{ error, code, fields? }`."
   },
   "servers": [

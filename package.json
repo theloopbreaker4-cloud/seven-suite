@@ -1,6 +1,6 @@
 {
   "name": "@seven/suite",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "license": "ISC",
   "scripts": {
     "dev:services": "docker compose -f docker/compose.dev.yml up -d",

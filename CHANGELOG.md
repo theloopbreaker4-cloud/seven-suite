@@ -5,6 +5,36 @@ versions: [Semantic Versioning](https://semver.org/) (0.x — APIs may still cha
 
 ## [Unreleased]
 
+## [0.3.0] — 2026-11-23 — Settings, modules, API docs and the storefront shell
+
+### Added
+
+- **Settings → Organization** — name, legal name, country, currency, time zone, default and enabled
+  languages, and **storefront addresses** (custom domains; a free `<slug>.<base domain>` address).
+- **Settings → Roles** — your own roles with a permission picker (never more than you hold); built-in
+  roles stay read-only; a role still in use can't be deleted.
+- **Settings → Modules** — module manifests (dependencies, permissions, menu); each organization
+  switches modules on and off with dependency checks; module routes answer `403 module_disabled`
+  until enabled.
+- **System → Queues** (operators only) — event backlog, queue counts, failed jobs with retry, scheduled
+  tasks with their next run and “run now”.
+- **Scheduled tasks** — repeatable jobs run by the worker: hourly outbox cleanup, nightly removal of
+  expired sessions, one-time tokens and old invitations.
+- **API documentation** — OpenAPI 3.1 generated from the live routes and their validation schemas at
+  `/api/v1/openapi.json`; typed client in `libs/api-client`.
+- **Storefront shell (Next.js)** — resolves the organization from the domain, six languages with
+  automatic language choice, strict nonce-based Content-Security-Policy, localized 404/500, health
+  check; server-side API access with a service key; signed per-shop customer session cookies.
+- **Interface languages** — Ukrainian, Azerbaijani and Armenian join Georgian, English and Russian
+  (admin and storefront); a test fails if any language misses a key.
+- **Platform** — `UnitOfWork` (one tenant transaction across repositories, after-commit hooks) and a
+  scoped Redis cache.
+
+### Quality
+
+- Browser tests in CI: admin (sign-up, invitations, 2FA, API keys, organization, roles, modules,
+  queues) and storefront (production build, CSP) next to 83 integration tests.
+
 ## [0.2.0] — 2026-11-23 — Security and reliable events
 
 ### Added
