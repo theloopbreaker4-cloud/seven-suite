@@ -10,6 +10,7 @@ import { PlatformLoggingModule } from './logging/logging.module';
 import { RedisService } from './redis/redis.service';
 import { CacheService } from './redis/cache.service';
 import { UnitOfWork } from './db/unit-of-work';
+import { OpenApiBuilder, OpenApiController } from './openapi/openapi';
 import { QueueService } from './queue/queue.service';
 import { QueueController } from './queue/queue.controller';
 import { SchedulerService } from './queue/scheduler';
@@ -24,12 +25,13 @@ import { OutboxDispatcher } from './events/outbox-dispatcher';
 @Global()
 @Module({
   imports: [PlatformConfigModule, PlatformLoggingModule, AuthModule],
-  controllers: [HealthController, QueueController],
+  controllers: [HealthController, QueueController, OpenApiController],
   providers: [
     PrismaService,
     RedisService,
     CacheService,
     UnitOfWork,
+    OpenApiBuilder,
     QueueService,
     // Inert until the worker calls start(); the API only produces (outbox) and reads stats.
     EventBus,

@@ -9,7 +9,7 @@ import { DomainError } from '../errors/domain-error';
  *   @Body(new ZodPipe(loginSchema)) body: LoginInput
  */
 export class ZodPipe<T> implements PipeTransform<unknown, T> {
-  constructor(private readonly schema: ZodType<T>) {}
+  constructor(readonly schema: ZodType<T>) {}
 
   transform(value: unknown): T {
     const result = this.schema.safeParse(value ?? {});
