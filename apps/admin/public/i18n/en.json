@@ -135,7 +135,8 @@
     "module_disabled": "This module is not enabled for your organization.",
     "module_requires": "Enable the modules it needs first.",
     "module_required_by": "Other enabled modules need this one.",
-    "module_always_on": "This module can’t be switched off."
+    "module_always_on": "This module can’t be switched off.",
+    "domain_taken": "This domain is already connected."
   },
   "roles": {
     "owner": "Owner",
@@ -206,7 +207,13 @@
     "defaultLanguage": "Default language",
     "languages": "Languages",
     "save": "Save",
-    "saved": "Organization saved"
+    "saved": "Organization saved",
+    "domains": "Storefront addresses",
+    "domainsHint": "Point a domain’s DNS at the platform, then add it here. Each domain belongs to one organization.",
+    "defaultDomain": "free address",
+    "addDomain": "Your domain",
+    "add": "Add",
+    "confirmRemoveDomain": "Remove {{domain}}? The storefront stops answering there."
   },
   "queues": {
     "outboxPending": "Events waiting for delivery",

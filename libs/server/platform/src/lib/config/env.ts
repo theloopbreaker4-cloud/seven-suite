@@ -41,6 +41,15 @@ export const envSchema = z.object({
     .string()
     .min(32, 'WEB_SERVICE_KEY must be at least 32 characters'),
 
+  /**
+   * Storefront base domain: `<org-slug>.<WEB_BASE_DOMAIN>` resolves to that organization without a
+   * custom domain (e.g. `shop.seven.toolpix.dev`). Empty: only custom domains resolve.
+   */
+  WEB_BASE_DOMAIN: z
+    .string()
+    .regex(/^([a-z0-9-]+\.)+[a-z0-9-]+$|^$/, 'WEB_BASE_DOMAIN must be a hostname')
+    .default(''),
+
   S3_ENDPOINT: url.optional(),
   S3_REGION: z.string().default('us-east-1'),
   S3_ACCESS_KEY: z.string().optional(),

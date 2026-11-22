@@ -20,6 +20,7 @@ model Organization {
   roles       Role[]
   invitations Invitation[]
   apiKeys     ApiKey[]
+  domains     OrganizationDomain[]
 
   @@map("organization")
   @@schema("platform")
@@ -230,5 +231,19 @@ model ApiKey {
 
   @@index([orgId])
   @@map("api_key")
+  @@schema("platform")
+}
+
+/// Hostnames the storefront answers for this organization (`shop.example.ge`). Globally unique:
+/// one domain → one organization. Subdomains of WEB_BASE_DOMAIN resolve by slug without a row.
+model OrganizationDomain {
+  domain    String   @id
+  orgId     String   @map("org_id") @db.Uuid
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  @@index([orgId])
+  @@map("organization_domain")
   @@schema("platform")
 }

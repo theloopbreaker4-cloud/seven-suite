@@ -1,0 +1,23 @@
+{
+  "frame": {
+    "language": "Dil",
+    "poweredBy": "Platforma:"
+  },
+  "home": {
+    "title": "{name}-ə xoş gəlmisiniz",
+    "subtitle": "{name} — onlayn.",
+    "soon": "Onlayn mağazamız tezliklə açılacaq."
+  },
+  "noSite": {
+    "title": "Bu ünvanda mağaza yoxdur",
+    "text": "Ünvanı yoxlayın və ya sahibindən bu domeni Seven Suite-də qoşmasını xahiş edin."
+  },
+  "errors": {
+    "notFoundTitle": "Səhifə tapılmadı",
+    "notFoundText": "Səhifə köçürülmüş və ya heç vaxt mövcud olmamış ola bilər.",
+    "home": "Ana səhifəyə keç",
+    "errorTitle": "Nəsə səhv getdi",
+    "errorText": "Bir azdan yenidən cəhd edin.",
+    "retry": "Yenidən cəhd et"
+  }
+}

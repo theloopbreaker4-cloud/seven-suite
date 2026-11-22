@@ -1,0 +1,23 @@
+{
+  "frame": {
+    "language": "Language",
+    "poweredBy": "Powered by"
+  },
+  "home": {
+    "title": "Welcome to {name}",
+    "subtitle": "{name} — online.",
+    "soon": "Our online shop is coming soon."
+  },
+  "noSite": {
+    "title": "There is no shop at this address",
+    "text": "Check the address, or ask the owner to connect this domain in Seven Suite."
+  },
+  "errors": {
+    "notFoundTitle": "Page not found",
+    "notFoundText": "The page may have moved or never existed.",
+    "home": "Go to the home page",
+    "errorTitle": "Something went wrong",
+    "errorText": "Please try again in a moment.",
+    "retry": "Try again"
+  }
+}

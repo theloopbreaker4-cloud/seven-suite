@@ -60,6 +60,16 @@ await check('Organization page saves the profile', async () => {
   await page.getByText('Organization saved').waitFor();
 });
 
+await check('Organization page adds and removes a storefront domain', async () => {
+  const domain = `shop-${run}.example.ge`;
+  await page.getByLabel('Your domain').fill(`HTTPS://${domain.toUpperCase()}/`);
+  await page.getByRole('button', { name: 'Add', exact: true }).click();
+  await page.getByText(domain, { exact: true }).waitFor();
+  page.once('dialog', (d) => d.accept());
+  await page.getByRole('listitem').filter({ hasText: domain }).getByRole('button', { name: 'Remove' }).click();
+  await page.getByText(domain, { exact: true }).waitFor({ state: 'detached' });
+});
+
 await check('Roles page creates, edits and deletes a custom role', async () => {
   await page.getByRole('link', { name: 'Roles' }).click();
   await page.getByRole('button', { name: 'New role' }).click();

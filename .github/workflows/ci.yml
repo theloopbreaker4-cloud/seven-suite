@@ -55,6 +55,7 @@ jobs:
           SMTP_URL: smtp://127.0.0.1:1025
           ADMIN_URL: http://127.0.0.1:4200
           PLATFORM_ADMINS: ops-e2e@e2e.seven
+          WEB_BASE_DOMAIN: shops.local
           QUEUE_PREFIX: seven-e2e
           MAILPIT: http://127.0.0.1:8025
           LOG_LEVEL: warn
@@ -69,6 +70,11 @@ jobs:
           done
           mkdir -p /tmp/shots
           node e2e/admin/run-all.mjs /tmp/shots || { tail -40 /tmp/api.log; exit 1; }
+          # Storefront: production build with the strict nonce CSP, resolving the e2e organization.
+          pnpm exec nx build web
+          (cd apps/web && WEB_DEV_HOST=ops-co.shops.local API_INTERNAL_URL=http://127.0.0.1:4000/api/v1 npx next start -p 4301 > /tmp/web.log 2>&1 &)
+          for i in $(seq 1 60); do curl -sf http://127.0.0.1:4301/api/health > /dev/null && break; sleep 2; done
+          WEB_BASE=http://127.0.0.1:4301 node e2e/web/storefront-e2e.mjs || { tail -40 /tmp/web.log; exit 1; }
       - name: Screenshots of failed browser tests
         if: failure()
         uses: actions/upload-artifact@v4

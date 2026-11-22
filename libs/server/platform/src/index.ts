@@ -34,3 +34,4 @@ export * from './lib/db/unit-of-work';
 export * from './lib/redis/cache.service';
 export * from './lib/openapi/openapi';
 export * from './lib/modules/module-registry';
+export * from './lib/org/domain.service';

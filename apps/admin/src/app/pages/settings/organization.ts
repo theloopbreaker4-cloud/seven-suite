@@ -20,6 +20,11 @@ interface Settings {
   supportedLanguages: string[];
 }
 
+interface DomainList {
+  items: { domain: string }[];
+  defaultDomain: string | null;
+}
+
 /** Language names in their own language — recognisable whatever the UI language is. */
 const LANGUAGE_NAMES: Record<string, string> = {
   ka: 'ქართული',
@@ -89,6 +94,39 @@ const LANGUAGE_NAMES: Record<string, string> = {
           </button>
         }
       </form>
+
+      <section class="sv-card mt-6 max-w-2xl p-5">
+        <h2 class="mb-1 font-medium">{{ 'org.domains' | transloco }}</h2>
+        <p class="mb-4 text-sm text-muted">{{ 'org.domainsHint' | transloco }}</p>
+        <ul class="mb-4 space-y-2 text-sm">
+          @if (defaultDomain()) {
+            <li class="flex items-center justify-between gap-3">
+              <span class="font-mono">{{ defaultDomain() }}</span>
+              <span class="text-xs text-muted">{{ 'org.defaultDomain' | transloco }}</span>
+            </li>
+          }
+          @for (d of domains(); track d.domain) {
+            <li class="flex items-center justify-between gap-3">
+              <span class="font-mono">{{ d.domain }}</span>
+              @if (canEdit) {
+                <button type="button" class="sv-btn-danger px-2 py-1" (click)="removeDomain(d.domain)">{{ 'common.remove' | transloco }}</button>
+              }
+            </li>
+          } @empty {
+            @if (!defaultDomain()) {
+              <li class="text-muted">—</li>
+            }
+          }
+        </ul>
+        @if (canEdit) {
+          <form class="grid gap-x-4 md:grid-cols-[1fr_auto] md:items-start" (submit)="$event.preventDefault(); addDomain(domainInput.value); domainInput.value = ''">
+            <sv-field [label]="'org.addDomain' | transloco" for="org-domain" [error]="domainState.fields()['domain'] ?? domainState.message()">
+              <input #domainInput id="org-domain" class="sv-input font-mono" placeholder="shop.example.ge" maxlength="253" />
+            </sv-field>
+            <button type="submit" class="sv-btn-ghost md:mt-6" [disabled]="domainState.busy()">{{ 'org.add' | transloco }}</button>
+          </form>
+        }
+      </section>
     }
   `,
 })
@@ -107,6 +145,9 @@ export class OrganizationPage implements OnInit {
   protected readonly supported = signal<string[]>([]);
   protected readonly enabled = signal<string[]>([]);
   protected readonly state = new FormState();
+  protected readonly domainState = new FormState();
+  protected readonly domains = signal<{ domain: string }[]>([]);
+  protected readonly defaultDomain = signal<string | null>(null);
   protected readonly form = inject(FormBuilder).nonNullable.group({
     name: ['', [Validators.required, Validators.maxLength(120)]],
     legalName: [''],
@@ -121,7 +162,27 @@ export class OrganizationPage implements OnInit {
     this.supported.set(s.supportedLanguages);
     this.apply(s);
     if (!this.canEdit) this.form.disable();
+    this.applyDomains(await firstValueFrom(this.http.get<DomainList>('api/v1/org/domains')));
     this.loaded.set(true);
+  }
+
+  private applyDomains(d: DomainList): void {
+    this.domains.set(d.items);
+    this.defaultDomain.set(d.defaultDomain);
+  }
+
+  async addDomain(domain: string): Promise<void> {
+    if (!domain.trim()) return;
+    await this.domainState.run(async () =>
+      this.applyDomains(await firstValueFrom(this.http.post<DomainList>('api/v1/org/domains', { domain }))),
+    );
+  }
+
+  async removeDomain(domain: string): Promise<void> {
+    if (!confirm(this.t.translate('org.confirmRemoveDomain', { domain }))) return;
+    await this.domainState.run(async () =>
+      this.applyDomains(await firstValueFrom(this.http.delete<DomainList>(`api/v1/org/domains/${encodeURIComponent(domain)}`))),
+    );
   }
 
   private apply(s: Settings): void {

@@ -1297,6 +1297,164 @@
         "security": []
       }
     },
+    "/org/domains": {
+      "get": {
+        "operationId": "Domain_list",
+        "tags": [
+          "Domain"
+        ],
+        "description": "Requires permission `platform:settings:read`.",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "apiKey": []
+          }
+        ],
+        "x-permission": "platform:settings:read"
+      },
+      "post": {
+        "operationId": "Domain_add",
+        "tags": [
+          "Domain"
+        ],
+        "description": "Requires permission `platform:settings:update`.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "domain": {
+                    "type": "string",
+                    "minLength": 3,
+                    "maxLength": 300
+                  }
+                },
+                "required": [
+                  "domain"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "apiKey": []
+          }
+        ],
+        "x-permission": "platform:settings:update"
+      }
+    },
+    "/org/domains/{domain}": {
+      "delete": {
+        "operationId": "Domain_remove",
+        "tags": [
+          "Domain"
+        ],
+        "description": "Requires permission `platform:settings:update`.",
+        "parameters": [
+          {
+            "name": "domain",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "apiKey": []
+          }
+        ],
+        "x-permission": "platform:settings:update"
+      }
+    },
     "/org/invitations": {
       "get": {
         "operationId": "Invitation_list",
@@ -2295,6 +2453,56 @@
         "security": [
           {
             "bearer": []
+          }
+        ]
+      }
+    },
+    "/web/site": {
+      "get": {
+        "operationId": "Web_site",
+        "tags": [
+          "Web"
+        ],
+        "parameters": [
+          {
+            "name": "host",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 3,
+              "maxLength": 300
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "apiKey": []
           }
         ]
       }

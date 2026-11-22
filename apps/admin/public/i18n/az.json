@@ -135,7 +135,8 @@
     "module_disabled": "Bu modul təşkilatınız üçün aktiv deyil.",
     "module_requires": "Əvvəlcə lazım olan modulları aktivləşdirin.",
     "module_required_by": "Bu modul digər aktiv modullar üçün lazımdır.",
-    "module_always_on": "Bu modulu söndürmək olmaz."
+    "module_always_on": "Bu modulu söndürmək olmaz.",
+    "domain_taken": "Bu domen artıq qoşulub."
   },
   "roles": {
     "owner": "Sahib",
@@ -206,7 +207,13 @@
     "defaultLanguage": "Əsas dil",
     "languages": "Dillər",
     "save": "Yadda saxla",
-    "saved": "Təşkilat yadda saxlanıldı"
+    "saved": "Təşkilat yadda saxlanıldı",
+    "domains": "Vitrin ünvanları",
+    "domainsHint": "Domenin DNS-ini platformaya yönləndirin, sonra burada əlavə edin. Hər domen bir təşkilata məxsusdur.",
+    "defaultDomain": "pulsuz ünvan",
+    "addDomain": "Domeniniz",
+    "add": "Əlavə et",
+    "confirmRemoveDomain": "{{domain}} silinsin? Vitrin bu ünvanda cavab verməyəcək."
   },
   "queues": {
     "outboxPending": "Çatdırılmanı gözləyən hadisələr",

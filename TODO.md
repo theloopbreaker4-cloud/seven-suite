@@ -94,9 +94,9 @@ the VPS works with one command.
 
 ### Web shell (Next.js)
 
-- [ ] App Router, next-intl, org resolution by domain, server-side API client with service key
-- [ ] Layout, theme tokens, 404/500, health
-- [ ] Customer session plumbing (httpOnly cookie held by Next)
+- [x] App Router, next-intl, org resolution by domain, server-side API client with service key — _`/[locale]` routing in `proxy.ts`, `GET /web/site` (`@ServiceOnly`), custom domains + `<slug>.<WEB_BASE_DOMAIN>`_
+- [x] Layout, theme tokens, 404/500, health — _strict nonce CSP, six languages, `/api/health`_
+- [x] Customer session plumbing (httpOnly cookie held by Next) — _signed per-organization cookie helpers; wired to customer sign-in when Commerce lands_
 
 ### Deploy
 

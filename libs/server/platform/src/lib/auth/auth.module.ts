@@ -25,6 +25,8 @@ import { OrganizationController } from '../org/organization.controller';
 import { OrganizationService } from '../org/organization.service';
 import { ModuleController } from '../modules/module.controller';
 import { ModuleRegistry } from '../modules/module-registry';
+import { DomainService } from '../org/domain.service';
+import { DomainController, WebController } from '../web/web.controller';
 
 /** Identity: sessions, account recovery, invitations, and the deny-by-default guard. */
 @Module({
@@ -37,6 +39,8 @@ import { ModuleRegistry } from '../modules/module-registry';
     ApiKeyController,
     OrganizationController,
     ModuleController,
+    DomainController,
+    WebController,
   ],
   providers: [
     AuthService,
@@ -45,6 +49,7 @@ import { ModuleRegistry } from '../modules/module-registry';
     MemberService,
     OrganizationService,
     ModuleRegistry,
+    DomainService,
     TwoFactorService,
     ApiKeyService,
     TokenService,
