@@ -1,5 +1,7 @@
-# Docker builds only need the API bundle and migrations.
+# Docker builds only need the API and worker bundles and migrations.
 *
 !dist/apps/api/**
+!dist/apps/worker/main.js
+!dist/apps/worker/main.js.map
 !prisma/**
 !prisma.config.ts
