@@ -21,6 +21,8 @@ import { LoginLimiter } from './login-limiter';
 import { TokenService } from './tokens';
 import { MemberController } from '../org/member.controller';
 import { MemberService } from '../org/member.service';
+import { OrganizationController } from '../org/organization.controller';
+import { OrganizationService } from '../org/organization.service';
 
 /** Identity: sessions, account recovery, invitations, and the deny-by-default guard. */
 @Module({
@@ -31,12 +33,14 @@ import { MemberService } from '../org/member.service';
     MemberController,
     TwoFactorController,
     ApiKeyController,
+    OrganizationController,
   ],
   providers: [
     AuthService,
     AccountService,
     InvitationService,
     MemberService,
+    OrganizationService,
     TwoFactorService,
     ApiKeyService,
     TokenService,

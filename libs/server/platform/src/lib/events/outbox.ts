@@ -7,6 +7,10 @@ import type { TenantTx } from '../db/prisma.service';
 /** Event names. `<module>.<entity>.<past-tense verb>`; consumers subscribe by name. */
 export const PlatformEvents = {
   OrganizationCreated: 'platform.organization.created',
+  OrganizationUpdated: 'platform.organization.updated',
+  RoleCreated: 'platform.role.created',
+  RoleUpdated: 'platform.role.updated',
+  RoleDeleted: 'platform.role.deleted',
   UserSignedUp: 'platform.user.signed_up',
   MemberInvited: 'platform.member.invited',
   MemberJoined: 'platform.member.joined',
