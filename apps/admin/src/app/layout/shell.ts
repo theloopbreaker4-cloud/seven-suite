@@ -17,6 +17,8 @@ interface NavItem {
   path: string;
   icon: string;
   permission?: string;
+  /** Only for operators of this installation (PLATFORM_ADMINS), not organization roles. */
+  operator?: boolean;
 }
 
 interface NavSection {
@@ -45,8 +47,24 @@ const NAV: NavSection[] = [
         icon: '🔑',
         permission: 'platform:api_key:read',
       },
+      {
+        label: 'nav.roles',
+        path: '/settings/roles',
+        icon: '🎭',
+        permission: 'platform:member:read',
+      },
+      {
+        label: 'nav.organization',
+        path: '/settings/organization',
+        icon: '🏢',
+        permission: 'platform:settings:read',
+      },
       { label: 'nav.security', path: '/settings/security', icon: '🛡' },
     ],
+  },
+  {
+    label: 'nav.system',
+    items: [{ label: 'nav.queues', path: '/system/queues', icon: '⚙', operator: true }],
   },
 ];
 
@@ -189,7 +207,9 @@ export class Shell {
     return NAV.map((s) => ({
       ...s,
       items: s.items.filter(
-        (i) => !i.permission || this.store.can(i.permission),
+        (i) =>
+          (!i.permission || this.store.can(i.permission)) &&
+          (!i.operator || this.store.me()?.isPlatformAdmin === true),
       ),
     })).filter((s) => s.items.length > 0);
   });

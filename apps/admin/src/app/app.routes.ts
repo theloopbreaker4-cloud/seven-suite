@@ -29,6 +29,25 @@ export const appRoutes: Route[] = [
           import('./pages/settings/api-keys').then((m) => m.ApiKeysPage),
       },
       {
+        path: 'settings/roles',
+        canActivate: [permissionGuard],
+        data: { permission: 'platform:member:read' },
+        loadComponent: () =>
+          import('./pages/settings/roles').then((m) => m.RolesPage),
+      },
+      {
+        path: 'settings/organization',
+        canActivate: [permissionGuard],
+        data: { permission: 'platform:settings:read' },
+        loadComponent: () =>
+          import('./pages/settings/organization').then((m) => m.OrganizationPage),
+      },
+      {
+        path: 'system/queues',
+        loadComponent: () =>
+          import('./pages/system/queues').then((m) => m.QueuesPage),
+      },
+      {
         path: 'settings/security',
         loadComponent: () =>
           import('./pages/settings/security').then((m) => m.SecurityPage),

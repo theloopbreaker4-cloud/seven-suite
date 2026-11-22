@@ -69,7 +69,11 @@
     "settings": "Settings",
     "members": "Members",
     "security": "Security",
-    "apiKeys": "API keys"
+    "apiKeys": "API keys",
+    "roles": "Roles",
+    "organization": "Organization",
+    "system": "System",
+    "queues": "Queues"
   },
   "shell": {
     "organization": "Organization",
@@ -123,12 +127,28 @@
     "api_key_not_allowed": "Not available with an API key.",
     "cannot_grant": "You cannot grant permissions you don’t have.",
     "2fa_already_enabled": "Two-factor sign-in is already on.",
-    "2fa_not_enabled": "Two-factor sign-in is off."
+    "2fa_not_enabled": "Two-factor sign-in is off.",
+    "role_in_use": "People still have this role — give them another one first.",
+    "system_role": "Built-in roles can’t be changed.",
+    "not_platform_admin": "Only operators of this installation can see this page."
   },
   "roles": {
     "owner": "Owner",
     "admin": "Administrator",
-    "member": "Member"
+    "member": "Member",
+    "hint": "Built-in roles can’t be changed. Your own roles can only include access you have yourself.",
+    "new": "New role",
+    "edit": "Edit role",
+    "editShort": "Edit",
+    "name": "Name",
+    "key": "Key",
+    "save": "Save role",
+    "cancel": "Cancel",
+    "builtIn": "built-in",
+    "delete": "Delete",
+    "saved": "Role saved",
+    "deleted": "Role deleted",
+    "confirmDelete": "Delete the role “{{name}}”?"
   },
   "security": {
     "twoFactor": "Two-factor sign-in",
@@ -171,5 +191,35 @@
     "empty": "No API keys yet.",
     "confirmRevoke": "Revoke “{{name}}”? Integrations using it stop working at once.",
     "revokedToast": "Key revoked"
+  },
+  "org": {
+    "name": "Name",
+    "legalName": "Legal name",
+    "country": "Country (ISO code)",
+    "currency": "Base currency",
+    "timezone": "Time zone",
+    "defaultLanguage": "Default language",
+    "languages": "Languages",
+    "save": "Save",
+    "saved": "Organization saved"
+  },
+  "queues": {
+    "outboxPending": "Events waiting for delivery",
+    "outboxFailing": "Events failing to queue",
+    "queue": "Queue",
+    "waiting": "Waiting",
+    "active": "Active",
+    "delayed": "Delayed",
+    "completed": "Completed",
+    "failed": "Failed",
+    "paused": "paused",
+    "deadLetter": "Failed jobs",
+    "attempts": "{{n}} attempts",
+    "retry": "Retry",
+    "retried": "Job queued again",
+    "task": "Scheduled task",
+    "schedule": "Schedule",
+    "next": "Next run",
+    "runNow": "Run now"
   }
 }

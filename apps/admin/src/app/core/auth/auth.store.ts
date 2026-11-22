@@ -33,6 +33,8 @@ export interface Me {
   role: string;
   permissions: string[];
   organizations: OrganizationRef[];
+  /** Operator of this installation (sees System → Queues). */
+  isPlatformAdmin?: boolean;
 }
 
 /**
