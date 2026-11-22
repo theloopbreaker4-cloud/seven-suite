@@ -19,6 +19,7 @@ model Organization {
   memberships Membership[]
   roles       Role[]
   invitations Invitation[]
+  apiKeys     ApiKey[]
 
   @@map("organization")
   @@schema("platform")
@@ -31,7 +32,12 @@ model User {
   name          String
   locale        String    @default("en")
   emailVerified DateTime? @map("email_verified") @db.Timestamptz(3)
+  /// TOTP secret, AES-256-GCM encrypted (never stored in the clear). Set during setup.
   totpSecret    String?   @map("totp_secret")
+  /// When two-factor sign-in was switched on; null while only set up or when off.
+  totpEnabledAt DateTime? @map("totp_enabled_at") @db.Timestamptz(3)
+  /// Last accepted 30-second time step: a code can't be used twice.
+  totpLastStep  BigInt?   @map("totp_last_step")
   isActive      Boolean   @default(true) @map("is_active")
   lastLoginAt   DateTime? @map("last_login_at") @db.Timestamptz(3)
   createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
@@ -40,6 +46,7 @@ model User {
   memberships   Membership[]
   refreshTokens RefreshToken[]
   tokens        UserToken[]
+  recoveryCodes RecoveryCode[]
 
   @@map("user")
   @@schema("platform")
@@ -186,5 +193,42 @@ model Invitation {
 
   @@index([orgId, email])
   @@map("invitation")
+  @@schema("platform")
+}
+
+/// Single-use 2FA recovery codes. Only the hash is stored; regenerating replaces the whole set.
+model RecoveryCode {
+  id        String    @id @default(uuid(7)) @db.Uuid
+  userId    String    @map("user_id") @db.Uuid
+  codeHash  String    @unique @map("code_hash") @db.Char(64)
+  usedAt    DateTime? @map("used_at") @db.Timestamptz(3)
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("recovery_code")
+  @@schema("platform")
+}
+
+/// Organization API keys for integrations. Only the SHA-256 of the key is stored; `prefix` is
+/// shown in lists. A key acts with its own permissions, capped by its creator's current role.
+model ApiKey {
+  id          String    @id @default(uuid(7)) @db.Uuid
+  orgId       String    @map("org_id") @db.Uuid
+  name        String
+  prefix      String    @db.VarChar(16)
+  keyHash     String    @unique @map("key_hash") @db.Char(64)
+  permissions String[]  @default([])
+  createdById String    @map("created_by_id") @db.Uuid
+  lastUsedAt  DateTime? @map("last_used_at") @db.Timestamptz(3)
+  expiresAt   DateTime? @map("expires_at") @db.Timestamptz(3)
+  revokedAt   DateTime? @map("revoked_at") @db.Timestamptz(3)
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  @@index([orgId])
+  @@map("api_key")
   @@schema("platform")
 }

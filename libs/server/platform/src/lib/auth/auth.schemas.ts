@@ -57,3 +57,21 @@ export const acceptInvitationSchema = z.object({
   password: z.string().max(200).optional(),
 });
 export type AcceptInvitationInput = z.infer<typeof acceptInvitationSchema>;
+
+/** A 6-digit authenticator code or a recovery code (xxxx-xxxx-xxxx). */
+const secondFactor = z.string().trim().min(6, 'Required').max(32);
+
+export const mfaLoginSchema = z.object({
+  mfaToken: z.string().min(20).max(2000),
+  code: secondFactor,
+});
+export type MfaLoginInput = z.infer<typeof mfaLoginSchema>;
+
+export const twoFactorCodeSchema = z.object({ code: secondFactor });
+export type TwoFactorCodeInput = z.infer<typeof twoFactorCodeSchema>;
+
+export const twoFactorDisableSchema = z.object({
+  password: z.string().min(1, 'Required').max(200),
+  code: secondFactor,
+});
+export type TwoFactorDisableInput = z.infer<typeof twoFactorDisableSchema>;

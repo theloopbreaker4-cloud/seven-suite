@@ -77,8 +77,10 @@ describe('outbox and event bus', () => {
   });
 
   it('dispatches each event once, with the event id as the job id', async () => {
-    const first = await dispatcher.dispatchBatch();
-    expect(first).toBeGreaterThanOrEqual(1);
+    // Other suites may have left events behind: drain everything, then nothing is left.
+    let total = 0;
+    for (let n = await dispatcher.dispatchBatch(); n > 0; n = await dispatcher.dispatchBatch()) total += n;
+    expect(total).toBeGreaterThanOrEqual(1);
     expect(await dispatcher.dispatchBatch()).toBe(0);
     const [row] = await pending();
     expect(row.dispatchedAt).not.toBeNull();

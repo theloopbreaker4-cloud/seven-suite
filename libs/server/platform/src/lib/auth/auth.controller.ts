@@ -15,12 +15,14 @@ import type { Env } from '../config/env';
 import { DomainError } from '../errors/domain-error';
 import { ZodPipe } from '../validation/zod.pipe';
 import { AccountService } from './account.service';
-import { AuthService } from './auth.service';
+import { AuthService, isMfaChallenge } from './auth.service';
 import {
   forgotPasswordSchema,
   loginSchema,
   resetPasswordSchema,
   signupSchema,
+  mfaLoginSchema,
+  type MfaLoginInput,
   switchOrganizationSchema,
   tokenSchema,
   type ForgotPasswordInput,
@@ -30,7 +32,7 @@ import {
   type SwitchOrganizationInput,
   type TokenInput,
 } from './auth.schemas';
-import { CurrentAuth, DemoLocked, Public } from './decorators';
+import { CurrentAuth, DemoLocked, Public, UserOnly } from './decorators';
 import {
   clientInfo,
   REFRESH_COOKIE,
@@ -44,6 +46,7 @@ import type { AuthContext } from './tokens';
  * Sessions and account recovery. The refresh token only ever travels in the httpOnly cookie;
  * the access token is returned in the body and kept in memory by the client.
  */
+@UserOnly()
 @Controller('auth')
 export class AuthController {
   constructor(
@@ -86,9 +89,24 @@ export class AuthController {
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ) {
+    const result = await this.auth.login(body, clientInfo(req));
+    // Two-factor accounts get a short-lived challenge instead of a session (no cookie yet).
+    if (isMfaChallenge(result)) return result;
+    return sessionResponse(res, result, this.env);
+  }
+
+  /** Second sign-in step for accounts with two-factor sign-in. */
+  @Public()
+  @Post('login/2fa')
+  @HttpCode(200)
+  async loginSecondFactor(
+    @Body(new ZodPipe(mfaLoginSchema)) body: MfaLoginInput,
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ) {
     return sessionResponse(
       res,
-      await this.auth.login(body, clientInfo(req)),
+      await this.auth.completeMfaLogin(body.mfaToken, body.code, clientInfo(req)),
       this.env,
     );
   }

@@ -62,6 +62,20 @@ export const envSchema = z.object({
   DEMO_EMAIL: z.string().default('demo@example.com'),
   DEMO_PASSWORD: z.string().default('seven-demo-2026'),
 
+  /**
+   * Operators of this installation (comma-separated emails). Only they see cross-tenant
+   * internals such as queue stats and dead-letter jobs — organization owners do not.
+   */
+  PLATFORM_ADMINS: z
+    .string()
+    .default('')
+    .transform((v) =>
+      v
+        .split(',')
+        .map((e) => e.trim().toLowerCase())
+        .filter(Boolean),
+    ),
+
   LOG_LEVEL: z
     .enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace'])
     .default('info'),

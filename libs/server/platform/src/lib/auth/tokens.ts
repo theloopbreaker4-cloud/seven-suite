@@ -14,10 +14,14 @@ export interface AuthContext {
   orgId: string;
   roleKey: string;
   permissions: string[];
+  /** Set when the caller is an API key (then `userId` is the key's creator). */
+  apiKeyId?: string;
 }
 
 const ISSUER = 'seven-suite';
 const AUDIENCE = 'seven-suite-api';
+const MFA_AUDIENCE = 'seven-suite-mfa';
+export const MFA_TTL_SECONDS = 5 * 60;
 
 /** Short-lived access JWTs (HS256) and opaque refresh tokens (only their SHA-256 is stored). */
 @Injectable()
@@ -66,6 +70,35 @@ export class TokenService {
         roleKey: role,
         permissions: perms as string[],
       };
+    } catch {
+      return null;
+    }
+  }
+
+  /**
+   * Proof that the password was right, for the second sign-in step only (5 minutes). Its own
+   * audience: it can never be used as an access token.
+   */
+  async signMfa(userId: string, orgId: string): Promise<string> {
+    return new SignJWT({ org: orgId })
+      .setProtectedHeader({ alg: 'HS256', typ: 'JWT' })
+      .setSubject(userId)
+      .setIssuer(ISSUER)
+      .setAudience(MFA_AUDIENCE)
+      .setIssuedAt()
+      .setExpirationTime(`${MFA_TTL_SECONDS}s`)
+      .sign(this.key);
+  }
+
+  async verifyMfa(token: string): Promise<{ userId: string; orgId: string } | null> {
+    try {
+      const { payload } = await jwtVerify(token, this.key, {
+        issuer: ISSUER,
+        audience: MFA_AUDIENCE,
+        algorithms: ['HS256'],
+      });
+      const { sub, org } = payload as Record<string, unknown>;
+      return typeof sub === 'string' && typeof org === 'string' ? { userId: sub, orgId: org } : null;
     } catch {
       return null;
     }

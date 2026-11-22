@@ -6,6 +6,7 @@ import { DomainError } from '../errors/domain-error';
 import { recordAudit } from '../audit/audit';
 import { emitEvent, PlatformEvents } from '../events/outbox';
 import type { LoginInput, SignupInput } from './auth.schemas';
+import { TwoFactorService } from './two-factor.service';
 import { LoginLimiter } from './login-limiter';
 import {
   DUMMY_PASSWORD_HASH,
@@ -29,6 +30,16 @@ export interface Session {
   auth: AuthContext;
 }
 
+/** Password was right, but the account has two-factor sign-in: send the code with this token. */
+export interface MfaChallenge {
+  mfaRequired: true;
+  mfaToken: string;
+}
+
+export function isMfaChallenge(x: Session | MfaChallenge): x is MfaChallenge {
+  return (x as MfaChallenge).mfaRequired === true;
+}
+
 export interface ClientInfo {
   ip: string;
   userAgent?: string;
@@ -44,6 +55,7 @@ export class AuthService {
     private readonly prisma: PrismaService,
     private readonly tokens: TokenService,
     private readonly limiter: LoginLimiter,
+    private readonly twoFactor: TwoFactorService,
   ) {}
 
   /** New user + new organization with the system roles; the user becomes its owner. */
@@ -111,7 +123,7 @@ export class AuthService {
     return this.startSession(userId, orgId, client, randomUUID());
   }
 
-  async login(input: LoginInput, client: ClientInfo): Promise<Session> {
+  async login(input: LoginInput, client: ClientInfo): Promise<Session | MfaChallenge> {
     await this.limiter.assertAllowed(client.ip, input.email);
     const db = this.prisma.system;
     const user = await db.user.findUnique({ where: { email: input.email } });
@@ -122,6 +134,8 @@ export class AuthService {
     );
     if (!user || !valid) {
       await this.limiter.recordFailure(client.ip, input.email);
+      if (user)
+        await recordAudit(db, { orgId: null, actorId: user.id, entityType: 'user', entityId: user.id, action: 'login_failed' });
       throw DomainError.unauthorized(
         'Wrong email or password',
         'invalid_credentials',
@@ -148,6 +162,11 @@ export class AuthService {
       );
 
     await this.limiter.recordSuccess(client.ip, input.email);
+    if (user.totpEnabledAt) {
+      // The password alone is not enough; nothing is recorded as a login yet.
+      return { mfaRequired: true, mfaToken: await this.tokens.signMfa(user.id, membership.orgId) };
+    }
+    await recordAudit(db, { orgId: membership.orgId, actorId: user.id, entityType: 'user', entityId: user.id, action: 'login' });
     await db.user.update({
       where: { id: user.id },
       data: {
@@ -158,6 +177,32 @@ export class AuthService {
       },
     });
     return this.startSession(user.id, membership.orgId, client, randomUUID());
+  }
+
+  /** Second sign-in step: an authenticator or recovery code for the challenge from `login`. */
+  async completeMfaLogin(mfaToken: string, code: string, client: ClientInfo): Promise<Session> {
+    const challenge = await this.tokens.verifyMfa(mfaToken);
+    if (!challenge)
+      throw DomainError.unauthorized('Sign-in step expired, start again', 'mfa_expired');
+    const key = `2fa:${challenge.userId}`;
+    await this.limiter.assertAllowed(client.ip, key);
+    const method = await this.twoFactor.verify(challenge.userId, code);
+    const db = this.prisma.system;
+    if (!method) {
+      await this.limiter.recordFailure(client.ip, key);
+      await recordAudit(db, { orgId: null, actorId: challenge.userId, entityType: 'user', entityId: challenge.userId, action: '2fa_failed' });
+      throw DomainError.unauthorized('Wrong code', 'invalid_code');
+    }
+    await this.limiter.recordSuccess(client.ip, key);
+    await recordAudit(db, {
+      orgId: challenge.orgId,
+      actorId: challenge.userId,
+      entityType: 'user',
+      entityId: challenge.userId,
+      action: method === 'recovery' ? 'login_recovery_code' : 'login',
+    });
+    await db.user.update({ where: { id: challenge.userId }, data: { lastLoginAt: new Date() } });
+    return this.startSession(challenge.userId, challenge.orgId, client, randomUUID());
   }
 
   /**
@@ -246,6 +291,7 @@ export class AuthService {
         locale: true,
         emailVerified: true,
         lastLoginAt: true,
+        totpEnabledAt: true,
       },
     });
     const memberships = await db.membership.findMany({

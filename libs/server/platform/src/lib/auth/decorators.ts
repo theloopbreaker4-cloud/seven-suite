@@ -10,6 +10,7 @@ import type { AuthContext } from './tokens';
 export const IS_PUBLIC = 'seven:public';
 export const REQUIRED_PERMISSION = 'seven:permission';
 export const DEMO_LOCKED = 'seven:demo-locked';
+export const USER_ONLY = 'seven:user-only';
 
 /** Every route requires a signed-in caller unless marked public. */
 export const Public = () => SetMetadata(IS_PUBLIC, true);
@@ -23,6 +24,12 @@ export const RequirePermission = (permission: string) =>
  * changes who belongs to the shared demo organization.
  */
 export const DemoLocked = () => SetMetadata(DEMO_LOCKED, true);
+
+/**
+ * Only a signed-in person, never an API key: sessions, two-factor settings, API key management.
+ * (A leaked key must not be able to mint more keys or change how anyone signs in.)
+ */
+export const UserOnly = () => SetMetadata(USER_ONLY, true);
 
 /** The authenticated caller, attached by AuthGuard. */
 export const CurrentAuth = createParamDecorator(

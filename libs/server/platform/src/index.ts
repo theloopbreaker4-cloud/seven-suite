@@ -26,3 +26,6 @@ export * from './lib/events/event-bus';
 export * from './lib/events/outbox-dispatcher';
 export * from './lib/queue/queue.service';
 export * from './lib/audit/audit';
+export * from './lib/auth/api-key.service';
+export * from './lib/auth/two-factor.service';
+export * from './lib/auth/totp';

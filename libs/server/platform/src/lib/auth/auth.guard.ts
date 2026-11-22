@@ -4,7 +4,8 @@ import { Reflector } from '@nestjs/core';
 import type { Request } from 'express';
 import { RequestContext } from '../context/request-context';
 import { DomainError } from '../errors/domain-error';
-import { IS_PUBLIC, REQUIRED_PERMISSION } from './decorators';
+import { ApiKeyService, API_KEY_PREFIX } from './api-key.service';
+import { IS_PUBLIC, REQUIRED_PERMISSION, USER_ONLY } from './decorators';
 import { hasPermission } from './permissions';
 import { TokenService, type AuthContext } from './tokens';
 
@@ -18,6 +19,7 @@ export class AuthGuard implements CanActivate {
   constructor(
     private readonly reflector: Reflector,
     private readonly tokens: TokenService,
+    private readonly apiKeys: ApiKeyService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -28,12 +30,26 @@ export class AuthGuard implements CanActivate {
     const req = context
       .switchToHttp()
       .getRequest<Request & { auth?: AuthContext }>();
+    // Either a session access token or an API key (`Authorization: Bearer sv_…` or `X-Api-Key`).
     const header = req.headers.authorization ?? '';
-    const match = /^Bearer\s+(\S+)$/i.exec(header);
-    const auth = match ? await this.tokens.verifyAccess(match[1]) : null;
+    const bearer = /^Bearer\s+(\S+)$/i.exec(header)?.[1];
+    const xKey = req.headers['x-api-key'];
+    const apiKey = typeof xKey === 'string' ? xKey : bearer?.startsWith(API_KEY_PREFIX) ? bearer : undefined;
+    const auth = apiKey
+      ? await this.apiKeys.authenticate(apiKey)
+      : bearer
+        ? await this.tokens.verifyAccess(bearer)
+        : null;
     if (!auth) throw DomainError.unauthorized();
+    if (auth.apiKeyId && this.reflector.getAllAndOverride<boolean>(USER_ONLY, targets))
+      throw DomainError.forbidden('Not available with an API key', 'api_key_not_allowed');
     req.auth = auth;
-    RequestContext.patch({ userId: auth.userId, orgId: auth.orgId, actorType: 'user' });
+    RequestContext.patch({
+      userId: auth.userId,
+      orgId: auth.orgId,
+      actorType: auth.apiKeyId ? 'api_key' : 'user',
+      apiKeyId: auth.apiKeyId,
+    });
 
     const required = this.reflector.getAllAndOverride<string | undefined>(
       REQUIRED_PERMISSION,

@@ -9,6 +9,7 @@ import { HealthController } from './health/health.controller';
 import { PlatformLoggingModule } from './logging/logging.module';
 import { RedisService } from './redis/redis.service';
 import { QueueService } from './queue/queue.service';
+import { QueueController } from './queue/queue.controller';
 import { EventBus } from './events/event-bus';
 import { OutboxDispatcher } from './events/outbox-dispatcher';
 
@@ -19,7 +20,7 @@ import { OutboxDispatcher } from './events/outbox-dispatcher';
 @Global()
 @Module({
   imports: [PlatformConfigModule, PlatformLoggingModule, AuthModule],
-  controllers: [HealthController],
+  controllers: [HealthController, QueueController],
   providers: [
     PrismaService,
     RedisService,
