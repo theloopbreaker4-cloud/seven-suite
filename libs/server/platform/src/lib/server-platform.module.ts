@@ -8,6 +8,9 @@ import { ErrorFilter } from './errors/error.filter';
 import { HealthController } from './health/health.controller';
 import { PlatformLoggingModule } from './logging/logging.module';
 import { RedisService } from './redis/redis.service';
+import { QueueService } from './queue/queue.service';
+import { EventBus } from './events/event-bus';
+import { OutboxDispatcher } from './events/outbox-dispatcher';
 
 /**
  * Kernel shared by the API and the worker: config, logging, database, Redis, identity,
@@ -20,6 +23,10 @@ import { RedisService } from './redis/redis.service';
   providers: [
     PrismaService,
     RedisService,
+    QueueService,
+    // Inert until the worker calls start(); the API only produces (outbox) and reads stats.
+    EventBus,
+    OutboxDispatcher,
     { provide: APP_FILTER, useClass: ErrorFilter },
   ],
   exports: [
@@ -27,6 +34,9 @@ import { RedisService } from './redis/redis.service';
     PlatformLoggingModule,
     PrismaService,
     RedisService,
+    QueueService,
+    EventBus,
+    OutboxDispatcher,
     AuthModule,
   ],
 })

@@ -2,6 +2,8 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService, type TenantTx } from '../db/prisma.service';
 import { DomainError } from '../errors/domain-error';
+import { recordAudit } from '../audit/audit';
+import { emitEvent, PlatformEvents } from '../events/outbox';
 import { hasPermission } from '../auth/permissions';
 import type { AuthContext } from '../auth/tokens';
 
@@ -94,17 +96,21 @@ export class MemberService {
         where: { id: member.id },
         data: { roleId: role.id },
       });
-      await tx.auditLog.create({
-        data: {
-          orgId: by.orgId,
-          actorId: by.userId,
-          entityType: 'membership',
-          entityId: member.id,
-          action: 'role_changed',
-          before: { role: member.role.key },
-          after: { role: role.key },
-        },
+      await recordAudit(tx, {
+        orgId: by.orgId,
+        actorId: by.userId,
+        entityType: 'membership',
+        entityId: member.id,
+        action: 'role_changed',
+        before: { role: member.role.key },
+        after: { role: role.key },
       });
+      await emitEvent(
+        tx,
+        PlatformEvents.MemberRoleChanged,
+        { membershipId: member.id, userId: member.userId, from: member.role.key, to: role.key },
+        by.orgId,
+      );
     });
   }
 
@@ -126,15 +132,20 @@ export class MemberService {
         where: { id: member.id },
         data: { isActive: false },
       });
-      await tx.auditLog.create({
-        data: {
-          orgId: by.orgId,
-          actorId: by.userId,
-          entityType: 'membership',
-          entityId: member.id,
-          action: 'removed',
-        },
+      await recordAudit(tx, {
+        orgId: by.orgId,
+        actorId: by.userId,
+        entityType: 'membership',
+        entityId: member.id,
+        action: 'removed',
+        before: { role: member.role.key },
       });
+      await emitEvent(
+        tx,
+        PlatformEvents.MemberRemoved,
+        { membershipId: member.id, userId: member.userId },
+        by.orgId,
+      );
     });
     // Close this member's sessions for this organization right away.
     const m = await this.prisma.system.membership.findUniqueOrThrow({

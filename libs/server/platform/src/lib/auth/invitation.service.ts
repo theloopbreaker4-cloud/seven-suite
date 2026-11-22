@@ -5,6 +5,8 @@ import { ENV } from '../config/config.module';
 import type { Env } from '../config/env';
 import { PrismaService } from '../db/prisma.service';
 import { DomainError } from '../errors/domain-error';
+import { recordAudit } from '../audit/audit';
+import { emitEvent, PlatformEvents } from '../events/outbox';
 import { MailService } from '../mail/mail.service';
 import { invitationMail } from '../mail/templates';
 import { RateLimiter } from '../redis/rate-limiter';
@@ -84,16 +86,20 @@ export class InvitationService {
           role: { select: { key: true } },
         },
       });
-      await tx.auditLog.create({
-        data: {
-          orgId: by.orgId,
-          actorId: by.userId,
-          entityType: 'invitation',
-          entityId: created.id,
-          action: 'created',
-          after: { email: input.email, role: role.key },
-        },
+      await recordAudit(tx, {
+        orgId: by.orgId,
+        actorId: by.userId,
+        entityType: 'invitation',
+        entityId: created.id,
+        action: 'created',
+        after: { email: input.email, role: role.key },
       });
+      await emitEvent(
+        tx,
+        PlatformEvents.MemberInvited,
+        { invitationId: created.id, email: input.email, role: role.key },
+        by.orgId,
+      );
       return created;
     });
 
@@ -214,16 +220,19 @@ export class InvitationService {
         create: { orgId: inv.orgId, userId, roleId: inv.roleId },
         update: { roleId: inv.roleId, isActive: true },
       });
-      await tx.auditLog.create({
-        data: {
-          orgId: inv.orgId,
-          actorId: userId,
-          entityType: 'invitation',
-          entityId: inv.id,
-          action: 'accepted',
-          ip: client.ip,
-        },
+      await recordAudit(tx, {
+        orgId: inv.orgId,
+        actorId: userId,
+        entityType: 'invitation',
+        entityId: inv.id,
+        action: 'accepted',
       });
+      await emitEvent(
+        tx,
+        PlatformEvents.MemberJoined,
+        { invitationId: inv.id, userId },
+        inv.orgId,
+      );
     });
     return this.auth.startSession(userId, inv.orgId, client, randomUUID());
   }

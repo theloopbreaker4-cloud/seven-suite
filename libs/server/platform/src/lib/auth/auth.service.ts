@@ -3,6 +3,8 @@ import { randomBytes, randomUUID } from 'node:crypto';
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../db/prisma.service';
 import { DomainError } from '../errors/domain-error';
+import { recordAudit } from '../audit/audit';
+import { emitEvent, PlatformEvents } from '../events/outbox';
 import type { LoginInput, SignupInput } from './auth.schemas';
 import { LoginLimiter } from './login-limiter';
 import {
@@ -81,16 +83,20 @@ export class AuthService {
       await tx.membership.create({
         data: { orgId: org.id, userId: user.id, roleId: owner.id },
       });
-      await tx.auditLog.create({
-        data: {
-          orgId: org.id,
-          actorId: user.id,
-          entityType: 'organization',
-          entityId: org.id,
-          action: 'created',
-          ip: client.ip,
-        },
+      await recordAudit(tx, {
+        orgId: org.id,
+        actorId: user.id,
+        entityType: 'organization',
+        entityId: org.id,
+        action: 'created',
       });
+      await emitEvent(
+        tx,
+        PlatformEvents.OrganizationCreated,
+        { organizationId: org.id, slug, ownerId: user.id },
+        org.id,
+      );
+      await emitEvent(tx, PlatformEvents.UserSignedUp, { userId: user.id, email: input.email }, null);
       return { userId: user.id, orgId: org.id };
     });
     const { userId, orgId } = await created.catch((e: { code?: string }) => {

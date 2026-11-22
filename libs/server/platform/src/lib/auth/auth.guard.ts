@@ -2,6 +2,7 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import type { Request } from 'express';
+import { RequestContext } from '../context/request-context';
 import { DomainError } from '../errors/domain-error';
 import { IS_PUBLIC, REQUIRED_PERMISSION } from './decorators';
 import { hasPermission } from './permissions';
@@ -32,6 +33,7 @@ export class AuthGuard implements CanActivate {
     const auth = match ? await this.tokens.verifyAccess(match[1]) : null;
     if (!auth) throw DomainError.unauthorized();
     req.auth = auth;
+    RequestContext.patch({ userId: auth.userId, orgId: auth.orgId, actorType: 'user' });
 
     const required = this.reflector.getAllAndOverride<string | undefined>(
       REQUIRED_PERMISSION,

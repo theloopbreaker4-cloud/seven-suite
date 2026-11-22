@@ -18,7 +18,8 @@ import type { Env } from '../config/env';
       useFactory: (env: Env) => ({
         pinoHttp: {
           level: env.LOG_LEVEL,
-          genReqId: (req: IncomingMessage) => {
+          genReqId: (req: IncomingMessage & { id?: string }) => {
+            if (req.id) return req.id; // set by requestContextMiddleware
             const header = req.headers['x-request-id'];
             return typeof header === 'string' && /^[\w-]{8,64}$/.test(header)
               ? header

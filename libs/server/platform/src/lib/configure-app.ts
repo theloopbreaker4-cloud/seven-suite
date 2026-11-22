@@ -2,6 +2,7 @@
 import type { INestApplication } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import cookieParser from 'cookie-parser';
+import { requestContextMiddleware } from './context/request-context';
 
 /**
  * HTTP setup shared by main.ts and integration tests, so tests exercise exactly what runs
@@ -12,6 +13,8 @@ export function configureApp(app: INestApplication): void {
   // nginx on the same host is the only proxy; trust it for req.ip / protocol, nobody else.
   express.set('trust proxy', 'loopback');
   express.disable('x-powered-by');
+  // First: every later step (logs, guards, services, audit, outbox) sees the same request id.
+  app.use(requestContextMiddleware);
   // JSON only, never rendered as a page: lock everything down. Responses carry session data,
   // so nothing may be cached on the way.
   app.use(

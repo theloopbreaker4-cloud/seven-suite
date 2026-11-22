@@ -262,6 +262,9 @@ importers:
       '@prisma/client':
         specifier: 7.10.1
         version: 7.10.1(prisma@7.10.1(@types/node@24.19.2)(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(magicast@0.5.5)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@6.0.3))(typescript@6.0.3)
+      bullmq:
+        specifier: ^6.7.8
+        version: 6.7.8(ioredis@6.0.0(supports-color@8.1.1))(pg@8.23.1)
       cookie-parser:
         specifier: ^1.4.7
         version: 1.4.7
@@ -5913,6 +5916,24 @@ packages:
   buffer@5.7.1:
     resolution: {integrity: sha512-EHcyIPBQ4BSGlvjB16k5KgAJ27CIsHY/2JBmCRReo48y9rQ3MaUzWX3KVlBa4U7MyX02HdVj0K7C3WaB3ju7FQ==}
 
+  bullmq@6.7.8:
+    resolution: {integrity: sha512-Mt0+nKGNFWAruuwwzEUVE+5yEgK5XgzjoR2BjSKp/JeqfgeYO0pFh6oy78Ls8u9upVTsaLhBzSaEZAhYvjPlJg==}
+    engines: {node: '>=14.18.0'}
+    peerDependencies:
+      bullmq-otel: '>=2.0.0'
+      ioredis: '>=5.0.0'
+      pg: '>=8.0.0'
+      redis: '>=5.0.0'
+    peerDependenciesMeta:
+      bullmq-otel:
+        optional: true
+      ioredis:
+        optional: true
+      pg:
+        optional: true
+      redis:
+        optional: true
+
   bundle-name@4.1.1:
     resolution: {integrity: sha512-DdH81/zPLVS11EUgWq3tEu/xn+EzljlMYooDNdzWEnFha3R3NBMpMV1UqYIpjYHV/SgpFKMIX1Oh7o06SjM/oA==}
     engines: {node: '>=18'}
@@ -6252,6 +6273,10 @@ packages:
 
   create-require@1.1.1:
     resolution: {integrity: sha512-dcKFX3jn0MpIaXjisoRvexIJVEKzaq7z2rZKxf+MSr9TkdmHmsU4m2lcLojrj/FHl8mk5VxMmYA+ftRkP/3oKQ==}
+
+  cron-parser@5.10.6:
+    resolution: {integrity: sha512-kpoxgQyveO1l29nw+FWdvmotyV7eOSzGHQpxiXOEZIDOjqO1iR6kfgJ0PVHTuV26uBemKq3ppzma7dHFAG7viw==}
+    engines: {node: '>=18'}
 
   cross-spawn@7.0.6:
     resolution: {integrity: sha512-uV2QOWP2nWzsy2aMp8aRibhi9dlzF5Hgh5SHaB9OiTGEyDTiJJyx0uy51QXdyWbtAHNua4XJzUKca3OzKUd3vA==}
@@ -8486,6 +8511,10 @@ packages:
     resolution: {integrity: sha512-5J9ysMYUpYIg9RF2vJpy9SinEmSviFSe0GyPpCQ4L5QSkLAgeLXlTAOu2ZwWUU5m+0SBl6gUU1R1ZQB3aKypfA==}
     engines: {bun: '>=1.0.0', deno: '>=1.30.0', node: '>=8.0.0'}
 
+  luxon@3.7.2:
+    resolution: {integrity: sha512-vtEhXh/gNjI9Yg1u4jX/0YVPMvxzHuGgCm6tC5kZyb08yjGWGnqAjGJvcXbqQR2P3MyMEFnRbpcdFS6PBcLqew==}
+    engines: {node: '>=12'}
+
   lz-string@1.5.0:
     resolution: {integrity: sha512-h5bgJWpxJNswbU7qCrV0tIKQCaS3blPDrqKWx+QxzuzL1zGUzij9XCWLrSLsJPu5t+eWA/ycetzYAO5IOMcWAQ==}
     hasBin: true
@@ -8717,6 +8746,9 @@ packages:
 
   msgpackr@1.12.1:
     resolution: {integrity: sha512-4EUH9tQHnMmEgzW/MdAP0KIfa1T9AF+htl0ffe2n5vb2EKn9y2co8ccpgWko6S52Jy1PQZKwRnx5/KkYjtd9MQ==}
+
+  msgpackr@2.1.4:
+    resolution: {integrity: sha512-TvP18sX5U3MXoHHSUZen/FagaNTEJObyb8OlnJcNbqN6Ux/oCwYJrHhCOzi31bItyW/Efz1IDnRDKQ23j4ZuvA==}
 
   multer@2.5.0:
     resolution: {integrity: sha512-BsqOzYGVq49JcW2IzoSAxeKYRevb+dGGPPWleOR8Lrlk4igwxu1/9pwSXlByhCb7MVZDrNJFC0IBP5/O5nLYRw==}
@@ -17288,6 +17320,17 @@ snapshots:
       base64-js: 1.5.1
       ieee754: 1.2.1
 
+  bullmq@6.7.8(ioredis@6.0.0(supports-color@8.1.1))(pg@8.23.1):
+    dependencies:
+      cron-parser: 5.10.6
+      msgpackr: 2.1.4
+      node-abort-controller: 3.1.1
+      semver: 7.8.6
+      tslib: 2.9.1
+    optionalDependencies:
+      ioredis: 6.0.0(supports-color@8.1.1)
+      pg: 8.23.1
+
   bundle-name@4.1.1:
     dependencies:
       run-applescript: 7.1.0
@@ -17611,6 +17654,10 @@ snapshots:
       typescript: 6.0.3
 
   create-require@1.1.1: {}
+
+  cron-parser@5.10.6:
+    dependencies:
+      luxon: 3.7.2
 
   cross-spawn@7.0.6:
     dependencies:
@@ -20534,6 +20581,8 @@ snapshots:
 
   lru.min@1.1.5: {}
 
+  luxon@3.7.2: {}
+
   lz-string@1.5.0: {}
 
   magic-string@0.30.17:
@@ -20740,6 +20789,10 @@ snapshots:
     optionalDependencies:
       msgpackr-extract: 3.0.7
     optional: true
+
+  msgpackr@2.1.4:
+    optionalDependencies:
+      msgpackr-extract: 3.0.7
 
   multer@2.5.0:
     dependencies:
