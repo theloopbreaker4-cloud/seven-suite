@@ -20,6 +20,10 @@ COPY dist/apps/api/package.json dist/apps/api/pnpm-lock.yaml dist/apps/api/pnpm-
 RUN pnpm install --prod --frozen-lockfile && pnpm exec prisma --version > /dev/null
 
 COPY dist/apps/api/main.js dist/apps/api/main.js.map ./
+# The worker (outbox dispatcher + event consumers) ships in the same image — its dependencies are
+# a subset of the API's. Run it with: docker run … seven-suite-api node worker.js
+COPY dist/apps/worker/main.js ./worker.js
+COPY dist/apps/worker/main.js.map ./worker.js.map
 COPY prisma ./prisma
 COPY prisma.config.ts ./
 
