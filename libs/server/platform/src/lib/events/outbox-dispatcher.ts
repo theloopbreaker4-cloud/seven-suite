@@ -23,7 +23,6 @@ export const OUTBOX_MAX_ATTEMPTS = 10;
 export class OutboxDispatcher implements OnApplicationShutdown {
   private readonly logger = new Logger(OutboxDispatcher.name);
   private timer?: NodeJS.Timeout;
-  private pruneTimer?: NodeJS.Timeout;
   private running = false;
 
   constructor(
@@ -80,14 +79,10 @@ export class OutboxDispatcher implements OnApplicationShutdown {
     return { events, marks };
   }
 
-  /** Poll every `intervalMs`, prune hourly (worker process only). */
+  /** Poll every `intervalMs` (worker process only). Pruning runs as the `platform.outbox-prune` task. */
   start(intervalMs = 1_000): void {
     if (this.timer) return;
     this.timer = setInterval(() => void this.tick(), intervalMs);
-    this.pruneTimer = setInterval(
-      () => void this.prune().catch((e) => this.logger.warn(`outbox prune failed: ${(e as Error).message}`)),
-      3_600_000,
-    );
   }
 
   private async tick(): Promise<void> {
@@ -105,6 +100,5 @@ export class OutboxDispatcher implements OnApplicationShutdown {
 
   async onApplicationShutdown(): Promise<void> {
     if (this.timer) clearInterval(this.timer);
-    if (this.pruneTimer) clearInterval(this.pruneTimer);
   }
 }

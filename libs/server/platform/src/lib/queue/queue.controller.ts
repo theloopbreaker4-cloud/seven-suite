@@ -7,6 +7,7 @@ import type { Env } from '../config/env';
 import { PrismaService } from '../db/prisma.service';
 import { DomainError } from '../errors/domain-error';
 import { QUEUES, QueueService, type QueueName } from './queue.service';
+import { SchedulerService } from './scheduler';
 
 /**
  * Queue health for the operators of this installation (PLATFORM_ADMINS). Queues are shared by
@@ -18,6 +19,7 @@ export class QueueController {
   constructor(
     private readonly queues: QueueService,
     private readonly prisma: PrismaService,
+    private readonly scheduler: SchedulerService,
     @Inject(ENV) private readonly env: Env,
   ) {}
 
@@ -32,10 +34,24 @@ export class QueueController {
     const stuck = await this.prisma.system.outboxEvent.count({
       where: { dispatchedAt: null, lastError: { not: null } },
     });
+    const schedules = await this.queues.queue(QUEUES.scheduler).getJobSchedulers();
     return {
       queues: await this.queues.stats(),
       outbox: { pending: outbox.reduce((n, g) => n + g._count, 0), failing: stuck },
+      tasks: this.scheduler.list().map((t) => ({
+        ...t,
+        next: schedules.find((s) => s.key === t.name)?.next ?? null,
+      })),
     };
+  }
+
+  /** Run a scheduled task right now (it also keeps its normal schedule). */
+  @Post('tasks/:name/run')
+  @HttpCode(200)
+  async runTask(@CurrentAuth() auth: AuthContext, @Param('name') name: string) {
+    await this.assertOperator(auth);
+    if (!this.scheduler.list().some((t) => t.name === name)) throw DomainError.notFound('Unknown task');
+    return { result: (await this.scheduler.runNow(name)) ?? null };
   }
 
   @Get(':name/failed')
@@ -59,7 +75,11 @@ export class QueueController {
 
   private async assertOperator(auth: AuthContext): Promise<void> {
     const user = await this.prisma.system.user.findUnique({ where: { id: auth.userId }, select: { email: true } });
-    if (!user || !this.env.PLATFORM_ADMINS.includes(user.email.toLowerCase()))
+    if (!user || !isPlatformAdmin(this.env, user.email))
       throw DomainError.forbidden('Only operators of this installation', 'not_platform_admin');
   }
+}
+
+export function isPlatformAdmin(env: Pick<Env, 'PLATFORM_ADMINS'>, email: string): boolean {
+  return env.PLATFORM_ADMINS.includes(email.toLowerCase());
 }

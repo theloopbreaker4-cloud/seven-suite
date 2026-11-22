@@ -1,12 +1,14 @@
 /** Seven Suite — github.com/theloopbreaker4-cloud/seven-suite */
 import { randomBytes, randomUUID } from 'node:crypto';
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { PrismaService } from '../db/prisma.service';
 import { DomainError } from '../errors/domain-error';
 import { recordAudit } from '../audit/audit';
 import { emitEvent, PlatformEvents } from '../events/outbox';
 import type { LoginInput, SignupInput } from './auth.schemas';
 import { TwoFactorService } from './two-factor.service';
+import { ENV } from '../config/config.module';
+import type { Env } from '../config/env';
 import { LoginLimiter } from './login-limiter';
 import {
   DUMMY_PASSWORD_HASH,
@@ -56,6 +58,7 @@ export class AuthService {
     private readonly tokens: TokenService,
     private readonly limiter: LoginLimiter,
     private readonly twoFactor: TwoFactorService,
+    @Inject(ENV) private readonly env: Env,
   ) {}
 
   /** New user + new organization with the system roles; the user becomes its owner. */
@@ -309,6 +312,8 @@ export class AuthService {
           ?.organization ?? null,
       role: auth.roleKey,
       permissions: auth.permissions,
+      // Operators of this installation get the System → Queues page.
+      isPlatformAdmin: this.env.PLATFORM_ADMINS.includes(user.email.toLowerCase()),
       organizations: memberships.map((m) => ({
         ...m.organization,
         role: m.role,

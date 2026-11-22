@@ -29,3 +29,4 @@ export * from './lib/audit/audit';
 export * from './lib/auth/api-key.service';
 export * from './lib/auth/two-factor.service';
 export * from './lib/auth/totp';
+export * from './lib/queue/scheduler';

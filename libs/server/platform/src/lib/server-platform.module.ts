@@ -10,6 +10,8 @@ import { PlatformLoggingModule } from './logging/logging.module';
 import { RedisService } from './redis/redis.service';
 import { QueueService } from './queue/queue.service';
 import { QueueController } from './queue/queue.controller';
+import { SchedulerService } from './queue/scheduler';
+import { PlatformTasks } from './queue/platform-tasks';
 import { EventBus } from './events/event-bus';
 import { OutboxDispatcher } from './events/outbox-dispatcher';
 
@@ -28,6 +30,8 @@ import { OutboxDispatcher } from './events/outbox-dispatcher';
     // Inert until the worker calls start(); the API only produces (outbox) and reads stats.
     EventBus,
     OutboxDispatcher,
+    SchedulerService,
+    PlatformTasks,
     { provide: APP_FILTER, useClass: ErrorFilter },
   ],
   exports: [
@@ -38,6 +42,7 @@ import { OutboxDispatcher } from './events/outbox-dispatcher';
     QueueService,
     EventBus,
     OutboxDispatcher,
+    SchedulerService,
     AuthModule,
   ],
 })

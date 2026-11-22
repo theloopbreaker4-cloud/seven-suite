@@ -10,6 +10,8 @@ import {
 } from '../../../test/test-app';
 import { PrismaService } from '../db/prisma.service';
 import { totpCode, totpStep } from './totp';
+import { QUEUES, QueueService } from '../queue/queue.service';
+import { SchedulerService } from '../queue/scheduler';
 
 /** Two-factor sign-in, API keys and the audit trail, over HTTP on a real database. */
 describe('two-factor sign-in, API keys, audit (HTTP)', () => {
@@ -25,6 +27,7 @@ describe('two-factor sign-in, API keys, audit (HTTP)', () => {
 
   beforeAll(async () => {
     process.env['PLATFORM_ADMINS'] = mail('own');
+    process.env['QUEUE_PREFIX'] = `seven-test-${run}`; // never touch a developer's queues
     app = await createTestApp();
     const res = await http(app)
       .post('/api/v1/auth/signup')
@@ -188,6 +191,24 @@ describe('two-factor sign-in, API keys, audit (HTTP)', () => {
     const denied = await http(app).get('/api/v1/system/queues').set(bearer(member)).expect(403);
     expect(denied.body.code).toBe('not_platform_admin');
     await http(app).get('/api/v1/system/queues/nope/failed').set(bearer(owner)).expect(404);
+    const me = await http(app).get('/api/v1/auth/me').set(bearer(owner)).expect(200);
+    expect(me.body.isPlatformAdmin).toBe(true);
+  });
+
+  it('schedules platform tasks once and lets operators run them', async () => {
+    const scheduler = app.get(SchedulerService);
+    await scheduler.start();
+    await scheduler.start(); // idempotent
+    const schedules = await app.get(QueueService).queue(QUEUES.scheduler).getJobSchedulers();
+    expect(schedules.map((x) => x.key).sort()).toEqual(['platform.outbox-prune', 'platform.tokens-cleanup']);
+    const stats = await http(app).get('/api/v1/system/queues').set(bearer(owner)).expect(200);
+    expect(stats.body.tasks).toEqual(
+      expect.arrayContaining([expect.objectContaining({ name: 'platform.tokens-cleanup', cron: '40 3 * * *', next: expect.any(Number) })]),
+    );
+    const ran = await http(app).post('/api/v1/system/queues/tasks/platform.tokens-cleanup/run').set(bearer(owner)).expect(200);
+    expect(ran.body.result).toEqual({ refresh: expect.any(Number), oneTime: expect.any(Number), invitations: expect.any(Number) });
+    await http(app).post('/api/v1/system/queues/tasks/platform.tokens-cleanup/run').set(bearer(member)).expect(403);
+    await app.get(QueueService).queue(QUEUES.scheduler).obliterate({ force: true });
   });
 
   it('writes an audit trail with request id, ip and no secrets', async () => {
