@@ -1,1 +1,225 @@
-{}
+{
+  "common": {
+    "wait": "Gözləyin…",
+    "continue": "Davam et",
+    "language": "Dil",
+    "lightTheme": "Açıq tema",
+    "darkTheme": "Tünd tema",
+    "remove": "Sil"
+  },
+  "auth": {
+    "email": "E-poçt",
+    "password": "Şifrə",
+    "newPassword": "Yeni şifrə",
+    "passwordHint": "Ən azı 10 simvol",
+    "name": "Adınız",
+    "organization": "Şirkətin adı",
+    "backToLogin": "Girişə qayıt",
+    "login": {
+      "title": "Giriş",
+      "subtitle": "Seven Suite-ə xoş gəlmisiniz",
+      "forgot": "Şifrəni unutmusunuz?",
+      "submit": "Daxil ol",
+      "noAccount": "Hələ hesabınız yoxdur?",
+      "link": "Daxil ol"
+    },
+    "signup": {
+      "title": "İş məkanınızı yaradın",
+      "subtitle": "Şirkətiniz öz məkanını alır, siz isə onun sahibi olursunuz.",
+      "submit": "Hesab yarat",
+      "haveAccount": "Artıq hesabınız var?",
+      "link": "Yarat"
+    },
+    "forgot": {
+      "title": "Şifrənin bərpası",
+      "subtitle": "Yeni şifrə seçmək üçün sizə keçid göndərəcəyik.",
+      "submit": "Keçid göndər",
+      "sent": "Bu ünvanla hesab varsa, bərpa keçidi göndərildi. Poçtunuzu yoxlayın."
+    },
+    "reset": {
+      "title": "Yeni şifrə seçin",
+      "submit": "Şifrəni yadda saxla",
+      "done": "Şifrəniz dəyişdirildi və bütün seanslarınız bağlandı. Yeni şifrə ilə daxil olun."
+    },
+    "verify": {
+      "title": "E-poçtun təsdiqi",
+      "done": "E-poçt ünvanınız təsdiqləndi."
+    },
+    "invite": {
+      "title": "İş məkanına qoşulun",
+      "intro": "Sizi {{organization}} təşkilatına {{role}} rolu ilə dəvət ediblər.",
+      "existing": "Artıq hesabınız var — onun şifrəsini daxil edin.",
+      "submit": "Qəbul et və davam et"
+    },
+    "demo": {
+      "title": "Demo",
+      "hint": "Ümumi demo hesabı — məlumatlar hər saat sıfırlanır. Qeydiyyat, poçt və üzvlük dəyişiklikləri söndürülüb.",
+      "signIn": "Demoya daxil ol"
+    },
+    "mfa": {
+      "hint": "Autentifikator tətbiqindəki 6 rəqəmli kodu daxil edin.",
+      "code": "Kod",
+      "recoveryHint": "Telefonunuz yanınızda deyil? Bərpa kodlarınızdan birini daxil edin.",
+      "submit": "Təsdiqlə",
+      "back": "Başqa hesabla daxil ol"
+    }
+  },
+  "nav": {
+    "dashboard": "İcmal",
+    "settings": "Parametrlər",
+    "members": "Üzvlər",
+    "security": "Təhlükəsizlik",
+    "apiKeys": "API açarları",
+    "roles": "Rollar",
+    "organization": "Təşkilat",
+    "system": "Sistem",
+    "queues": "Növbələr"
+  },
+  "shell": {
+    "organization": "Təşkilat",
+    "logout": "Çıxış"
+  },
+  "dashboard": {
+    "hello": "Salam, {{name}}",
+    "verifyBanner": "{{email}} ünvanınızı təsdiqləyin.",
+    "resend": "Yenidən göndər",
+    "resent": "Təsdiq məktubu göndərildi.",
+    "membersHint": "Komandanızı dəvət edin və rollarını seçin.",
+    "comingSoon": "Tezliklə",
+    "shop": "Mağaza"
+  },
+  "members": {
+    "invite": "Dəvət et",
+    "role": "Rol",
+    "send": "Dəvət göndər",
+    "you": "siz",
+    "unverified": "təsdiqlənməyib",
+    "lastLogin": "Son giriş",
+    "pending": "Gözləyən dəvətlər",
+    "expires": "bitir",
+    "revoke": "Ləğv et",
+    "sent": "Dəvət {{email}} ünvanına göndərildi.",
+    "roleChanged": "Rol dəyişdirildi.",
+    "removed": "Üzv silindi.",
+    "revoked": "Dəvət ləğv edildi.",
+    "confirmRemove": "{{name}} təşkilatdan silinsin?",
+    "name": "Ad"
+  },
+  "errors": {
+    "invalid_credentials": "E-poçt və ya şifrə yanlışdır.",
+    "rate_limited": "Çox sayda cəhd. Bir az sonra yenidən cəhd edin.",
+    "email_taken": "Bu e-poçtla hesab artıq mövcuddur.",
+    "invalid_token": "Keçid etibarsızdır və ya müddəti bitib.",
+    "session_expired": "Seansın müddəti bitib. Yenidən daxil olun.",
+    "no_organization": "Siz bu təşkilatın üzvü deyilsiniz.",
+    "account_disabled": "Bu hesab söndürülüb.",
+    "role_too_powerful": "Özünüzdə olandan çox giriş verə bilməzsiniz.",
+    "already_member": "Bu şəxs artıq üzvdür.",
+    "own_role": "Öz rolunuzu dəyişə bilməzsiniz.",
+    "remove_self": "Özünüzü silə bilməzsiniz.",
+    "last_owner": "Təşkilatın ən azı bir sahibi olmalıdır.",
+    "forbidden": "Bunun üçün icazəniz yoxdur.",
+    "unauthorized": "Zəhmət olmasa, daxil olun.",
+    "network": "Serverə qoşulmaq mümkün deyil. Bağlantını yoxlayın.",
+    "demo_locked": "Bu demoda söndürülüb. Qalan hər şeyi sınaya bilərsiniz — məlumatlar hər saat sıfırlanır.",
+    "invalid_code": "Kod yanlışdır.",
+    "mfa_expired": "Bu addımın vaxtı bitdi. Yenidən daxil olun.",
+    "api_key_not_allowed": "API açarı ilə əlçatan deyil.",
+    "cannot_grant": "Sizdə olmayan icazələri verə bilməzsiniz.",
+    "2fa_already_enabled": "İkifaktorlu giriş artıq aktivdir.",
+    "2fa_not_enabled": "İkifaktorlu giriş söndürülüb.",
+    "role_in_use": "Bu rol hələ də insanlara təyin olunub — əvvəlcə onlara başqa rol verin.",
+    "system_role": "Daxili rolları dəyişmək olmaz.",
+    "not_platform_admin": "Bu səhifə yalnız quraşdırmanın operatorları üçündür."
+  },
+  "roles": {
+    "owner": "Sahib",
+    "admin": "Administrator",
+    "member": "Üzv",
+    "hint": "Daxili rolları dəyişmək olmaz. Öz rollarınıza yalnız sizdə olan icazələri daxil edə bilərsiniz.",
+    "new": "Yeni rol",
+    "edit": "Rolu redaktə et",
+    "editShort": "Redaktə",
+    "name": "Ad",
+    "key": "Açar",
+    "save": "Rolu yadda saxla",
+    "cancel": "İmtina",
+    "builtIn": "daxili",
+    "delete": "Sil",
+    "saved": "Rol yadda saxlanıldı",
+    "deleted": "Rol silindi",
+    "confirmDelete": "“{{name}}” rolu silinsin?"
+  },
+  "security": {
+    "twoFactor": "İkifaktorlu giriş",
+    "twoFactorHint": "Şifrədən əlavə, giriş zamanı autentifikator tətbiqindən kod tələb olunur (Google Authenticator, 1Password, Authy…).",
+    "on": "Aktivdir",
+    "off": "Söndürülüb",
+    "turnOn": "Aktivləşdir",
+    "turnOff": "Söndür",
+    "step1": "QR kodu autentifikator tətbiqi ilə skan edin.",
+    "step2": "Təsdiq üçün tətbiqin göstərdiyi 6 rəqəmli kodu daxil edin.",
+    "manual": "Skan edə bilmirsiniz? Açarı əl ilə daxil edin:",
+    "qrAlt": "Autentifikator tətbiqi üçün QR kod",
+    "confirm": "Təsdiqlə",
+    "codesTitle": "Bərpa kodlarınız",
+    "codesHint": "Telefonu itirsəniz, hər kod bir dəfə işləyir. Onları etibarlı yerdə saxlayın — bir daha göstərilməyəcək.",
+    "copy": "Kopyala",
+    "copied": "Kopyalandı",
+    "saved": "Yadda saxladım",
+    "codesLeft": "Qalan bərpa kodları: {{n}}",
+    "codesLow": "Bərpa kodları tükənir — yenilərini yaradın.",
+    "newCodes": "Yeni bərpa kodları",
+    "enabled": "İkifaktorlu giriş aktivləşdirildi",
+    "disabled": "İkifaktorlu giriş söndürüldü"
+  },
+  "apiKeys": {
+    "hint": "Açarlar digər sistemlərinizə API-dən istifadə etməyə imkan verir. Açar heç vaxt onu yaradan şəxsdən çox şey edə bilməz və o şəxs təşkilatı tərk etdikdə işləməyi dayandırır.",
+    "new": "Yeni açar",
+    "name": "Ad",
+    "expires": "Müddəti",
+    "days": "{{n}} gün",
+    "never": "Müddətsiz",
+    "permissions": "İcazələr",
+    "create": "Açar yarat",
+    "createdTitle": "“{{name}}” açarı yaradıldı",
+    "createdHint": "İndi kopyalayın — təhlükəsizlik üçün yalnız bir dəfə göstərilir.",
+    "key": "Açar",
+    "lastUsed": "Son istifadə",
+    "revoked": "ləğv edilib",
+    "expired": "müddəti bitib",
+    "empty": "Hələ API açarı yoxdur.",
+    "confirmRevoke": "“{{name}}” ləğv edilsin? Ondan istifadə edən inteqrasiyalar dərhal dayanacaq.",
+    "revokedToast": "Açar ləğv edildi"
+  },
+  "org": {
+    "name": "Ad",
+    "legalName": "Hüquqi ad",
+    "country": "Ölkə (ISO kodu)",
+    "currency": "Əsas valyuta",
+    "timezone": "Saat qurşağı",
+    "defaultLanguage": "Əsas dil",
+    "languages": "Dillər",
+    "save": "Yadda saxla",
+    "saved": "Təşkilat yadda saxlanıldı"
+  },
+  "queues": {
+    "outboxPending": "Çatdırılmanı gözləyən hadisələr",
+    "outboxFailing": "Növbəyə qoyulmayan hadisələr",
+    "queue": "Növbə",
+    "waiting": "Gözləyir",
+    "active": "İcrada",
+    "delayed": "Təxirə salınıb",
+    "completed": "Tamamlanıb",
+    "failed": "Xəta ilə",
+    "paused": "dayandırılıb",
+    "deadLetter": "Xəta ilə bitən tapşırıqlar",
+    "attempts": "cəhd: {{n}}",
+    "retry": "Təkrarla",
+    "retried": "Tapşırıq yenidən növbədədir",
+    "task": "Planlaşdırılmış tapşırıq",
+    "schedule": "Cədvəl",
+    "next": "Növbəti icra",
+    "runNow": "İndi işə sal"
+  }
+}
