@@ -4,8 +4,9 @@
 > inventory on one data model. Built for small and medium businesses in Georgia, the Caucasus and
 > the CIS: UI in en, ru, ka, uk, az, hy, local payment gateways, Georgian tax compliance.
 >
-> **Status: 0.1.0 — foundation preview.** Sign-in, organizations, members, roles and invitations
-> work end to end; business modules land milestone by milestone ([TODO.md](TODO.md),
+> **Status: 0.2.0 — foundation preview.** Sign-in with optional two-factor codes, organizations,
+> members, roles, invitations, API keys and reliable events (outbox + worker) work end to end;
+> business modules land milestone by milestone ([TODO.md](TODO.md),
 > [CHANGELOG.md](CHANGELOG.md)).
 >
 > **Live demo:** https://seven.toolpix.dev/suite/ — `demo@example.com` / `seven-demo-2026`
