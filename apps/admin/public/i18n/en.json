@@ -73,7 +73,8 @@
     "roles": "Roles",
     "organization": "Organization",
     "system": "System",
-    "queues": "Queues"
+    "queues": "Queues",
+    "modules": "Modules"
   },
   "shell": {
     "organization": "Organization",
@@ -130,7 +131,11 @@
     "2fa_not_enabled": "Two-factor sign-in is off.",
     "role_in_use": "People still have this role — give them another one first.",
     "system_role": "Built-in roles can’t be changed.",
-    "not_platform_admin": "Only operators of this installation can see this page."
+    "not_platform_admin": "Only operators of this installation can see this page.",
+    "module_disabled": "This module is not enabled for your organization.",
+    "module_requires": "Enable the modules it needs first.",
+    "module_required_by": "Other enabled modules need this one.",
+    "module_always_on": "This module can’t be switched off."
   },
   "roles": {
     "owner": "Owner",
@@ -221,5 +226,11 @@
     "schedule": "Schedule",
     "next": "Next run",
     "runNow": "Run now"
+  },
+  "modules": {
+    "hint": "Switch parts of Seven Suite on or off for your organization. A module can only be enabled when the modules it builds on are on.",
+    "alwaysOn": "always on",
+    "requires": "Needs: {{list}}",
+    "requiredBy": "Used by: {{list}}"
   }
 }

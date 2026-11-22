@@ -11,6 +11,8 @@ export const PlatformEvents = {
   RoleCreated: 'platform.role.created',
   RoleUpdated: 'platform.role.updated',
   RoleDeleted: 'platform.role.deleted',
+  ModuleEnabled: 'platform.module.enabled',
+  ModuleDisabled: 'platform.module.disabled',
   UserSignedUp: 'platform.user.signed_up',
   MemberInvited: 'platform.member.invited',
   MemberJoined: 'platform.member.joined',

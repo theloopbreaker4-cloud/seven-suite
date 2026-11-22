@@ -11,6 +11,7 @@ export const IS_PUBLIC = 'seven:public';
 export const REQUIRED_PERMISSION = 'seven:permission';
 export const DEMO_LOCKED = 'seven:demo-locked';
 export const USER_ONLY = 'seven:user-only';
+export const REQUIRED_MODULE = 'seven:module';
 
 /** Every route requires a signed-in caller unless marked public. */
 export const Public = () => SetMetadata(IS_PUBLIC, true);
@@ -30,6 +31,9 @@ export const DemoLocked = () => SetMetadata(DEMO_LOCKED, true);
  * (A leaked key must not be able to mint more keys or change how anyone signs in.)
  */
 export const UserOnly = () => SetMetadata(USER_ONLY, true);
+
+/** The route belongs to a domain module: `403 module_disabled` unless the organization enabled it. */
+export const RequireModule = (id: string) => SetMetadata(REQUIRED_MODULE, id);
 
 /** The authenticated caller, attached by AuthGuard. */
 export const CurrentAuth = createParamDecorator(

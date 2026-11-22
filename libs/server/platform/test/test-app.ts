@@ -1,5 +1,5 @@
 /** Seven Suite — github.com/theloopbreaker4-cloud/seven-suite */
-import type { INestApplication } from '@nestjs/common';
+import type { INestApplication, Type } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import request from 'supertest';
 import { configureApp } from '../src/lib/configure-app';
@@ -9,7 +9,9 @@ import { RedisService } from '../src/lib/redis/redis.service';
 import { ServerPlatformModule } from '../src/lib/server-platform.module';
 
 /** The API exactly as main.ts wires it, on the test database, with mail captured in memory. */
-export async function createTestApp(): Promise<INestApplication> {
+export async function createTestApp(
+  extra: { controllers?: Type<unknown>[] } = {},
+): Promise<INestApplication> {
   const testUrl = process.env['DATABASE_TEST_URL'];
   if (!testUrl) throw new Error('DATABASE_TEST_URL is not set');
   const appUrl = process.env['DATABASE_APP_URL'];
@@ -26,6 +28,7 @@ export async function createTestApp(): Promise<INestApplication> {
 
   const moduleRef = await Test.createTestingModule({
     imports: [ServerPlatformModule],
+    controllers: extra.controllers ?? [],
   }).compile();
   const app = moduleRef.createNestApplication({ logger: false });
   configureApp(app);

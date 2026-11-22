@@ -5,7 +5,8 @@ import type { Request } from 'express';
 import { RequestContext } from '../context/request-context';
 import { DomainError } from '../errors/domain-error';
 import { ApiKeyService, API_KEY_PREFIX } from './api-key.service';
-import { IS_PUBLIC, REQUIRED_PERMISSION, USER_ONLY } from './decorators';
+import { IS_PUBLIC, REQUIRED_MODULE, REQUIRED_PERMISSION, USER_ONLY } from './decorators';
+import { ModuleRegistry } from '../modules/module-registry';
 import { hasPermission } from './permissions';
 import { TokenService, type AuthContext } from './tokens';
 
@@ -20,6 +21,7 @@ export class AuthGuard implements CanActivate {
     private readonly reflector: Reflector,
     private readonly tokens: TokenService,
     private readonly apiKeys: ApiKeyService,
+    private readonly modules: ModuleRegistry,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -57,6 +59,9 @@ export class AuthGuard implements CanActivate {
     );
     if (required && !hasPermission(auth.permissions, required))
       throw DomainError.forbidden();
+    const moduleId = this.reflector.getAllAndOverride<string | undefined>(REQUIRED_MODULE, targets);
+    if (moduleId && !(await this.modules.isEnabled(auth.orgId, moduleId)))
+      throw DomainError.forbidden('This module is not enabled for your organization', 'module_disabled');
     return true;
   }
 }

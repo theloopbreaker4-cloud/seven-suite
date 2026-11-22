@@ -67,7 +67,7 @@ the VPS works with one command.
 - [x] Structured logging (pino), request ids, credential redaction; error filter → `{ error, code, fields }` (500s never leak details)
 - [x] Health endpoints (`/api/v1/health/live`, `/ready` checks PostgreSQL + Redis)
 - [x] OpenAPI generation + `libs/api-client` generation script — _generated from live routes + zod schemas, public `/api/v1/openapi.json`, `nx run api-client:generate`, drift test_
-- [ ] Module manifest system: id, requires, permissions, settings schema, menu entries; enable/disable per org with dependency checks
+- [x] Module manifest system: id, requires, permissions, settings schema, menu entries; enable/disable per org with dependency checks — _`ModuleRegistry.register`, `@RequireModule`, Settings → Modules; per-module settings schema comes with the first module that needs one_
 
 ### Identity & access
 

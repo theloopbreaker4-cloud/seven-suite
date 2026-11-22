@@ -59,6 +59,7 @@ const NAV: NavSection[] = [
         icon: '🏢',
         permission: 'platform:settings:read',
       },
+      { label: 'nav.modules', path: '/settings/modules', icon: '🧩' },
       { label: 'nav.security', path: '/settings/security', icon: '🛡' },
     ],
   },

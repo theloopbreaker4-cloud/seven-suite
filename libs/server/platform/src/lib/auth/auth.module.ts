@@ -23,6 +23,8 @@ import { MemberController } from '../org/member.controller';
 import { MemberService } from '../org/member.service';
 import { OrganizationController } from '../org/organization.controller';
 import { OrganizationService } from '../org/organization.service';
+import { ModuleController } from '../modules/module.controller';
+import { ModuleRegistry } from '../modules/module-registry';
 
 /** Identity: sessions, account recovery, invitations, and the deny-by-default guard. */
 @Module({
@@ -34,6 +36,7 @@ import { OrganizationService } from '../org/organization.service';
     TwoFactorController,
     ApiKeyController,
     OrganizationController,
+    ModuleController,
   ],
   providers: [
     AuthService,
@@ -41,6 +44,7 @@ import { OrganizationService } from '../org/organization.service';
     InvitationService,
     MemberService,
     OrganizationService,
+    ModuleRegistry,
     TwoFactorService,
     ApiKeyService,
     TokenService,
@@ -50,6 +54,6 @@ import { OrganizationService } from '../org/organization.service';
     { provide: APP_GUARD, useClass: AuthGuard },
     { provide: APP_GUARD, useClass: DemoGuard },
   ],
-  exports: [AuthService, TokenService, MailService, RateLimiter, ApiKeyService, TwoFactorService],
+  exports: [AuthService, TokenService, MailService, RateLimiter, ApiKeyService, TwoFactorService, ModuleRegistry],
 })
 export class AuthModule {}

@@ -43,6 +43,11 @@ export const appRoutes: Route[] = [
           import('./pages/settings/organization').then((m) => m.OrganizationPage),
       },
       {
+        path: 'settings/modules',
+        loadComponent: () =>
+          import('./pages/settings/modules').then((m) => m.ModulesPage),
+      },
+      {
         path: 'system/queues',
         loadComponent: () =>
           import('./pages/system/queues').then((m) => m.QueuesPage),

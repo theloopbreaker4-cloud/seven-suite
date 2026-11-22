@@ -37,3 +37,26 @@ export const PERMISSION_CATALOG: readonly { key: string; group: string }[] = [
   { key: 'platform:api_key:create', group: 'platform' },
   { key: 'platform:api_key:delete', group: 'platform' },
 ];
+
+/** What a domain module declares about itself (docs/03-architecture.md §3). */
+export interface ModuleManifest {
+  /** Stable id, also the permission prefix: `crm` → `crm:deal:read`. */
+  id: string;
+  name: string;
+  description: string;
+  /** Modules that must be enabled first (`core` is always on). */
+  requires: string[];
+  /** Permissions this module checks (for role and API key pickers). */
+  permissions: string[];
+  /** Admin menu entries; shown only when the module is enabled and the permission is held. */
+  menu?: { label: string; path: string; icon: string; permission?: string }[];
+  /** Can't be switched off (the platform itself). */
+  alwaysOn?: boolean;
+}
+
+/** One module as an organization sees it (GET /org/modules). */
+export interface OrgModule extends ModuleManifest {
+  enabled: boolean;
+  /** Enabled modules that would break if this one were switched off. */
+  requiredBy: string[];
+}

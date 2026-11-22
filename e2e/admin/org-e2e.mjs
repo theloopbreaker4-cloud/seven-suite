@@ -82,6 +82,12 @@ await check('Roles page creates, edits and deletes a custom role', async () => {
   if (built !== 3) throw new Error(`${built} built-in roles shown`);
 });
 
+await check('Modules page shows Core as always on', async () => {
+  await page.getByRole('link', { name: 'Modules' }).click();
+  await page.getByRole('heading', { name: 'Core' }).waitFor();
+  await page.getByText('always on').waitFor();
+});
+
 await check('System → Queues shows queues and runs a task', async () => {
   await page.getByRole('link', { name: 'Queues' }).click();
   await page.getByText('seven-events').waitFor();

@@ -73,7 +73,8 @@
     "roles": "Rollar",
     "organization": "Təşkilat",
     "system": "Sistem",
-    "queues": "Növbələr"
+    "queues": "Növbələr",
+    "modules": "Modullar"
   },
   "shell": {
     "organization": "Təşkilat",
@@ -130,7 +131,11 @@
     "2fa_not_enabled": "İkifaktorlu giriş söndürülüb.",
     "role_in_use": "Bu rol hələ də insanlara təyin olunub — əvvəlcə onlara başqa rol verin.",
     "system_role": "Daxili rolları dəyişmək olmaz.",
-    "not_platform_admin": "Bu səhifə yalnız quraşdırmanın operatorları üçündür."
+    "not_platform_admin": "Bu səhifə yalnız quraşdırmanın operatorları üçündür.",
+    "module_disabled": "Bu modul təşkilatınız üçün aktiv deyil.",
+    "module_requires": "Əvvəlcə lazım olan modulları aktivləşdirin.",
+    "module_required_by": "Bu modul digər aktiv modullar üçün lazımdır.",
+    "module_always_on": "Bu modulu söndürmək olmaz."
   },
   "roles": {
     "owner": "Sahib",
@@ -221,5 +226,11 @@
     "schedule": "Cədvəl",
     "next": "Növbəti icra",
     "runNow": "İndi işə sal"
+  },
+  "modules": {
+    "hint": "Təşkilatınız üçün Seven Suite-in hissələrini aktivləşdirin və ya söndürün. Modul yalnız əsaslandığı modullar aktiv olduqda aktivləşdirilə bilər.",
+    "alwaysOn": "həmişə aktiv",
+    "requires": "Tələb edir: {{list}}",
+    "requiredBy": "İstifadə edir: {{list}}"
   }
 }
