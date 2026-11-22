@@ -62,7 +62,7 @@ the VPS works with one command.
 - [x] Tenancy: RLS policies + `PrismaService.withOrg()` (`app.org_id` per transaction) + integration test with two tenants — _org resolution from request pending_
 - [ ] Transactions helper (unit of work) shared by repositories
 - [x] Outbox: `outbox_event` written in-transaction; dispatcher in worker; `processed_event` idempotency; retries + dead-letter — _`emitEvent(tx,…)`, `EventBus.subscribe()`, 7-day retention_
-- [ ] BullMQ setup: queues, repeatable jobs (scheduler), dashboard (Bull Board) behind admin auth — _done: queues, worker, stats/failed/retry API for PLATFORM_ADMINS; repeatable jobs and an admin page pending_
+- [x] BullMQ setup: queues, repeatable jobs (scheduler), dashboard (Bull Board) behind admin auth — _own System → Queues page instead of Bull Board (strict CSP), operators only (PLATFORM_ADMINS)_
 - [ ] Cache + rate limiter (Redis) — _done: `RateLimiter` (fixed window); cache pending_
 - [x] Structured logging (pino), request ids, credential redaction; error filter → `{ error, code, fields }` (500s never leak details)
 - [x] Health endpoints (`/api/v1/health/live`, `/ready` checks PostgreSQL + Redis)
@@ -87,10 +87,10 @@ the VPS works with one command.
 - [x] Auth flows: sign-up, login, forgot/reset password, email verification, invitation accept; session restored from the refresh cookie on reload — _2FA screen comes with TOTP_
 - [x] HTTP interceptor (token, CSRF header, one shared refresh then replay, redirect to login), `*svCan` permission directive, API error codes shown in the UI language
 - [ ] Theme tokens (light/dark), Tailwind 4, base components — _done: tokens, light/dark, buttons, inputs, field, card, toast; date/money/table/dialog/empty state with M2 meta-UI_
-- [ ] i18n with Transloco — _done: en, ru, ka complete (same keys); uk, az, hy fall back to English until translated; CI missing-key check pending_
-- [ ] Settings area — _done: members (invite, roles, remove, pending invitations); organization profile, role editor, API keys pending_
+- [x] i18n with Transloco — _en, ru, ka, uk, az, hy complete; unit test checks every key and placeholder_
+- [x] Settings area — _members, roles editor, organization profile, API keys, security (2FA)_
 
-- [ ] Move the Playwright smoke test (`d:/Works/tools/seven-suite-e2e/admin-smoke.mjs`, 8 steps, passing) into `apps/admin-e2e` and run it in CI
+- [x] Move the Playwright smoke test (`d:/Works/tools/seven-suite-e2e/admin-smoke.mjs`, 8 steps, passing) into `apps/admin-e2e` and run it in CI — _`e2e/admin/` (smoke, 2FA/API keys, organization/roles/queues), CI step with Mailpit_
 
 ### Web shell (Next.js)
 

@@ -518,6 +518,9 @@ importers:
       pino-pretty:
         specifier: ^13.2.0
         version: 13.2.0
+      playwright:
+        specifier: 1.65.1
+        version: 1.65.1
       postcss:
         specifier: ^8.5.33
         version: 8.5.33

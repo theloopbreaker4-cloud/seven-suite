@@ -24,6 +24,9 @@ jobs:
       redis:
         image: redis:7-alpine
         ports: ['6379:6379']
+      mailpit:
+        image: axllent/mailpit:latest
+        ports: ['1025:1025', '8025:8025']
     env:
       DATABASE_URL: postgresql://seven:seven_ci_password@localhost:5432/seven_suite_test
       DATABASE_TEST_URL: postgresql://seven:seven_ci_password@localhost:5432/seven_suite_test
@@ -44,3 +47,32 @@ jobs:
       - run: pnpm exec nx affected -t lint typecheck test build --parallel=3
       # Row-level security and other database invariants, on the real PostgreSQL service.
       - run: pnpm exec nx run server-platform:integration
+      # Browser tests: the real API (built) and admin (dev server with the /api proxy) on the
+      # database the integration step just migrated; email links are read from Mailpit.
+      - name: Admin browser tests
+        env:
+          WEB_SERVICE_KEY: ci-only-web-service-key-ci-only-0001
+          SMTP_URL: smtp://127.0.0.1:1025
+          ADMIN_URL: http://127.0.0.1:4200
+          PLATFORM_ADMINS: ops-e2e@e2e.seven
+          QUEUE_PREFIX: seven-e2e
+          MAILPIT: http://127.0.0.1:8025
+          LOG_LEVEL: warn
+        run: |
+          pnpm exec playwright install --with-deps chromium
+          pnpm exec nx build api
+          node dist/apps/api/main.js > /tmp/api.log 2>&1 &
+          pnpm exec nx serve admin > /tmp/admin.log 2>&1 &
+          for i in $(seq 1 120); do
+            curl -sf http://127.0.0.1:4000/api/v1/health/ready > /dev/null && curl -sf http://127.0.0.1:4200/ > /dev/null && break
+            sleep 2
+          done
+          mkdir -p /tmp/shots
+          node e2e/admin/run-all.mjs /tmp/shots || { tail -40 /tmp/api.log; exit 1; }
+      - name: Screenshots of failed browser tests
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: admin-e2e-screenshots
+          path: /tmp/shots
+          if-no-files-found: ignore
