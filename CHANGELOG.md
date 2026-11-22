@@ -5,6 +5,33 @@ versions: [Semantic Versioning](https://semver.org/) (0.x — APIs may still cha
 
 ## [Unreleased]
 
+## [0.2.0] — 2026-11-23 — Security and reliable events
+
+### Added
+
+- **Two-factor sign-in** — authenticator apps (TOTP, RFC 6238) with a QR code in Settings →
+  Security, ten single-use recovery codes, a second sign-in step, turning it off needs the password
+  and a code. The secret is encrypted at rest (AES-256-GCM); a code can't be used twice.
+- **API keys** — Settings → API keys: per-organization keys with chosen permissions and expiry,
+  shown once, sent as `X-Api-Key` or `Authorization: Bearer sv_…`. A key never has more rights than
+  its creator currently has and stops working if they leave; keys can't manage sessions, 2FA or keys.
+- **Reliable events (transactional outbox)** — changes record events in the same database
+  transaction; the worker delivers them through BullMQ to consumers, each at most once per event,
+  with retries and a dead letter. Delivered events are kept for 7 days.
+- **Worker** — a real background process (outbox dispatcher + event consumers), deployed next to the
+  API from the same image.
+- **Request context** — every log line, audit row and event carries the request id (also returned
+  as `X-Request-Id`), organization, user or API key, IP.
+- **Queue stats for operators** — `GET /api/v1/system/queues`, failed jobs and retry, only for the
+  emails in `PLATFORM_ADMINS` (queues are shared by all organizations).
+
+### Security
+
+- Audit log for sign-ins (`login`, `login_failed`, `2fa_failed`, recovery-code use), 2FA changes,
+  API keys, invitations and member changes — with IP and request id; secrets are scrubbed.
+- Fixed: organization-less audit rows and events written by the row-level-security role failed
+  (Prisma read the row back through a policy that hides it).
+
 ## [0.1.0] — 2026-11-22 — Foundation preview
 
 The platform kernel every module will build on, live as a public demo at

@@ -118,6 +118,20 @@ describe('outbox and event bus', () => {
     expect(await prisma.system.auditLog.count({ where: { entityId: event.id, action: 'consumed' } })).toBe(1);
   });
 
+  it('prunes delivered events after a week, never undelivered ones', async () => {
+    const old = new Date(Date.now() - 8 * 86_400_000);
+    const [delivered, waiting] = [randomUUID(), randomUUID()];
+    await prisma.system.outboxEvent.createMany({
+      data: [
+        { id: delivered, name: `test.${run}.old`, payload: {}, occurredAt: old, dispatchedAt: old },
+        { id: waiting, name: `test.${run}.stuck`, payload: {}, occurredAt: old, attempts: 99 },
+      ],
+    });
+    await dispatcher.prune();
+    const left = await prisma.system.outboxEvent.findMany({ where: { id: { in: [delivered, waiting] } } });
+    expect(left.map((e) => e.id)).toEqual([waiting]);
+  });
+
   it('delivers end to end through the worker', async () => {
     const got = new Promise<DomainEvent>((resolve) =>
       bus.subscribe(`e2e-${run}`, `test.${run}.e2e`, async (e) => resolve(e)),

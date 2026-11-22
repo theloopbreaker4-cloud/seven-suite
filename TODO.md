@@ -58,11 +58,11 @@ the VPS works with one command.
 ### Platform kernel (`libs/server/platform`)
 
 - [x] Prisma 7: multi-file schema, Postgres schema per module (`platform`), migration workflow — _seed runner pending_
-- [ ] Request context (AsyncLocalStorage): requestId, orgId, userId, locale
+- [x] Request context (AsyncLocalStorage): requestId, orgId, userId, locale — _also actor (user/API key) and ip; X-Request-Id echoed_
 - [x] Tenancy: RLS policies + `PrismaService.withOrg()` (`app.org_id` per transaction) + integration test with two tenants — _org resolution from request pending_
 - [ ] Transactions helper (unit of work) shared by repositories
-- [ ] Outbox: `outbox_event` written in-transaction; dispatcher in worker; `processed_event` idempotency; retries + dead-letter
-- [ ] BullMQ setup: queues, repeatable jobs (scheduler), dashboard (Bull Board) behind admin auth
+- [x] Outbox: `outbox_event` written in-transaction; dispatcher in worker; `processed_event` idempotency; retries + dead-letter — _`emitEvent(tx,…)`, `EventBus.subscribe()`, 7-day retention_
+- [ ] BullMQ setup: queues, repeatable jobs (scheduler), dashboard (Bull Board) behind admin auth — _done: queues, worker, stats/failed/retry API for PLATFORM_ADMINS; repeatable jobs and an admin page pending_
 - [ ] Cache + rate limiter (Redis) — _done: `RateLimiter` (fixed window); cache pending_
 - [x] Structured logging (pino), request ids, credential redaction; error filter → `{ error, code, fields }` (500s never leak details)
 - [x] Health endpoints (`/api/v1/health/live`, `/ready` checks PostgreSQL + Redis)
@@ -74,11 +74,11 @@ the VPS works with one command.
 - [x] User, Organization, Membership, Role (permissions as `module:entity:action` strings), RefreshToken tables + migrations
 - [x] Sign-up (creates org + system roles owner/admin/member), login, logout, `/auth/me`, email verification, password reset (single-use hashed tokens; reset signs out every session)
 - [x] JWT access (HS256 via jose, 15 min) + rotating refresh in an httpOnly SameSite=Strict cookie; reuse revokes the whole family; refresh/logout need `X-Requested-With` (CSRF)
-- [ ] TOTP 2FA + recovery codes
+- [x] TOTP 2FA + recovery codes — _encrypted secret, no code reuse, admin Security page, login step_
 - [x] Invite members by email (cannot grant more than you have), accept as new or existing user, switch organization
 - [x] Deny-by-default global guard, `@Public()`, `@RequirePermission(...)` with `*` wildcards — _record-rule hook pending_
-- [ ] API keys (hashed, scoped)
-- [x] Login rate limits in Redis (5 per account+IP, 30 per IP / 15 min); timing-safe login for unknown emails — _refresh/reset limits and full auth audit pending_
+- [x] API keys (hashed, scoped) — _capped by the creator's current role, `@UserOnly()` routes, admin page_
+- [x] Login rate limits in Redis (5 per account+IP, 30 per IP / 15 min); timing-safe login for unknown emails — _auth audit done (login, failures, 2FA, keys); refresh/reset limits pending_
 - [x] Security headers, CORS policy, CSP for admin — _API: CSP `default-src 'none'`, nosniff, frame deny, no-store, no CORS (tested); admin: strict CSP + HSTS in nginx; web (Next.js) when it ships_
 
 ### Admin shell (Angular)
