@@ -55,12 +55,21 @@
       "title": "Live demo",
       "hint": "Shared demo account — data resets every hour. Sign-up, mail and membership changes are off.",
       "signIn": "Sign in to the demo"
+    },
+    "mfa": {
+      "hint": "Enter the 6-digit code from your authenticator app.",
+      "code": "Code",
+      "recoveryHint": "Lost your phone? Enter one of your recovery codes instead.",
+      "submit": "Verify",
+      "back": "Use a different account"
     }
   },
   "nav": {
     "dashboard": "Dashboard",
     "settings": "Settings",
-    "members": "Members"
+    "members": "Members",
+    "security": "Security",
+    "apiKeys": "API keys"
   },
   "shell": {
     "organization": "Organization",
@@ -108,11 +117,59 @@
     "forbidden": "You do not have access to this.",
     "unauthorized": "Please sign in.",
     "network": "Cannot reach the server. Check your connection.",
-    "demo_locked": "This is disabled in the demo. Everything else is yours to try — data resets every hour."
+    "demo_locked": "This is disabled in the demo. Everything else is yours to try — data resets every hour.",
+    "invalid_code": "Wrong code.",
+    "mfa_expired": "This step expired. Please sign in again.",
+    "api_key_not_allowed": "Not available with an API key.",
+    "cannot_grant": "You cannot grant permissions you don’t have.",
+    "2fa_already_enabled": "Two-factor sign-in is already on.",
+    "2fa_not_enabled": "Two-factor sign-in is off."
   },
   "roles": {
     "owner": "Owner",
     "admin": "Administrator",
     "member": "Member"
+  },
+  "security": {
+    "twoFactor": "Two-factor sign-in",
+    "twoFactorHint": "Besides your password, sign-in asks for a code from an authenticator app (Google Authenticator, 1Password, Authy…).",
+    "on": "On",
+    "off": "Off",
+    "turnOn": "Turn on",
+    "turnOff": "Turn off",
+    "step1": "Scan the QR code with your authenticator app.",
+    "step2": "Enter the 6-digit code it shows to confirm.",
+    "manual": "Can’t scan? Enter this key manually:",
+    "qrAlt": "QR code for your authenticator app",
+    "confirm": "Confirm",
+    "codesTitle": "Your recovery codes",
+    "codesHint": "Each code works once if you lose your phone. Store them somewhere safe — they won’t be shown again.",
+    "copy": "Copy",
+    "copied": "Copied",
+    "saved": "I saved them",
+    "codesLeft": "{{n}} recovery codes left",
+    "codesLow": "You are running out of recovery codes — create new ones.",
+    "newCodes": "New recovery codes",
+    "enabled": "Two-factor sign-in is on",
+    "disabled": "Two-factor sign-in is off"
+  },
+  "apiKeys": {
+    "hint": "Keys let your other systems use the API. A key can never do more than the person who created it, and stops working if they leave.",
+    "new": "New key",
+    "name": "Name",
+    "expires": "Expires",
+    "days": "in {{n}} days",
+    "never": "Never",
+    "permissions": "Permissions",
+    "create": "Create key",
+    "createdTitle": "Key “{{name}}” created",
+    "createdHint": "Copy it now — for your safety it is shown only once.",
+    "key": "Key",
+    "lastUsed": "Last used",
+    "revoked": "revoked",
+    "expired": "expired",
+    "empty": "No API keys yet.",
+    "confirmRevoke": "Revoke “{{name}}”? Integrations using it stop working at once.",
+    "revokedToast": "Key revoked"
   }
 }

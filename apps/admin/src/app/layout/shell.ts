@@ -39,6 +39,13 @@ const NAV: NavSection[] = [
         icon: '👥',
         permission: 'platform:member:read',
       },
+      {
+        label: 'nav.apiKeys',
+        path: '/settings/api-keys',
+        icon: '🔑',
+        permission: 'platform:api_key:read',
+      },
+      { label: 'nav.security', path: '/settings/security', icon: '🛡' },
     ],
   },
 ];

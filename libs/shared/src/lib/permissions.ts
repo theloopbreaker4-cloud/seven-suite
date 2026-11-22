@@ -18,3 +18,17 @@ export function hasPermission(granted: readonly string[], required: string): boo
     return have.length === need.length;
   });
 }
+
+/**
+ * Every concrete permission the product checks, for pickers (roles, API keys). Modules append
+ * theirs as they land; the API stays the source of truth for enforcement.
+ */
+export const PERMISSION_CATALOG: readonly { key: string; group: string }[] = [
+  { key: 'platform:member:read', group: 'platform' },
+  { key: 'platform:member:invite', group: 'platform' },
+  { key: 'platform:member:update', group: 'platform' },
+  { key: 'platform:member:remove', group: 'platform' },
+  { key: 'platform:api_key:read', group: 'platform' },
+  { key: 'platform:api_key:create', group: 'platform' },
+  { key: 'platform:api_key:delete', group: 'platform' },
+];

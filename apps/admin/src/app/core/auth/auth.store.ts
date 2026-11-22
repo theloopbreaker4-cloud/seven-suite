@@ -27,6 +27,7 @@ export interface Me {
     locale: string;
     emailVerified: string | null;
     lastLoginAt: string | null;
+    totpEnabledAt: string | null;
   };
   organization: OrganizationRef | null;
   role: string;
@@ -58,13 +59,31 @@ export class AuthStore {
     if (await this.refresh()) await this.loadMe().catch(() => this.clear());
   }
 
+  /**
+   * Password step. Returns the challenge token when the account has two-factor sign-in
+   * (finish with `completeMfa`), or null when the session has started.
+   */
   async login(body: {
     email: string;
     password: string;
     organization?: string;
-  }): Promise<void> {
+  }): Promise<string | null> {
+    const res = await firstValueFrom(
+      this.http.post<SessionResponse | { mfaRequired: true; mfaToken: string }>(
+        'api/v1/auth/login',
+        body,
+      ),
+    );
+    if ('mfaRequired' in res) return res.mfaToken;
+    this.accessToken.set(res.accessToken);
+    await this.loadMe();
+    return null;
+  }
+
+  /** Second step: an authenticator code or a recovery code. */
+  async completeMfa(mfaToken: string, code: string): Promise<void> {
     await this.start(
-      this.http.post<SessionResponse>('api/v1/auth/login', body),
+      this.http.post<SessionResponse>('api/v1/auth/login/2fa', { mfaToken, code }),
     );
   }
 

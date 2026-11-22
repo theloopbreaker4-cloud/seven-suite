@@ -35,6 +35,39 @@ import { FormState } from '../../ui/form-state';
           </button>
         </div>
       }
+      @if (mfaToken()) {
+        <form [formGroup]="codeForm" (ngSubmit)="submitCode()" novalidate>
+          <p class="mb-4 text-sm text-muted">{{ 'auth.mfa.hint' | transloco }}</p>
+          <sv-field
+            [label]="'auth.mfa.code' | transloco"
+            for="code"
+            [error]="state.fields()['code']"
+          >
+            <input
+              id="code"
+              type="text"
+              inputmode="numeric"
+              autocomplete="one-time-code"
+              class="sv-input font-mono tracking-widest"
+              formControlName="code"
+              maxlength="32"
+              required
+            />
+          </sv-field>
+          <p class="mb-4 text-xs text-muted">{{ 'auth.mfa.recoveryHint' | transloco }}</p>
+          @if (state.message()) {
+            <p class="mb-4 rounded-md bg-surface-2 px-3 py-2 text-sm text-danger" role="alert">
+              {{ state.message() }}
+            </p>
+          }
+          <button type="submit" class="sv-btn-primary w-full" [disabled]="state.busy() || codeForm.invalid">
+            {{ (state.busy() ? 'common.wait' : 'auth.mfa.submit') | transloco }}
+          </button>
+          <button type="button" class="sv-link mt-4 block w-full text-center text-sm" (click)="restart()">
+            {{ 'auth.mfa.back' | transloco }}
+          </button>
+        </form>
+      } @else {
       <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
         <sv-field
           [label]="'auth.email' | transloco"
@@ -85,6 +118,7 @@ import { FormState } from '../../ui/form-state';
           {{ (state.busy() ? 'common.wait' : 'auth.login.submit') | transloco }}
         </button>
       </form>
+      }
       @if (!demo()) {
         <p class="mt-5 text-center text-sm text-muted">
           {{ 'auth.login.noAccount' | transloco }}
@@ -105,6 +139,11 @@ export class LoginPage {
     email: ['', [Validators.required, Validators.email]],
     password: ['', Validators.required],
   });
+  protected readonly codeForm = inject(FormBuilder).nonNullable.group({
+    code: ['', [Validators.required, Validators.minLength(6)]],
+  });
+  /** Set after a correct password on an account with two-factor sign-in. */
+  protected readonly mfaToken = signal<string | null>(null);
 
   /** Set on the public demo instance: the shared account to sign in with. */
   protected readonly demo = signal<{ email: string; password: string } | null>(
@@ -132,12 +171,38 @@ export class LoginPage {
 
   async submit(): Promise<void> {
     if (this.form.invalid) return;
+    let challenge: string | null = null;
+    const ok = await this.state.run(async () => {
+      challenge = await this.store.login(this.form.getRawValue());
+    });
+    if (!ok) return;
+    if (challenge) {
+      this.mfaToken.set(challenge);
+      return;
+    }
+    await this.done();
+  }
+
+  async submitCode(): Promise<void> {
+    const token = this.mfaToken();
+    if (!token || this.codeForm.invalid) return;
     const ok = await this.state.run(() =>
-      this.store.login(this.form.getRawValue()),
+      this.store.completeMfa(token, this.codeForm.getRawValue().code.trim()),
     );
-    if (ok)
-      await this.router.navigateByUrl(
-        safeNext(this.route.snapshot.queryParamMap.get('next')),
-      );
+    if (ok) await this.done();
+    // An expired challenge (5 min) means starting over with the password.
+    else if (this.state.message() && !this.state.fields()['code']) this.codeForm.reset();
+  }
+
+  restart(): void {
+    this.mfaToken.set(null);
+    this.codeForm.reset();
+    this.state.message.set(null);
+  }
+
+  private async done(): Promise<void> {
+    await this.router.navigateByUrl(
+      safeNext(this.route.snapshot.queryParamMap.get('next')),
+    );
   }
 }

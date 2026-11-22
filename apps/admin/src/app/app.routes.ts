@@ -21,6 +21,18 @@ export const appRoutes: Route[] = [
         loadComponent: () =>
           import('./pages/settings/members').then((m) => m.MembersPage),
       },
+      {
+        path: 'settings/api-keys',
+        canActivate: [permissionGuard],
+        data: { permission: 'platform:api_key:read' },
+        loadComponent: () =>
+          import('./pages/settings/api-keys').then((m) => m.ApiKeysPage),
+      },
+      {
+        path: 'settings/security',
+        loadComponent: () =>
+          import('./pages/settings/security').then((m) => m.SecurityPage),
+      },
     ],
   },
   {

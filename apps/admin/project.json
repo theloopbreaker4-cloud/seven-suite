@@ -4,11 +4,16 @@
   "projectType": "application",
   "prefix": "sv",
   "sourceRoot": "apps/admin/src",
-  "tags": ["type:app", "platform:admin"],
+  "tags": [
+    "type:app",
+    "platform:admin"
+  ],
   "targets": {
     "build": {
       "executor": "@angular/build:application",
-      "outputs": ["{options.outputPath}"],
+      "outputs": [
+        "{options.outputPath}"
+      ],
       "defaultConfiguration": "production",
       "options": {
         "outputPath": "dist/apps/admin",
@@ -20,7 +25,12 @@
             "input": "apps/admin/public"
           }
         ],
-        "styles": ["apps/admin/src/styles.css"]
+        "styles": [
+          "apps/admin/src/styles.css"
+        ],
+        "allowedCommonJsDependencies": [
+          "qrcode"
+        ]
       },
       "configurations": {
         "production": {
@@ -79,7 +89,9 @@
       "readyWhen": {
         "signal": true
       },
-      "dependsOn": ["build"],
+      "dependsOn": [
+        "build"
+      ],
       "executor": "@nx/web:file-server",
       "options": {
         "buildTarget": "admin:build",
