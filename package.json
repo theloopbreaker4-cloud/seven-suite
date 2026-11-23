@@ -17,7 +17,8 @@
     "postinstall": "prisma generate",
     "db:migrate": "prisma migrate dev",
     "db:deploy": "prisma migrate deploy",
-    "db:studio": "prisma studio"
+    "db:studio": "prisma studio",
+    "prepare": "git config core.hooksPath .githooks 2>/dev/null || true"
   },
   "private": true,
   "dependencies": {
@@ -124,6 +125,7 @@
     "jiti": "2.4.2",
     "jsdom": "~22.1.0",
     "jsonc-eslint-parser": "^2.1.0",
+    "lint-staged": "^17.6.2",
     "nx": "24.0.6",
     "openapi-typescript": "^7.13.0",
     "pino-pretty": "^13.2.0",
@@ -147,5 +149,14 @@
     "webpack-dev-server": "^5.2.1"
   },
   "packageManager": "pnpm@12.15.0",
-  "description": "Seven Suite — all-in-one business platform"
+  "description": "Seven Suite — all-in-one business platform",
+  "lint-staged": {
+    "*.{ts,tsx,js,mjs,cjs}": [
+      "eslint --fix --no-warn-ignored",
+      "prettier --write"
+    ],
+    "*.{json,html,css,md,yml,yaml}": [
+      "prettier --write"
+    ]
+  }
 }
