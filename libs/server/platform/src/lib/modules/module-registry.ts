@@ -12,7 +12,8 @@ import { CacheService } from '../redis/cache.service';
 export const CORE_MODULE: ModuleManifest = {
   id: 'core',
   name: 'Core',
-  description: 'Organizations, people, roles, API keys, audit trail and events.',
+  description:
+    'Organizations, people, roles, API keys, audit trail and events.',
   requires: [],
   permissions: [
     'platform:member:read',
@@ -41,7 +42,9 @@ const CACHE_TTL = 60;
  */
 @Injectable()
 export class ModuleRegistry {
-  private readonly manifests = new Map<string, ModuleManifest>([[CORE_MODULE.id, CORE_MODULE]]);
+  private readonly manifests = new Map<string, ModuleManifest>([
+    [CORE_MODULE.id, CORE_MODULE],
+  ]);
 
   constructor(
     private readonly prisma: PrismaService,
@@ -49,9 +52,14 @@ export class ModuleRegistry {
   ) {}
 
   register(manifest: ModuleManifest): void {
-    if (!/^[a-z][a-z0-9_]{1,30}$/.test(manifest.id)) throw new Error(`Bad module id "${manifest.id}"`);
-    if (this.manifests.has(manifest.id)) throw new Error(`Module ${manifest.id} registered twice`);
-    this.manifests.set(manifest.id, { ...manifest, requires: [...new Set(manifest.requires)] });
+    if (!/^[a-z][a-z0-9_]{1,30}$/.test(manifest.id))
+      throw new Error(`Bad module id "${manifest.id}"`);
+    if (this.manifests.has(manifest.id))
+      throw new Error(`Module ${manifest.id} registered twice`);
+    this.manifests.set(manifest.id, {
+      ...manifest,
+      requires: [...new Set(manifest.requires)],
+    });
   }
 
   /** Drop a registration (tests only). */
@@ -65,11 +73,21 @@ export class ModuleRegistry {
 
   /** Ids enabled for an organization (always including core and other always-on modules). */
   async enabledFor(orgId: string): Promise<string[]> {
-    const stored = await this.cache.wrap(`org:${orgId}`, 'modules', CACHE_TTL, async () => {
-      const org = await this.prisma.system.organization.findUnique({ where: { id: orgId }, select: { modulesEnabled: true } });
-      return org?.modulesEnabled ?? [];
-    });
-    const alwaysOn = this.all().filter((m) => m.alwaysOn).map((m) => m.id);
+    const stored = await this.cache.wrap(
+      `org:${orgId}`,
+      'modules',
+      CACHE_TTL,
+      async () => {
+        const org = await this.prisma.system.organization.findUnique({
+          where: { id: orgId },
+          select: { modulesEnabled: true },
+        });
+        return org?.modulesEnabled ?? [];
+      },
+    );
+    const alwaysOn = this.all()
+      .filter((m) => m.alwaysOn)
+      .map((m) => m.id);
     return [...new Set([...alwaysOn, ...stored])];
   }
 
@@ -88,30 +106,56 @@ export class ModuleRegistry {
     }));
   }
 
-  async setEnabled(by: AuthContext, id: string, enabled: boolean): Promise<OrgModule[]> {
+  async setEnabled(
+    by: AuthContext,
+    id: string,
+    enabled: boolean,
+  ): Promise<OrgModule[]> {
     const manifest = this.manifests.get(id);
     if (!manifest) throw DomainError.notFound('Unknown module');
     if (manifest.alwaysOn && !enabled)
-      throw DomainError.conflict('module_always_on', `${manifest.name} can't be switched off`);
+      throw DomainError.conflict(
+        'module_always_on',
+        `${manifest.name} can't be switched off`,
+      );
 
     await this.prisma.withOrg(by.orgId, async (tx) => {
-      const org = await tx.organization.findUniqueOrThrow({ where: { id: by.orgId }, select: { modulesEnabled: true } });
-      const current = new Set([...org.modulesEnabled, ...this.all().filter((m) => m.alwaysOn).map((m) => m.id)]);
+      const org = await tx.organization.findUniqueOrThrow({
+        where: { id: by.orgId },
+        select: { modulesEnabled: true },
+      });
+      const current = new Set([
+        ...org.modulesEnabled,
+        ...this.all()
+          .filter((m) => m.alwaysOn)
+          .map((m) => m.id),
+      ]);
       if (enabled === current.has(id)) return;
       if (enabled) {
         const missing = manifest.requires.filter((r) => !current.has(r));
         if (missing.length)
-          throw DomainError.conflict('module_requires', `Enable ${missing.join(', ')} first`);
+          throw DomainError.conflict(
+            'module_requires',
+            `Enable ${missing.join(', ')} first`,
+          );
         current.add(id);
       } else {
-        const dependants = this.all().filter((m) => current.has(m.id) && m.requires.includes(id)).map((m) => m.id);
+        const dependants = this.all()
+          .filter((m) => current.has(m.id) && m.requires.includes(id))
+          .map((m) => m.id);
         if (dependants.length)
-          throw DomainError.conflict('module_required_by', `Switch off ${dependants.join(', ')} first`);
+          throw DomainError.conflict(
+            'module_required_by',
+            `Switch off ${dependants.join(', ')} first`,
+          );
         current.delete(id);
       }
       // Keep only modules this installation knows about.
       const next = [...current].filter((m) => this.manifests.has(m)).sort();
-      await tx.organization.update({ where: { id: by.orgId }, data: { modulesEnabled: next } });
+      await tx.organization.update({
+        where: { id: by.orgId },
+        data: { modulesEnabled: next },
+      });
       await recordAudit(tx, {
         entityType: 'organization',
         entityId: by.orgId,
@@ -119,7 +163,11 @@ export class ModuleRegistry {
         before: { modules: org.modulesEnabled },
         after: { modules: next },
       });
-      await emitEvent(tx, enabled ? PlatformEvents.ModuleEnabled : PlatformEvents.ModuleDisabled, { module: id });
+      await emitEvent(
+        tx,
+        enabled ? PlatformEvents.ModuleEnabled : PlatformEvents.ModuleDisabled,
+        { module: id },
+      );
     });
     await this.cache.del(`org:${by.orgId}`, 'modules');
     return this.list(by.orgId);

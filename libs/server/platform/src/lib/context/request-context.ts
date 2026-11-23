@@ -64,7 +64,10 @@ export function requestContextMiddleware(
     {
       requestId,
       ip: req.ip,
-      locale: typeof lang === 'string' ? lang.split(',')[0]?.trim().slice(0, 16) : undefined,
+      locale:
+        typeof lang === 'string'
+          ? lang.split(',')[0]?.trim().slice(0, 16)
+          : undefined,
     },
     next,
   );

@@ -1,8 +1,20 @@
 /** Seven Suite — github.com/theloopbreaker4-cloud/seven-suite */
-import { Controller, Get, Header, Injectable, RequestMethod } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Header,
+  Injectable,
+  RequestMethod,
+} from '@nestjs/common';
 import { ModulesContainer } from '@nestjs/core';
 import { z, type ZodType } from 'zod';
-import { DEMO_LOCKED, IS_PUBLIC, Public, REQUIRED_PERMISSION, USER_ONLY } from '../auth/decorators';
+import {
+  DEMO_LOCKED,
+  IS_PUBLIC,
+  Public,
+  REQUIRED_PERMISSION,
+  USER_ONLY,
+} from '../auth/decorators';
 import { ZodPipe } from '../validation/zod.pipe';
 
 // Nest's own metadata keys (stable public constants of @nestjs/common).
@@ -20,14 +32,24 @@ const errorSchema = {
   required: ['error', 'code'],
   properties: {
     error: { type: 'string', description: 'Human-readable message (English)' },
-    code: { type: 'string', description: 'Stable machine code, e.g. `validation_failed`, `forbidden`' },
-    fields: { type: 'object', additionalProperties: { type: 'string' }, description: 'Per-field messages (422)' },
+    code: {
+      type: 'string',
+      description: 'Stable machine code, e.g. `validation_failed`, `forbidden`',
+    },
+    fields: {
+      type: 'object',
+      additionalProperties: { type: 'string' },
+      description: 'Per-field messages (422)',
+    },
   },
 };
 
 function jsonSchema(schema: ZodType): Json {
   try {
-    const out = z.toJSONSchema(schema, { unrepresentable: 'any', io: 'input' }) as Json;
+    const out = z.toJSONSchema(schema, {
+      unrepresentable: 'any',
+      io: 'input',
+    }) as Json;
     delete out['$schema'];
     return out;
   } catch {
@@ -35,18 +57,27 @@ function jsonSchema(schema: ZodType): Json {
   }
 }
 
-function zodOf(args: Record<string, { pipes?: unknown[] }> | undefined, type: number): ZodType | undefined {
+function zodOf(
+  args: Record<string, { pipes?: unknown[] }> | undefined,
+  type: number,
+): ZodType | undefined {
   if (!args) return undefined;
   for (const [key, arg] of Object.entries(args)) {
     if (Number(key.split(':')[0]) !== type) continue;
-    const pipe = arg.pipes?.find((p): p is ZodPipe<unknown> => p instanceof ZodPipe);
+    const pipe = arg.pipes?.find(
+      (p): p is ZodPipe<unknown> => p instanceof ZodPipe,
+    );
     if (pipe) return pipe.schema as ZodType;
   }
   return undefined;
 }
 
 const joinPath = (...parts: (string | undefined)[]) =>
-  '/' + parts.flatMap((p) => (p ?? '').split('/')).filter(Boolean).join('/');
+  '/' +
+  parts
+    .flatMap((p) => (p ?? '').split('/'))
+    .filter(Boolean)
+    .join('/');
 
 /**
  * Builds the OpenAPI 3.1 document from the running application itself: every controller route,
@@ -66,7 +97,8 @@ export class OpenApiBuilder {
 
     for (const mod of this.modules.values()) {
       for (const wrapper of mod.controllers.values()) {
-        const ctrl = wrapper.metatype as (new (...a: unknown[]) => unknown) | undefined;
+        const ctrl = wrapper.metatype as
+          (new (...a: unknown[]) => unknown) | undefined;
         if (!ctrl?.prototype) continue;
         const base = Reflect.getMetadata(PATH, ctrl) as string | undefined;
         const tag = ctrl.name.replace(/Controller$/, '');
@@ -74,56 +106,109 @@ export class OpenApiBuilder {
           if (name === 'constructor') continue;
           const handler = (ctrl.prototype as Record<string, unknown>)[name];
           if (typeof handler !== 'function') continue;
-          const method = Reflect.getMetadata(METHOD, handler) as RequestMethod | undefined;
+          const method = Reflect.getMetadata(METHOD, handler) as
+            RequestMethod | undefined;
           const sub = Reflect.getMetadata(PATH, handler) as string | undefined;
           if (method === undefined || sub === undefined) continue;
 
           const meta = <T>(key: string): T | undefined =>
-            (Reflect.getMetadata(key, handler) as T | undefined) ?? (Reflect.getMetadata(key, ctrl) as T | undefined);
+            (Reflect.getMetadata(key, handler) as T | undefined) ??
+            (Reflect.getMetadata(key, ctrl) as T | undefined);
           const isPublic = meta<boolean>(IS_PUBLIC) === true;
           const permission = meta<string>(REQUIRED_PERMISSION);
           const userOnly = meta<boolean>(USER_ONLY) === true;
           const demoLocked = meta<boolean>(DEMO_LOCKED) === true;
-          const status = (Reflect.getMetadata(HTTP_CODE, handler) as number | undefined) ?? (method === RequestMethod.POST ? 201 : 200);
+          const status =
+            (Reflect.getMetadata(HTTP_CODE, handler) as number | undefined) ??
+            (method === RequestMethod.POST ? 201 : 200);
 
           const rawPath = joinPath(base, sub);
           const oaPath = rawPath.replace(/:(\w+)/g, '{$1}');
           const verb = RequestMethod[method].toLowerCase();
-          const args = Reflect.getMetadata(ROUTE_ARGS, ctrl, name) as Record<string, { pipes?: unknown[] }> | undefined;
+          const args = Reflect.getMetadata(ROUTE_ARGS, ctrl, name) as
+            Record<string, { pipes?: unknown[] }> | undefined;
           const body = zodOf(args, BODY);
           const query = zodOf(args, QUERY);
 
           const notes: string[] = [];
           if (permission) notes.push(`Requires permission \`${permission}\`.`);
-          if (userOnly && !isPublic) notes.push('People only — not available with an API key.');
-          if (demoLocked) notes.push('Disabled on the public demo (`403 demo_locked`).');
+          if (userOnly && !isPublic)
+            notes.push('People only — not available with an API key.');
+          if (demoLocked)
+            notes.push('Disabled on the public demo (`403 demo_locked`).');
 
-          const parameters: Json[] = [...rawPath.matchAll(/:(\w+)/g)].map((m) => ({
-            name: m[1],
-            in: 'path',
-            required: true,
-            schema: { type: 'string' },
-          }));
+          const parameters: Json[] = [...rawPath.matchAll(/:(\w+)/g)].map(
+            (m) => ({
+              name: m[1],
+              in: 'path',
+              required: true,
+              schema: { type: 'string' },
+            }),
+          );
           if (query) {
-            const qs = jsonSchema(query) as { properties?: Record<string, Json>; required?: string[] };
+            const qs = jsonSchema(query) as {
+              properties?: Record<string, Json>;
+              required?: string[];
+            };
             for (const [qName, qSchema] of Object.entries(qs.properties ?? {}))
-              parameters.push({ name: qName, in: 'query', required: qs.required?.includes(qName) ?? false, schema: qSchema });
+              parameters.push({
+                name: qName,
+                in: 'query',
+                required: qs.required?.includes(qName) ?? false,
+                schema: qSchema,
+              });
           }
 
           const responses: Json = {
-            [status]: status === 204 ? { description: 'Done' } : { description: 'OK', content: { 'application/json': { schema: { type: 'object' } } } },
-            default: { description: 'Error', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
+            [status]:
+              status === 204
+                ? { description: 'Done' }
+                : {
+                    description: 'OK',
+                    content: {
+                      'application/json': { schema: { type: 'object' } },
+                    },
+                  },
+            default: {
+              description: 'Error',
+              content: {
+                'application/json': {
+                  schema: { $ref: '#/components/schemas/Error' },
+                },
+              },
+            },
           };
-          if (body) responses['422'] = { description: 'Validation failed', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } };
+          if (body)
+            responses['422'] = {
+              description: 'Validation failed',
+              content: {
+                'application/json': {
+                  schema: { $ref: '#/components/schemas/Error' },
+                },
+              },
+            };
 
           (paths[oaPath] ??= {})[verb] = {
             operationId: `${tag}_${name}`,
             tags: [tag],
             ...(notes.length ? { description: notes.join(' ') } : {}),
             ...(parameters.length ? { parameters } : {}),
-            ...(body ? { requestBody: { required: true, content: { 'application/json': { schema: jsonSchema(body) } } } } : {}),
+            ...(body
+              ? {
+                  requestBody: {
+                    required: true,
+                    content: {
+                      'application/json': { schema: jsonSchema(body) },
+                    },
+                  },
+                }
+              : {}),
             responses,
-            security: isPublic ? [] : userOnly ? [{ bearer: [] }] : [{ bearer: [] }, { apiKey: [] }],
+            security: isPublic
+              ? []
+              : userOnly
+                ? [{ bearer: [] }]
+                : [{ bearer: [] }, { apiKey: [] }],
             ...(permission ? { 'x-permission': permission } : {}),
           };
         }
@@ -147,7 +232,9 @@ export class OpenApiBuilder {
         },
         schemas: { Error: errorSchema },
       },
-      paths: Object.fromEntries(Object.entries(paths).sort(([a], [b]) => a.localeCompare(b))),
+      paths: Object.fromEntries(
+        Object.entries(paths).sort(([a], [b]) => a.localeCompare(b)),
+      ),
     };
     return this.cached;
   }
@@ -162,6 +249,10 @@ export class OpenApiController {
   @Get('openapi.json')
   @Header('Cache-Control', 'public, max-age=300')
   spec() {
-    return this.builder.build(process.env['npm_package_version'] ?? process.env['APP_VERSION'] ?? '0.3.0');
+    return this.builder.build(
+      process.env['npm_package_version'] ??
+        process.env['APP_VERSION'] ??
+        '0.3.0',
+    );
   }
 }

@@ -37,15 +37,26 @@ export class TwoFactorService {
       where: { id: userId },
       select: { totpEnabledAt: true },
     });
-    const left = await this.prisma.system.recoveryCode.count({ where: { userId, usedAt: null } });
-    return { enabled: !!user.totpEnabledAt, enabledAt: user.totpEnabledAt, recoveryCodesLeft: left };
+    const left = await this.prisma.system.recoveryCode.count({
+      where: { userId, usedAt: null },
+    });
+    return {
+      enabled: !!user.totpEnabledAt,
+      enabledAt: user.totpEnabledAt,
+      recoveryCodesLeft: left,
+    };
   }
 
   /** Step 1: a fresh secret to scan. Not active until confirmed with a code. */
   async setup(userId: string) {
-    const user = await this.prisma.system.user.findUniqueOrThrow({ where: { id: userId } });
+    const user = await this.prisma.system.user.findUniqueOrThrow({
+      where: { id: userId },
+    });
     if (user.totpEnabledAt)
-      throw DomainError.conflict('2fa_already_enabled', 'Two-factor sign-in is already on');
+      throw DomainError.conflict(
+        '2fa_already_enabled',
+        'Two-factor sign-in is already on',
+      );
     const secret = generateTotpSecret();
     await this.prisma.system.user.update({
       where: { id: userId },
@@ -56,9 +67,14 @@ export class TwoFactorService {
 
   /** Step 2: prove the app works; returns the recovery codes — shown once, never again. */
   async enable(userId: string, code: string) {
-    const user = await this.prisma.system.user.findUniqueOrThrow({ where: { id: userId } });
+    const user = await this.prisma.system.user.findUniqueOrThrow({
+      where: { id: userId },
+    });
     if (user.totpEnabledAt)
-      throw DomainError.conflict('2fa_already_enabled', 'Two-factor sign-in is already on');
+      throw DomainError.conflict(
+        '2fa_already_enabled',
+        'Two-factor sign-in is already on',
+      );
     if (!user.totpSecret)
       throw DomainError.validation({ code: 'Start the setup first' });
     const step = verifyTotp(this.box.open(user.totpSecret), code, null);
@@ -74,13 +90,21 @@ export class TwoFactorService {
       await tx.recoveryCode.createMany({
         data: codes.map((c) => ({ userId, codeHash: TokenService.hash(c) })),
       });
-      await recordAudit(tx, { orgId: null, actorId: userId, entityType: 'user', entityId: userId, action: '2fa_enabled' });
+      await recordAudit(tx, {
+        orgId: null,
+        actorId: userId,
+        entityType: 'user',
+        entityId: userId,
+        action: '2fa_enabled',
+      });
     });
     return { recoveryCodes: codes };
   }
 
   async disable(userId: string, password: string, code: string): Promise<void> {
-    const user = await this.prisma.system.user.findUniqueOrThrow({ where: { id: userId } });
+    const user = await this.prisma.system.user.findUniqueOrThrow({
+      where: { id: userId },
+    });
     if (!user.totpEnabledAt) return;
     if (!(await verifyPassword(password, user.passwordHash)))
       throw DomainError.validation({ password: 'Wrong password' });
@@ -92,22 +116,48 @@ export class TwoFactorService {
         data: { totpSecret: null, totpEnabledAt: null, totpLastStep: null },
       });
       await tx.recoveryCode.deleteMany({ where: { userId } });
-      await recordAudit(tx, { orgId: null, actorId: userId, entityType: 'user', entityId: userId, action: '2fa_disabled' });
+      await recordAudit(tx, {
+        orgId: null,
+        actorId: userId,
+        entityType: 'user',
+        entityId: userId,
+        action: '2fa_disabled',
+      });
     });
   }
 
   /** A new set of recovery codes (the old ones stop working). Needs a current app code. */
   async regenerateRecoveryCodes(userId: string, code: string) {
-    const user = await this.prisma.system.user.findUniqueOrThrow({ where: { id: userId } });
+    const user = await this.prisma.system.user.findUniqueOrThrow({
+      where: { id: userId },
+    });
     if (!user.totpEnabledAt || !user.totpSecret)
-      throw DomainError.conflict('2fa_not_enabled', 'Two-factor sign-in is off');
-    if (!(await this.verifyTotpOnly(userId, user.totpSecret, user.totpLastStep, code)))
+      throw DomainError.conflict(
+        '2fa_not_enabled',
+        'Two-factor sign-in is off',
+      );
+    if (
+      !(await this.verifyTotpOnly(
+        userId,
+        user.totpSecret,
+        user.totpLastStep,
+        code,
+      ))
+    )
       throw DomainError.validation({ code: 'Wrong code' });
     const codes = generateRecoveryCodes();
     await this.prisma.system.$transaction(async (tx) => {
       await tx.recoveryCode.deleteMany({ where: { userId } });
-      await tx.recoveryCode.createMany({ data: codes.map((c) => ({ userId, codeHash: TokenService.hash(c) })) });
-      await recordAudit(tx, { orgId: null, actorId: userId, entityType: 'user', entityId: userId, action: '2fa_recovery_regenerated' });
+      await tx.recoveryCode.createMany({
+        data: codes.map((c) => ({ userId, codeHash: TokenService.hash(c) })),
+      });
+      await recordAudit(tx, {
+        orgId: null,
+        actorId: userId,
+        entityType: 'user',
+        entityId: userId,
+        action: '2fa_recovery_regenerated',
+      });
     });
     return { recoveryCodes: codes };
   }
@@ -116,7 +166,10 @@ export class TwoFactorService {
    * The second factor at sign-in: an app code or a recovery code. Each is consumed atomically —
    * two parallel requests with the same code can't both pass.
    */
-  async verify(userId: string, code: string): Promise<'totp' | 'recovery' | null> {
+  async verify(
+    userId: string,
+    code: string,
+  ): Promise<'totp' | 'recovery' | null> {
     const user = await this.prisma.system.user.findUnique({
       where: { id: userId },
       select: { totpSecret: true, totpEnabledAt: true, totpLastStep: true },
@@ -124,17 +177,37 @@ export class TwoFactorService {
     if (!user?.totpEnabledAt || !user.totpSecret) return null;
     const trimmed = code.replace(/\s/g, '');
     if (/^\d{6}$/.test(trimmed))
-      return (await this.verifyTotpOnly(userId, user.totpSecret, user.totpLastStep, trimmed)) ? 'totp' : null;
+      return (await this.verifyTotpOnly(
+        userId,
+        user.totpSecret,
+        user.totpLastStep,
+        trimmed,
+      ))
+        ? 'totp'
+        : null;
 
     const used = await this.prisma.system.recoveryCode.updateMany({
-      where: { userId, codeHash: TokenService.hash(normalizeRecoveryCode(trimmed)), usedAt: null },
+      where: {
+        userId,
+        codeHash: TokenService.hash(normalizeRecoveryCode(trimmed)),
+        usedAt: null,
+      },
       data: { usedAt: new Date() },
     });
     return used.count === 1 ? 'recovery' : null;
   }
 
-  private async verifyTotpOnly(userId: string, sealed: string, lastStep: bigint | null, code: string): Promise<boolean> {
-    const step = verifyTotp(this.box.open(sealed), code, lastStep === null ? null : Number(lastStep));
+  private async verifyTotpOnly(
+    userId: string,
+    sealed: string,
+    lastStep: bigint | null,
+    code: string,
+  ): Promise<boolean> {
+    const step = verifyTotp(
+      this.box.open(sealed),
+      code,
+      lastStep === null ? null : Number(lastStep),
+    );
     if (step === null) return false;
     // Compare-and-set: only one request can advance past this step.
     const claimed = await this.prisma.system.user.updateMany({

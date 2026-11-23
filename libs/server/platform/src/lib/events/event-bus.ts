@@ -1,5 +1,10 @@
 /** Seven Suite — github.com/theloopbreaker4-cloud/seven-suite */
-import { Inject, Injectable, Logger, OnApplicationShutdown } from '@nestjs/common';
+import {
+  Inject,
+  Injectable,
+  Logger,
+  OnApplicationShutdown,
+} from '@nestjs/common';
 import { Worker, type Job } from 'bullmq';
 import { ENV } from '../config/config.module';
 import type { Env } from '../config/env';
@@ -9,7 +14,9 @@ import { bullOptions, QUEUES } from '../queue/queue.service';
 import type { DomainEvent, OutboxPayload } from './outbox';
 
 /** Owner-role transaction handed to consumers (they may write across tenants, carefully). */
-export type SystemTx = Parameters<Parameters<PrismaService['system']['$transaction']>[0]>[0];
+export type SystemTx = Parameters<
+  Parameters<PrismaService['system']['$transaction']>[0]
+>[0];
 
 export type EventHandler = (event: DomainEvent, tx: SystemTx) => Promise<void>;
 
@@ -50,11 +57,15 @@ export class EventBus implements OnApplicationShutdown {
   }
 
   /** Run every matching consumer for one event (exported for tests and the worker). */
-  async deliver(event: DomainEvent): Promise<{ ran: string[]; skipped: string[] }> {
+  async deliver(
+    event: DomainEvent,
+  ): Promise<{ ran: string[]; skipped: string[] }> {
     const ran: string[] = [];
     const skipped: string[] = [];
     const failures: string[] = [];
-    for (const sub of this.subs.filter((s) => matchesEvent(s.pattern, event.name))) {
+    for (const sub of this.subs.filter((s) =>
+      matchesEvent(s.pattern, event.name),
+    )) {
       try {
         const done = await RequestContext.run(
           {
@@ -90,7 +101,10 @@ export class EventBus implements OnApplicationShutdown {
     this.worker = new Worker(
       QUEUES.events,
       async (job: Job) => {
-        const payload = job.data as OutboxPayload & { orgId: string | null; occurredAt: string };
+        const payload = job.data as OutboxPayload & {
+          orgId: string | null;
+          occurredAt: string;
+        };
         await this.deliver({
           id: String(job.id),
           name: job.name,
@@ -103,7 +117,9 @@ export class EventBus implements OnApplicationShutdown {
       { ...bullOptions(this.env), concurrency },
     );
     this.worker.on('failed', (job, err) =>
-      this.logger.warn(`event ${job?.name} ${job?.id} attempt ${job?.attemptsMade} failed: ${err.message}`),
+      this.logger.warn(
+        `event ${job?.name} ${job?.id} attempt ${job?.attemptsMade} failed: ${err.message}`,
+      ),
     );
   }
 

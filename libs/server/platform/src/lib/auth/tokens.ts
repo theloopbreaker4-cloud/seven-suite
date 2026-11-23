@@ -90,7 +90,9 @@ export class TokenService {
       .sign(this.key);
   }
 
-  async verifyMfa(token: string): Promise<{ userId: string; orgId: string } | null> {
+  async verifyMfa(
+    token: string,
+  ): Promise<{ userId: string; orgId: string } | null> {
     try {
       const { payload } = await jwtVerify(token, this.key, {
         issuer: ISSUER,
@@ -98,7 +100,9 @@ export class TokenService {
         algorithms: ['HS256'],
       });
       const { sub, org } = payload as Record<string, unknown>;
-      return typeof sub === 'string' && typeof org === 'string' ? { userId: sub, orgId: org } : null;
+      return typeof sub === 'string' && typeof org === 'string'
+        ? { userId: sub, orgId: org }
+        : null;
     } catch {
       return null;
     }

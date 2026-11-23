@@ -111,7 +111,12 @@ export class AuthService {
         { organizationId: org.id, slug, ownerId: user.id },
         org.id,
       );
-      await emitEvent(tx, PlatformEvents.UserSignedUp, { userId: user.id, email: input.email }, null);
+      await emitEvent(
+        tx,
+        PlatformEvents.UserSignedUp,
+        { userId: user.id, email: input.email },
+        null,
+      );
       return { userId: user.id, orgId: org.id };
     });
     const { userId, orgId } = await created.catch((e: { code?: string }) => {
@@ -126,7 +131,10 @@ export class AuthService {
     return this.startSession(userId, orgId, client, randomUUID());
   }
 
-  async login(input: LoginInput, client: ClientInfo): Promise<Session | MfaChallenge> {
+  async login(
+    input: LoginInput,
+    client: ClientInfo,
+  ): Promise<Session | MfaChallenge> {
     await this.limiter.assertAllowed(client.ip, input.email);
     const db = this.prisma.system;
     const user = await db.user.findUnique({ where: { email: input.email } });
@@ -138,7 +146,13 @@ export class AuthService {
     if (!user || !valid) {
       await this.limiter.recordFailure(client.ip, input.email);
       if (user)
-        await recordAudit(db, { orgId: null, actorId: user.id, entityType: 'user', entityId: user.id, action: 'login_failed' });
+        await recordAudit(db, {
+          orgId: null,
+          actorId: user.id,
+          entityType: 'user',
+          entityId: user.id,
+          action: 'login_failed',
+        });
       throw DomainError.unauthorized(
         'Wrong email or password',
         'invalid_credentials',
@@ -167,9 +181,18 @@ export class AuthService {
     await this.limiter.recordSuccess(client.ip, input.email);
     if (user.totpEnabledAt) {
       // The password alone is not enough; nothing is recorded as a login yet.
-      return { mfaRequired: true, mfaToken: await this.tokens.signMfa(user.id, membership.orgId) };
+      return {
+        mfaRequired: true,
+        mfaToken: await this.tokens.signMfa(user.id, membership.orgId),
+      };
     }
-    await recordAudit(db, { orgId: membership.orgId, actorId: user.id, entityType: 'user', entityId: user.id, action: 'login' });
+    await recordAudit(db, {
+      orgId: membership.orgId,
+      actorId: user.id,
+      entityType: 'user',
+      entityId: user.id,
+      action: 'login',
+    });
     await db.user.update({
       where: { id: user.id },
       data: {
@@ -183,17 +206,30 @@ export class AuthService {
   }
 
   /** Second sign-in step: an authenticator or recovery code for the challenge from `login`. */
-  async completeMfaLogin(mfaToken: string, code: string, client: ClientInfo): Promise<Session> {
+  async completeMfaLogin(
+    mfaToken: string,
+    code: string,
+    client: ClientInfo,
+  ): Promise<Session> {
     const challenge = await this.tokens.verifyMfa(mfaToken);
     if (!challenge)
-      throw DomainError.unauthorized('Sign-in step expired, start again', 'mfa_expired');
+      throw DomainError.unauthorized(
+        'Sign-in step expired, start again',
+        'mfa_expired',
+      );
     const key = `2fa:${challenge.userId}`;
     await this.limiter.assertAllowed(client.ip, key);
     const method = await this.twoFactor.verify(challenge.userId, code);
     const db = this.prisma.system;
     if (!method) {
       await this.limiter.recordFailure(client.ip, key);
-      await recordAudit(db, { orgId: null, actorId: challenge.userId, entityType: 'user', entityId: challenge.userId, action: '2fa_failed' });
+      await recordAudit(db, {
+        orgId: null,
+        actorId: challenge.userId,
+        entityType: 'user',
+        entityId: challenge.userId,
+        action: '2fa_failed',
+      });
       throw DomainError.unauthorized('Wrong code', 'invalid_code');
     }
     await this.limiter.recordSuccess(client.ip, key);
@@ -204,8 +240,16 @@ export class AuthService {
       entityId: challenge.userId,
       action: method === 'recovery' ? 'login_recovery_code' : 'login',
     });
-    await db.user.update({ where: { id: challenge.userId }, data: { lastLoginAt: new Date() } });
-    return this.startSession(challenge.userId, challenge.orgId, client, randomUUID());
+    await db.user.update({
+      where: { id: challenge.userId },
+      data: { lastLoginAt: new Date() },
+    });
+    return this.startSession(
+      challenge.userId,
+      challenge.orgId,
+      client,
+      randomUUID(),
+    );
   }
 
   /**
@@ -313,7 +357,9 @@ export class AuthService {
       role: auth.roleKey,
       permissions: auth.permissions,
       // Operators of this installation get the System → Queues page.
-      isPlatformAdmin: this.env.PLATFORM_ADMINS.includes(user.email.toLowerCase()),
+      isPlatformAdmin: this.env.PLATFORM_ADMINS.includes(
+        user.email.toLowerCase(),
+      ),
       organizations: memberships.map((m) => ({
         ...m.organization,
         role: m.role,

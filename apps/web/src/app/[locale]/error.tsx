@@ -3,7 +3,12 @@
 import { useTranslations } from 'next-intl';
 
 /** Something failed while rendering a page (the frame around it still works). */
-export default function PageError({ reset }: { error: Error & { digest?: string }; reset: () => void }) {
+export default function PageError({
+  reset,
+}: {
+  error: Error & { digest?: string };
+  reset: () => void;
+}) {
   const t = useTranslations('errors');
   return (
     <section className="hero">

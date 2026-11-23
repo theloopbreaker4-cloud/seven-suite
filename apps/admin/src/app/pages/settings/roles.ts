@@ -24,10 +24,18 @@ interface Role {
 /** Settings → Roles: built-in roles (read-only) and the organization's own roles. */
 @Component({
   selector: 'sv-roles',
-  imports: [ReactiveFormsModule, TranslocoPipe, Field, CanDirective, RoleNamePipe],
+  imports: [
+    ReactiveFormsModule,
+    TranslocoPipe,
+    Field,
+    CanDirective,
+    RoleNamePipe,
+  ],
   template: `
     <h1 class="mb-2 text-2xl font-semibold">{{ 'nav.roles' | transloco }}</h1>
-    <p class="mb-6 max-w-2xl text-sm text-muted">{{ 'roles.hint' | transloco }}</p>
+    <p class="mb-6 max-w-2xl text-sm text-muted">
+      {{ 'roles.hint' | transloco }}
+    </p>
 
     @if (editing() !== undefined) {
       <section class="sv-card mb-6 p-5">
@@ -36,37 +44,78 @@ interface Role {
         </h2>
         <form [formGroup]="form" (ngSubmit)="save()" novalidate>
           <div class="grid gap-x-4 md:grid-cols-2">
-            <sv-field [label]="'roles.name' | transloco" for="role-name" [error]="state.fields()['name']">
-              <input id="role-name" class="sv-input" formControlName="name" maxlength="80" />
+            <sv-field
+              [label]="'roles.name' | transloco"
+              for="role-name"
+              [error]="state.fields()['name']"
+            >
+              <input
+                id="role-name"
+                class="sv-input"
+                formControlName="name"
+                maxlength="80"
+              />
             </sv-field>
-            <sv-field [label]="'roles.key' | transloco" for="role-key" [error]="state.fields()['key']">
-              <input id="role-key" class="sv-input font-mono" formControlName="key" maxlength="40" />
+            <sv-field
+              [label]="'roles.key' | transloco"
+              for="role-key"
+              [error]="state.fields()['key']"
+            >
+              <input
+                id="role-key"
+                class="sv-input font-mono"
+                formControlName="key"
+                maxlength="40"
+              />
             </sv-field>
           </div>
           <fieldset class="mb-4">
-            <legend class="sv-label mb-2">{{ 'apiKeys.permissions' | transloco }}</legend>
+            <legend class="sv-label mb-2">
+              {{ 'apiKeys.permissions' | transloco }}
+            </legend>
             <div class="grid gap-1 sm:grid-cols-2">
               @for (p of grantable(); track p) {
                 <label class="flex items-center gap-2 text-sm">
-                  <input type="checkbox" [checked]="picked().has(p)" (change)="toggle(p)" />
+                  <input
+                    type="checkbox"
+                    [checked]="picked().has(p)"
+                    (change)="toggle(p)"
+                  />
                   <span class="font-mono text-xs">{{ p }}</span>
                 </label>
               }
             </div>
           </fieldset>
           @if (state.message()) {
-            <p class="mb-4 text-sm text-danger" role="alert">{{ state.message() }}</p>
+            <p class="mb-4 text-sm text-danger" role="alert">
+              {{ state.message() }}
+            </p>
           }
           <div class="flex gap-2">
-            <button type="submit" class="sv-btn-primary" [disabled]="state.busy() || form.invalid">
+            <button
+              type="submit"
+              class="sv-btn-primary"
+              [disabled]="state.busy() || form.invalid"
+            >
               {{ 'roles.save' | transloco }}
             </button>
-            <button type="button" class="sv-btn-ghost" (click)="editing.set(undefined)">{{ 'roles.cancel' | transloco }}</button>
+            <button
+              type="button"
+              class="sv-btn-ghost"
+              (click)="editing.set(undefined)"
+            >
+              {{ 'roles.cancel' | transloco }}
+            </button>
           </div>
         </form>
       </section>
     } @else {
-      <button *svCan="'platform:role:create'" type="button" class="sv-btn-primary mb-6" (click)="startNew()">
+      <button
+        *svCan="'platform:role:create'"
+        type="button"
+        class="sv-btn-primary mb-6"
+        (click)="startNew()"
+      >
         {{ 'roles.new' | transloco }}
       </button>
     }
@@ -75,8 +124,12 @@ interface Role {
       <table class="w-full text-left text-sm">
         <thead class="border-b border-border text-muted">
           <tr>
-            <th class="px-4 py-2 font-medium">{{ 'roles.name' | transloco }}</th>
-            <th class="px-4 py-2 font-medium">{{ 'apiKeys.permissions' | transloco }}</th>
+            <th class="px-4 py-2 font-medium">
+              {{ 'roles.name' | transloco }}
+            </th>
+            <th class="px-4 py-2 font-medium">
+              {{ 'apiKeys.permissions' | transloco }}
+            </th>
             <th class="px-4 py-2"></th>
           </tr>
         </thead>
@@ -86,16 +139,30 @@ interface Role {
               <td class="px-4 py-2">
                 {{ r.key | roleName: r.name }}
                 @if (r.isSystem) {
-                  <span class="ml-1 text-xs text-muted">({{ 'roles.builtIn' | transloco }})</span>
+                  <span class="ml-1 text-xs text-muted"
+                    >({{ 'roles.builtIn' | transloco }})</span
+                  >
                 }
               </td>
-              <td class="px-4 py-2 font-mono text-xs">{{ r.permissions.join(', ') || '—' }}</td>
+              <td class="px-4 py-2 font-mono text-xs">
+                {{ r.permissions.join(', ') || '—' }}
+              </td>
               <td class="whitespace-nowrap px-4 py-2 text-right">
                 @if (!r.isSystem && r.assignable) {
-                  <button *svCan="'platform:role:update'" type="button" class="sv-btn-ghost mr-2 px-2 py-1" (click)="startEdit(r)">
+                  <button
+                    *svCan="'platform:role:update'"
+                    type="button"
+                    class="sv-btn-ghost mr-2 px-2 py-1"
+                    (click)="startEdit(r)"
+                  >
                     {{ 'roles.editShort' | transloco }}
                   </button>
-                  <button *svCan="'platform:role:delete'" type="button" class="sv-btn-danger px-2 py-1" (click)="remove(r)">
+                  <button
+                    *svCan="'platform:role:delete'"
+                    type="button"
+                    class="sv-btn-danger px-2 py-1"
+                    (click)="remove(r)"
+                  >
                     {{ 'roles.delete' | transloco }}
                   </button>
                 }
@@ -120,10 +187,15 @@ export class RolesPage implements OnInit {
   protected readonly state = new FormState();
   protected readonly form = inject(FormBuilder).nonNullable.group({
     name: ['', [Validators.required, Validators.maxLength(80)]],
-    key: ['', [Validators.required, Validators.pattern(/^[a-z][a-z0-9_]{1,39}$/)]],
+    key: [
+      '',
+      [Validators.required, Validators.pattern(/^[a-z][a-z0-9_]{1,39}$/)],
+    ],
   });
   protected readonly grantable = computed(() =>
-    PERMISSION_CATALOG.map((p) => p.key).filter((k) => hasPermission(this.store.permissions(), k)),
+    PERMISSION_CATALOG.map((p) => p.key).filter((k) =>
+      hasPermission(this.store.permissions(), k),
+    ),
   );
 
   async ngOnInit(): Promise<void> {
@@ -131,7 +203,13 @@ export class RolesPage implements OnInit {
   }
 
   private async load(): Promise<void> {
-    this.roles.set((await firstValueFrom(this.http.get<{ items: Role[] }>('api/v1/org/roles'))).items);
+    this.roles.set(
+      (
+        await firstValueFrom(
+          this.http.get<{ items: Role[] }>('api/v1/org/roles'),
+        )
+      ).items,
+    );
   }
 
   startNew(): void {
@@ -166,7 +244,10 @@ export class RolesPage implements OnInit {
     const ok = await this.state.run(() =>
       firstValueFrom(
         current
-          ? this.http.patch(`api/v1/org/roles/${current.key}`, { name, permissions })
+          ? this.http.patch(`api/v1/org/roles/${current.key}`, {
+              name,
+              permissions,
+            })
           : this.http.post('api/v1/org/roles', { key, name, permissions }),
       ),
     );
@@ -177,7 +258,8 @@ export class RolesPage implements OnInit {
   }
 
   async remove(r: Role): Promise<void> {
-    if (!confirm(this.t.translate('roles.confirmDelete', { name: r.name }))) return;
+    if (!confirm(this.t.translate('roles.confirmDelete', { name: r.name })))
+      return;
     try {
       await firstValueFrom(this.http.delete(`api/v1/org/roles/${r.key}`));
       this.toast.success(this.t.translate('roles.deleted'));

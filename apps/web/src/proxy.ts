@@ -1,6 +1,11 @@
 /** Seven Suite — github.com/theloopbreaker4-cloud/seven-suite */
 import { NextResponse, type NextRequest } from 'next/server';
-import { FALLBACK_LOCALE, isLocale, LOCALES, negotiateLocale } from './lib/locales';
+import {
+  FALLBACK_LOCALE,
+  isLocale,
+  LOCALES,
+  negotiateLocale,
+} from './lib/locales';
 
 /**
  * Runs before every page request:
@@ -13,7 +18,11 @@ export function proxy(req: NextRequest) {
   const { pathname, search } = req.nextUrl;
   const first = pathname.split('/')[1];
   if (!isLocale(first)) {
-    const locale = negotiateLocale(req.headers.get('accept-language'), LOCALES, FALLBACK_LOCALE);
+    const locale = negotiateLocale(
+      req.headers.get('accept-language'),
+      LOCALES,
+      FALLBACK_LOCALE,
+    );
     const url = req.nextUrl.clone();
     url.pathname = `/${locale}${pathname === '/' ? '' : pathname}`;
     url.search = search;

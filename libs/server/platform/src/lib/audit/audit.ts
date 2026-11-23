@@ -17,12 +17,15 @@ export interface AuditEntry {
 }
 
 /** Secrets never reach the audit log, whatever a caller passes in `before`/`after`. */
-const SECRET_KEYS = /pass(word)?|secret|token|hash|totp|recovery|^key$|apiKey$/i;
+const SECRET_KEYS =
+  /pass(word)?|secret|token|hash|totp|recovery|^key$|apiKey$/i;
 
 function scrub(value: unknown): Prisma.InputJsonValue | undefined {
   if (value === undefined || value === null) return undefined;
   const json = JSON.parse(
-    JSON.stringify(value, (k, v) => (k && SECRET_KEYS.test(k) ? '[redacted]' : v)),
+    JSON.stringify(value, (k, v) =>
+      k && SECRET_KEYS.test(k) ? '[redacted]' : v,
+    ),
   );
   return json as Prisma.InputJsonValue;
 }
@@ -31,13 +34,19 @@ function scrub(value: unknown): Prisma.InputJsonValue | undefined {
  * Append one row to the audit log inside the caller's transaction, so the trail and the change
  * commit (or roll back) together. Who, from where and in which request come from RequestContext.
  */
-export async function recordAudit(tx: Pick<TenantTx, 'auditLog'>, entry: AuditEntry): Promise<void> {
+export async function recordAudit(
+  tx: Pick<TenantTx, 'auditLog'>,
+  entry: AuditEntry,
+): Promise<void> {
   const ctx = RequestContext.get();
   // createMany: no RETURNING (the RLS role may append account-level rows it cannot read).
   await tx.auditLog.createMany({
     data: {
       orgId: entry.orgId === undefined ? (ctx?.orgId ?? null) : entry.orgId,
-      actorId: entry.actorId === undefined ? (ctx?.apiKeyId ?? ctx?.userId ?? null) : entry.actorId,
+      actorId:
+        entry.actorId === undefined
+          ? (ctx?.apiKeyId ?? ctx?.userId ?? null)
+          : entry.actorId,
       entityType: entry.entityType,
       entityId: entry.entityId,
       action: entry.action,

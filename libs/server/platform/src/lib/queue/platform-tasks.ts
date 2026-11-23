@@ -36,7 +36,11 @@ export class PlatformTasks implements OnModuleInit {
     const monthAgo = new Date(Date.now() - 30 * 86_400_000);
     const [refresh, oneTime, invitations] = await Promise.all([
       db.refreshToken.deleteMany({ where: { expiresAt: { lt: dayAgo } } }),
-      db.userToken.deleteMany({ where: { OR: [{ expiresAt: { lt: dayAgo } }, { usedAt: { lt: monthAgo } }] } }),
+      db.userToken.deleteMany({
+        where: {
+          OR: [{ expiresAt: { lt: dayAgo } }, { usedAt: { lt: monthAgo } }],
+        },
+      }),
       db.invitation.deleteMany({
         where: {
           OR: [
@@ -47,6 +51,10 @@ export class PlatformTasks implements OnModuleInit {
         },
       }),
     ]);
-    return { refresh: refresh.count, oneTime: oneTime.count, invitations: invitations.count };
+    return {
+      refresh: refresh.count,
+      oneTime: oneTime.count,
+      invitations: invitations.count,
+    };
   }
 }

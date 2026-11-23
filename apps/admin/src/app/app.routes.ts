@@ -40,7 +40,9 @@ export const appRoutes: Route[] = [
         canActivate: [permissionGuard],
         data: { permission: 'platform:settings:read' },
         loadComponent: () =>
-          import('./pages/settings/organization').then((m) => m.OrganizationPage),
+          import('./pages/settings/organization').then(
+            (m) => m.OrganizationPage,
+          ),
       },
       {
         path: 'settings/modules',

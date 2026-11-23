@@ -59,6 +59,14 @@ import { DomainController, WebController } from '../web/web.controller';
     { provide: APP_GUARD, useClass: AuthGuard },
     { provide: APP_GUARD, useClass: DemoGuard },
   ],
-  exports: [AuthService, TokenService, MailService, RateLimiter, ApiKeyService, TwoFactorService, ModuleRegistry],
+  exports: [
+    AuthService,
+    TokenService,
+    MailService,
+    RateLimiter,
+    ApiKeyService,
+    TwoFactorService,
+    ModuleRegistry,
+  ],
 })
 export class AuthModule {}

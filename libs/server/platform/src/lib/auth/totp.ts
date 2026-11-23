@@ -63,7 +63,9 @@ export function totpStep(now = Date.now()): number {
 export function totpCode(secretB32: string, step: number): string {
   const counter = Buffer.alloc(8);
   counter.writeBigUInt64BE(BigInt(step));
-  const mac = createHmac('sha1', base32Decode(secretB32)).update(counter).digest();
+  const mac = createHmac('sha1', base32Decode(secretB32))
+    .update(counter)
+    .digest();
   const offset = mac[mac.length - 1] & 0x0f;
   const bin = (mac.readUInt32BE(offset) & 0x7fffffff) % 10 ** TOTP_DIGITS;
   return bin.toString().padStart(TOTP_DIGITS, '0');
@@ -90,7 +92,11 @@ export function verifyTotp(
   return null;
 }
 
-export function otpauthUrl(secretB32: string, account: string, issuer = 'Seven Suite'): string {
+export function otpauthUrl(
+  secretB32: string,
+  account: string,
+  issuer = 'Seven Suite',
+): string {
   const label = encodeURIComponent(`${issuer}:${account}`);
   const params = new URLSearchParams({
     secret: secretB32,
@@ -107,22 +113,37 @@ export class SecretBox {
   private readonly key: Buffer;
 
   constructor(appSecret: string, context: string) {
-    this.key = Buffer.from(hkdfSync('sha256', appSecret, 'seven-suite', context, 32));
+    this.key = Buffer.from(
+      hkdfSync('sha256', appSecret, 'seven-suite', context, 32),
+    );
   }
 
   seal(plain: string): string {
     const iv = randomBytes(12);
     const cipher = createCipheriv('aes-256-gcm', this.key, iv);
     const body = Buffer.concat([cipher.update(plain, 'utf8'), cipher.final()]);
-    return ['v1', iv.toString('base64url'), cipher.getAuthTag().toString('base64url'), body.toString('base64url')].join('.');
+    return [
+      'v1',
+      iv.toString('base64url'),
+      cipher.getAuthTag().toString('base64url'),
+      body.toString('base64url'),
+    ].join('.');
   }
 
   open(sealed: string): string {
     const [v, iv, tag, body] = sealed.split('.');
-    if (v !== 'v1' || !iv || !tag || !body) throw new Error('Unsupported sealed value');
-    const decipher = createDecipheriv('aes-256-gcm', this.key, Buffer.from(iv, 'base64url'));
+    if (v !== 'v1' || !iv || !tag || !body)
+      throw new Error('Unsupported sealed value');
+    const decipher = createDecipheriv(
+      'aes-256-gcm',
+      this.key,
+      Buffer.from(iv, 'base64url'),
+    );
     decipher.setAuthTag(Buffer.from(tag, 'base64url'));
-    return Buffer.concat([decipher.update(Buffer.from(body, 'base64url')), decipher.final()]).toString('utf8');
+    return Buffer.concat([
+      decipher.update(Buffer.from(body, 'base64url')),
+      decipher.final(),
+    ]).toString('utf8');
   }
 }
 
@@ -137,5 +158,8 @@ export function generateRecoveryCodes(count = 10): string[] {
 }
 
 export function normalizeRecoveryCode(code: string): string {
-  return code.toLowerCase().replace(/[^a-z0-9]/g, '').replace(/^(.{4})(.{4})(.{4})$/, '$1-$2-$3');
+  return code
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, '')
+    .replace(/^(.{4})(.{4})(.{4})$/, '$1-$2-$3');
 }

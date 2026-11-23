@@ -34,10 +34,15 @@ export class QueueController {
     const stuck = await this.prisma.system.outboxEvent.count({
       where: { dispatchedAt: null, lastError: { not: null } },
     });
-    const schedules = await this.queues.queue(QUEUES.scheduler).getJobSchedulers();
+    const schedules = await this.queues
+      .queue(QUEUES.scheduler)
+      .getJobSchedulers();
     return {
       queues: await this.queues.stats(),
-      outbox: { pending: outbox.reduce((n, g) => n + g._count, 0), failing: stuck },
+      outbox: {
+        pending: outbox.reduce((n, g) => n + g._count, 0),
+        failing: stuck,
+      },
       tasks: this.scheduler.list().map((t) => ({
         ...t,
         next: schedules.find((s) => s.key === t.name)?.next ?? null,
@@ -50,7 +55,8 @@ export class QueueController {
   @HttpCode(200)
   async runTask(@CurrentAuth() auth: AuthContext, @Param('name') name: string) {
     await this.assertOperator(auth);
-    if (!this.scheduler.list().some((t) => t.name === name)) throw DomainError.notFound('Unknown task');
+    if (!this.scheduler.list().some((t) => t.name === name))
+      throw DomainError.notFound('Unknown task');
     return { result: (await this.scheduler.runNow(name)) ?? null };
   }
 
@@ -62,9 +68,14 @@ export class QueueController {
 
   @Post(':name/jobs/:id/retry')
   @HttpCode(204)
-  async retry(@CurrentAuth() auth: AuthContext, @Param('name') name: string, @Param('id') id: string) {
+  async retry(
+    @CurrentAuth() auth: AuthContext,
+    @Param('name') name: string,
+    @Param('id') id: string,
+  ) {
     await this.assertOperator(auth);
-    if (!(await this.queues.retry(this.queueName(name), id))) throw DomainError.notFound('Failed job not found');
+    if (!(await this.queues.retry(this.queueName(name), id)))
+      throw DomainError.notFound('Failed job not found');
   }
 
   private queueName(name: string): QueueName {
@@ -74,12 +85,21 @@ export class QueueController {
   }
 
   private async assertOperator(auth: AuthContext): Promise<void> {
-    const user = await this.prisma.system.user.findUnique({ where: { id: auth.userId }, select: { email: true } });
+    const user = await this.prisma.system.user.findUnique({
+      where: { id: auth.userId },
+      select: { email: true },
+    });
     if (!user || !isPlatformAdmin(this.env, user.email))
-      throw DomainError.forbidden('Only operators of this installation', 'not_platform_admin');
+      throw DomainError.forbidden(
+        'Only operators of this installation',
+        'not_platform_admin',
+      );
   }
 }
 
-export function isPlatformAdmin(env: Pick<Env, 'PLATFORM_ADMINS'>, email: string): boolean {
+export function isPlatformAdmin(
+  env: Pick<Env, 'PLATFORM_ADMINS'>,
+  email: string,
+): boolean {
   return env.PLATFORM_ADMINS.includes(email.toLowerCase());
 }

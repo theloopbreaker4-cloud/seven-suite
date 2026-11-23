@@ -36,17 +36,31 @@ function config() {
  * Server-side call to the API with the service key. Never runs in the browser (`server-only`),
  * so the key can't leak into client bundles.
  */
-export async function api<T>(path: string, init: RequestInit & { revalidate?: number } = {}): Promise<T> {
+export async function api<T>(
+  path: string,
+  init: RequestInit & { revalidate?: number } = {},
+): Promise<T> {
   const { url, key } = config();
   const { revalidate = 60, ...rest } = init;
   const res = await fetch(`${url}${path}`, {
     ...rest,
-    headers: { ...(rest.headers ?? {}), 'X-Service-Key': key, Accept: 'application/json' },
+    headers: {
+      ...(rest.headers ?? {}),
+      'X-Service-Key': key,
+      Accept: 'application/json',
+    },
     next: { revalidate },
   });
   if (!res.ok) {
-    const body = (await res.json().catch(() => ({}))) as { code?: string; error?: string };
-    throw new ApiError(res.status, body.code ?? 'api_error', body.error ?? `API ${res.status}`);
+    const body = (await res.json().catch(() => ({}))) as {
+      code?: string;
+      error?: string;
+    };
+    throw new ApiError(
+      res.status,
+      body.code ?? 'api_error',
+      body.error ?? `API ${res.status}`,
+    );
   }
   return (await res.json()) as T;
 }
@@ -56,7 +70,11 @@ export async function requestHost(): Promise<string> {
   const h = await headers();
   const host = h.get('x-forwarded-host') ?? h.get('host') ?? '';
   // Local development: map localhost to a configured storefront host.
-  if (/^(localhost|127\.0\.0\.1)(:\d+)?$/.test(host) && process.env['WEB_DEV_HOST']) return process.env['WEB_DEV_HOST'];
+  if (
+    /^(localhost|127\.0\.0\.1)(:\d+)?$/.test(host) &&
+    process.env['WEB_DEV_HOST']
+  )
+    return process.env['WEB_DEV_HOST'];
   return host;
 }
 

@@ -6,20 +6,36 @@ import { chromium } from 'playwright';
 const BASE = process.env.BASE ?? 'http://127.0.0.1:4200';
 const shots = process.argv[2];
 const run = Date.now().toString(36);
-const ops = { name: 'Ops E2E', org: 'Ops Co', email: 'ops-e2e@e2e.seven', password: 'ops password 1234' };
+const ops = {
+  name: 'Ops E2E',
+  org: 'Ops Co',
+  email: 'ops-e2e@e2e.seven',
+  password: 'ops password 1234',
+};
 
 const results = [];
 const check = async (name, fn) => {
-  try { await fn(); results.push(['ok', name]); }
-  catch (e) { results.push(['FAIL', `${name}: ${String(e.message).split('\n')[0]}`]); }
+  try {
+    await fn();
+    results.push(['ok', name]);
+  } catch (e) {
+    results.push(['FAIL', `${name}: ${String(e.message).split('\n')[0]}`]);
+  }
 };
-const shot = async (page, name) => shots && page.screenshot({ path: `${shots}/${name}.png`, fullPage: true });
+const shot = async (page, name) =>
+  shots && page.screenshot({ path: `${shots}/${name}.png`, fullPage: true });
 
 const browser = await chromium.launch();
 const page = await (await browser.newContext({ locale: 'en-US' })).newPage();
 const errors = [];
 page.on('pageerror', (e) => errors.push(e.message));
-page.on('console', (m) => m.type() === 'error' && !/40[13]|409|422/.test(m.text()) && errors.push(m.text()));
+page.on(
+  'console',
+  (m) =>
+    m.type() === 'error' &&
+    !/40[13]|409|422/.test(m.text()) &&
+    errors.push(m.text()),
+);
 
 await check('operator signs up (or in)', async () => {
   await page.goto(BASE + '/signup');
@@ -52,7 +68,10 @@ await check('Organization page saves the profile', async () => {
   await page.getByText('Organization saved').waitFor();
   await shot(page, 'org-01-settings');
   await page.reload();
-  if ((await page.getByLabel('Legal name').inputValue()) !== `Ops Co LLC ${run}`) throw new Error('not persisted');
+  if (
+    (await page.getByLabel('Legal name').inputValue()) !== `Ops Co LLC ${run}`
+  )
+    throw new Error('not persisted');
   // put the time zone back for the next run
   await page.getByLabel('Time zone').selectOption('Asia/Tbilisi');
   await page.getByRole('checkbox', { name: 'Українська' }).click();
@@ -60,33 +79,53 @@ await check('Organization page saves the profile', async () => {
   await page.getByText('Organization saved').waitFor();
 });
 
-await check('Organization page adds and removes a storefront domain', async () => {
-  const domain = `shop-${run}.example.ge`;
-  await page.getByLabel('Your domain').fill(`HTTPS://${domain.toUpperCase()}/`);
-  await page.getByRole('button', { name: 'Add', exact: true }).click();
-  await page.getByText(domain, { exact: true }).waitFor();
-  page.once('dialog', (d) => d.accept());
-  await page.getByRole('listitem').filter({ hasText: domain }).getByRole('button', { name: 'Remove' }).click();
-  await page.getByText(domain, { exact: true }).waitFor({ state: 'detached' });
-});
+await check(
+  'Organization page adds and removes a storefront domain',
+  async () => {
+    const domain = `shop-${run}.example.ge`;
+    await page
+      .getByLabel('Your domain')
+      .fill(`HTTPS://${domain.toUpperCase()}/`);
+    await page.getByRole('button', { name: 'Add', exact: true }).click();
+    await page.getByText(domain, { exact: true }).waitFor();
+    page.once('dialog', (d) => d.accept());
+    await page
+      .getByRole('listitem')
+      .filter({ hasText: domain })
+      .getByRole('button', { name: 'Remove' })
+      .click();
+    await page
+      .getByText(domain, { exact: true })
+      .waitFor({ state: 'detached' });
+  },
+);
 
 await check('Roles page creates, edits and deletes a custom role', async () => {
   await page.getByRole('link', { name: 'Roles' }).click();
   await page.getByRole('button', { name: 'New role' }).click();
   await page.getByLabel('Name', { exact: true }).fill('Support');
   await page.getByLabel('Key', { exact: true }).fill(`support_${run}`);
-  await page.getByRole('checkbox', { name: 'platform:member:read', exact: true }).click();
+  await page
+    .getByRole('checkbox', { name: 'platform:member:read', exact: true })
+    .click();
   await page.getByRole('button', { name: 'Save role' }).click();
   await page.getByText('Role saved').waitFor();
   const row = page.getByRole('row', { name: /Support/ });
   await row.getByRole('button', { name: 'Edit' }).click();
   await page.getByLabel('Name', { exact: true }).fill('Customer support');
-  await page.getByRole('checkbox', { name: 'platform:member:invite', exact: true }).click();
+  await page
+    .getByRole('checkbox', { name: 'platform:member:invite', exact: true })
+    .click();
   await page.getByRole('button', { name: 'Save role' }).click();
-  await page.getByRole('cell', { name: 'platform:member:read, platform:member:invite' }).waitFor();
+  await page
+    .getByRole('cell', { name: 'platform:member:read, platform:member:invite' })
+    .waitFor();
   await shot(page, 'org-02-roles');
   page.once('dialog', (d) => d.accept());
-  await page.getByRole('row', { name: /Customer support/ }).getByRole('button', { name: 'Delete' }).click();
+  await page
+    .getByRole('row', { name: /Customer support/ })
+    .getByRole('button', { name: 'Delete' })
+    .click();
   await page.getByText('Role deleted').waitFor();
   const built = await page.getByText('(built-in)').count();
   if (built !== 3) throw new Error(`${built} built-in roles shown`);

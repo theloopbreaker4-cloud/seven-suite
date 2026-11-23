@@ -2,7 +2,11 @@
 import type { Metadata } from 'next';
 import { notFound, redirect } from 'next/navigation';
 import { NextIntlClientProvider } from 'next-intl';
-import { getMessages, getTranslations, setRequestLocale } from 'next-intl/server';
+import {
+  getMessages,
+  getTranslations,
+  setRequestLocale,
+} from 'next-intl/server';
 import { currentSite } from '../../lib/api';
 import { isLocale, LOCALE_NAMES, type Locale } from '../../lib/locales';
 
@@ -11,9 +15,15 @@ type Props = { children: React.ReactNode; params: Promise<{ locale: string }> };
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
   const site = await currentSite();
-  const t = await getTranslations({ locale: isLocale(locale) ? locale : 'en', namespace: 'home' });
+  const t = await getTranslations({
+    locale: isLocale(locale) ? locale : 'en',
+    namespace: 'home',
+  });
   return site
-    ? { title: { default: site.name, template: `%s · ${site.name}` }, description: t('subtitle', { name: site.name }) }
+    ? {
+        title: { default: site.name, template: `%s · ${site.name}` },
+        description: t('subtitle', { name: site.name }),
+      }
     : { title: 'Seven Suite', robots: { index: false } };
 }
 
@@ -29,7 +39,10 @@ export default async function LocaleLayout({ children, params }: Props) {
   setRequestLocale(locale);
 
   // The CSP nonce from src/proxy.ts is picked up by Next for its own scripts automatically.
-  const [messages, t] = await Promise.all([getMessages(), getTranslations('frame')]);
+  const [messages, t] = await Promise.all([
+    getMessages(),
+    getTranslations('frame'),
+  ]);
   const languages = (site?.languages ?? [locale]).filter(isLocale) as Locale[];
 
   return (
@@ -43,7 +56,12 @@ export default async function LocaleLayout({ children, params }: Props) {
             {languages.length > 1 && (
               <nav aria-label={t('language')} className="langs">
                 {languages.map((l) => (
-                  <a key={l} href={`/${l}`} aria-current={l === locale ? 'true' : undefined} lang={l}>
+                  <a
+                    key={l}
+                    href={`/${l}`}
+                    aria-current={l === locale ? 'true' : undefined}
+                    lang={l}
+                  >
                     {LOCALE_NAMES[l]}
                   </a>
                 ))}
@@ -57,7 +75,10 @@ export default async function LocaleLayout({ children, params }: Props) {
             </span>
             <span>
               {t('poweredBy')}{' '}
-              <a href="https://seven.toolpix.dev/products/seven-suite" rel="noopener">
+              <a
+                href="https://seven.toolpix.dev/products/seven-suite"
+                rel="noopener"
+              >
                 Seven Suite
               </a>
             </span>

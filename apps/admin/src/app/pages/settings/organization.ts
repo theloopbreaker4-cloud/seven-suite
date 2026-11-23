@@ -40,30 +40,81 @@ const LANGUAGE_NAMES: Record<string, string> = {
   selector: 'sv-organization',
   imports: [ReactiveFormsModule, TranslocoPipe, Field],
   template: `
-    <h1 class="mb-6 text-2xl font-semibold">{{ 'nav.organization' | transloco }}</h1>
+    <h1 class="mb-6 text-2xl font-semibold">
+      {{ 'nav.organization' | transloco }}
+    </h1>
     @if (loaded()) {
-      <form class="sv-card max-w-2xl p-5" [formGroup]="form" (ngSubmit)="save()" novalidate>
+      <form
+        class="sv-card max-w-2xl p-5"
+        [formGroup]="form"
+        (ngSubmit)="save()"
+        novalidate
+      >
         <div class="grid gap-x-4 md:grid-cols-2">
-          <sv-field [label]="'org.name' | transloco" for="org-name" [error]="state.fields()['name']">
-            <input id="org-name" class="sv-input" formControlName="name" maxlength="120" />
+          <sv-field
+            [label]="'org.name' | transloco"
+            for="org-name"
+            [error]="state.fields()['name']"
+          >
+            <input
+              id="org-name"
+              class="sv-input"
+              formControlName="name"
+              maxlength="120"
+            />
           </sv-field>
-          <sv-field [label]="'org.legalName' | transloco" for="org-legal" [error]="state.fields()['legalName']">
-            <input id="org-legal" class="sv-input" formControlName="legalName" maxlength="200" />
+          <sv-field
+            [label]="'org.legalName' | transloco"
+            for="org-legal"
+            [error]="state.fields()['legalName']"
+          >
+            <input
+              id="org-legal"
+              class="sv-input"
+              formControlName="legalName"
+              maxlength="200"
+            />
           </sv-field>
-          <sv-field [label]="'org.country' | transloco" for="org-country" [error]="state.fields()['country']">
-            <input id="org-country" class="sv-input uppercase" formControlName="country" maxlength="2" />
+          <sv-field
+            [label]="'org.country' | transloco"
+            for="org-country"
+            [error]="state.fields()['country']"
+          >
+            <input
+              id="org-country"
+              class="sv-input uppercase"
+              formControlName="country"
+              maxlength="2"
+            />
           </sv-field>
-          <sv-field [label]="'org.currency' | transloco" for="org-currency" [error]="state.fields()['baseCurrency']">
-            <input id="org-currency" class="sv-input uppercase" formControlName="baseCurrency" maxlength="3" />
+          <sv-field
+            [label]="'org.currency' | transloco"
+            for="org-currency"
+            [error]="state.fields()['baseCurrency']"
+          >
+            <input
+              id="org-currency"
+              class="sv-input uppercase"
+              formControlName="baseCurrency"
+              maxlength="3"
+            />
           </sv-field>
-          <sv-field [label]="'org.timezone' | transloco" for="org-tz" [error]="state.fields()['timezone']">
+          <sv-field
+            [label]="'org.timezone' | transloco"
+            for="org-tz"
+            [error]="state.fields()['timezone']"
+          >
             <select id="org-tz" class="sv-input" formControlName="timezone">
               @for (tz of timezones; track tz) {
                 <option [value]="tz">{{ tz }}</option>
               }
             </select>
           </sv-field>
-          <sv-field [label]="'org.defaultLanguage' | transloco" for="org-locale" [error]="state.fields()['locale']">
+          <sv-field
+            [label]="'org.defaultLanguage' | transloco"
+            for="org-locale"
+            [error]="state.fields()['locale']"
+          >
             <select id="org-locale" class="sv-input" formControlName="locale">
               @for (l of enabled(); track l) {
                 <option [value]="l">{{ names[l] ?? l }}</option>
@@ -72,24 +123,39 @@ const LANGUAGE_NAMES: Record<string, string> = {
           </sv-field>
         </div>
         <fieldset class="mb-4">
-          <legend class="sv-label mb-2">{{ 'org.languages' | transloco }}</legend>
+          <legend class="sv-label mb-2">
+            {{ 'org.languages' | transloco }}
+          </legend>
           <div class="flex flex-wrap gap-x-5 gap-y-2">
             @for (l of supported(); track l) {
               <label class="flex items-center gap-2 text-sm">
-                <input type="checkbox" [checked]="enabled().includes(l)" [disabled]="!canEdit || l === form.controls.locale.value" (change)="toggle(l)" />
+                <input
+                  type="checkbox"
+                  [checked]="enabled().includes(l)"
+                  [disabled]="!canEdit || l === form.controls.locale.value"
+                  (change)="toggle(l)"
+                />
                 {{ names[l] ?? l }}
               </label>
             }
           </div>
           @if (state.fields()['languages']) {
-            <p class="mt-1 text-sm text-danger">{{ state.fields()['languages'] }}</p>
+            <p class="mt-1 text-sm text-danger">
+              {{ state.fields()['languages'] }}
+            </p>
           }
         </fieldset>
         @if (state.message()) {
-          <p class="mb-4 text-sm text-danger" role="alert">{{ state.message() }}</p>
+          <p class="mb-4 text-sm text-danger" role="alert">
+            {{ state.message() }}
+          </p>
         }
         @if (canEdit) {
-          <button type="submit" class="sv-btn-primary" [disabled]="state.busy() || form.invalid || form.pristine">
+          <button
+            type="submit"
+            class="sv-btn-primary"
+            [disabled]="state.busy() || form.invalid || form.pristine"
+          >
             {{ (state.busy() ? 'common.wait' : 'org.save') | transloco }}
           </button>
         }
@@ -97,19 +163,29 @@ const LANGUAGE_NAMES: Record<string, string> = {
 
       <section class="sv-card mt-6 max-w-2xl p-5">
         <h2 class="mb-1 font-medium">{{ 'org.domains' | transloco }}</h2>
-        <p class="mb-4 text-sm text-muted">{{ 'org.domainsHint' | transloco }}</p>
+        <p class="mb-4 text-sm text-muted">
+          {{ 'org.domainsHint' | transloco }}
+        </p>
         <ul class="mb-4 space-y-2 text-sm">
           @if (defaultDomain()) {
             <li class="flex items-center justify-between gap-3">
               <span class="font-mono">{{ defaultDomain() }}</span>
-              <span class="text-xs text-muted">{{ 'org.defaultDomain' | transloco }}</span>
+              <span class="text-xs text-muted">{{
+                'org.defaultDomain' | transloco
+              }}</span>
             </li>
           }
           @for (d of domains(); track d.domain) {
             <li class="flex items-center justify-between gap-3">
               <span class="font-mono">{{ d.domain }}</span>
               @if (canEdit) {
-                <button type="button" class="sv-btn-danger px-2 py-1" (click)="removeDomain(d.domain)">{{ 'common.remove' | transloco }}</button>
+                <button
+                  type="button"
+                  class="sv-btn-danger px-2 py-1"
+                  (click)="removeDomain(d.domain)"
+                >
+                  {{ 'common.remove' | transloco }}
+                </button>
               }
             </li>
           } @empty {
@@ -119,11 +195,34 @@ const LANGUAGE_NAMES: Record<string, string> = {
           }
         </ul>
         @if (canEdit) {
-          <form class="grid gap-x-4 md:grid-cols-[1fr_auto] md:items-start" (submit)="$event.preventDefault(); addDomain(domainInput.value); domainInput.value = ''">
-            <sv-field [label]="'org.addDomain' | transloco" for="org-domain" [error]="domainState.fields()['domain'] ?? domainState.message()">
-              <input #domainInput id="org-domain" class="sv-input font-mono" placeholder="shop.example.ge" maxlength="253" />
+          <form
+            class="grid gap-x-4 md:grid-cols-[1fr_auto] md:items-start"
+            (submit)="
+              $event.preventDefault();
+              addDomain(domainInput.value);
+              domainInput.value = ''
+            "
+          >
+            <sv-field
+              [label]="'org.addDomain' | transloco"
+              for="org-domain"
+              [error]="domainState.fields()['domain'] ?? domainState.message()"
+            >
+              <input
+                #domainInput
+                id="org-domain"
+                class="sv-input font-mono"
+                placeholder="shop.example.ge"
+                maxlength="253"
+              />
             </sv-field>
-            <button type="submit" class="sv-btn-ghost md:mt-6" [disabled]="domainState.busy()">{{ 'org.add' | transloco }}</button>
+            <button
+              type="submit"
+              class="sv-btn-ghost md:mt-6"
+              [disabled]="domainState.busy()"
+            >
+              {{ 'org.add' | transloco }}
+            </button>
           </form>
         }
       </section>
@@ -139,7 +238,13 @@ export class OrganizationPage implements OnInit {
   protected readonly names = LANGUAGE_NAMES;
   protected readonly timezones: string[] = (
     Intl as unknown as { supportedValuesOf?: (k: string) => string[] }
-  ).supportedValuesOf?.('timeZone') ?? ['Asia/Tbilisi', 'Europe/Kyiv', 'Asia/Baku', 'Asia/Yerevan', 'UTC'];
+  ).supportedValuesOf?.('timeZone') ?? [
+    'Asia/Tbilisi',
+    'Europe/Kyiv',
+    'Asia/Baku',
+    'Asia/Yerevan',
+    'UTC',
+  ];
   protected readonly canEdit = this.store.can('platform:settings:update');
   protected readonly loaded = signal(false);
   protected readonly supported = signal<string[]>([]);
@@ -152,17 +257,24 @@ export class OrganizationPage implements OnInit {
     name: ['', [Validators.required, Validators.maxLength(120)]],
     legalName: [''],
     country: ['', [Validators.required, Validators.pattern(/^[A-Za-z]{2}$/)]],
-    baseCurrency: ['', [Validators.required, Validators.pattern(/^[A-Za-z]{3}$/)]],
+    baseCurrency: [
+      '',
+      [Validators.required, Validators.pattern(/^[A-Za-z]{3}$/)],
+    ],
     timezone: ['', Validators.required],
     locale: ['', Validators.required],
   });
 
   async ngOnInit(): Promise<void> {
-    const s = await firstValueFrom(this.http.get<Settings>('api/v1/org/settings'));
+    const s = await firstValueFrom(
+      this.http.get<Settings>('api/v1/org/settings'),
+    );
     this.supported.set(s.supportedLanguages);
     this.apply(s);
     if (!this.canEdit) this.form.disable();
-    this.applyDomains(await firstValueFrom(this.http.get<DomainList>('api/v1/org/domains')));
+    this.applyDomains(
+      await firstValueFrom(this.http.get<DomainList>('api/v1/org/domains')),
+    );
     this.loaded.set(true);
   }
 
@@ -174,19 +286,31 @@ export class OrganizationPage implements OnInit {
   async addDomain(domain: string): Promise<void> {
     if (!domain.trim()) return;
     await this.domainState.run(async () =>
-      this.applyDomains(await firstValueFrom(this.http.post<DomainList>('api/v1/org/domains', { domain }))),
+      this.applyDomains(
+        await firstValueFrom(
+          this.http.post<DomainList>('api/v1/org/domains', { domain }),
+        ),
+      ),
     );
   }
 
   async removeDomain(domain: string): Promise<void> {
-    if (!confirm(this.t.translate('org.confirmRemoveDomain', { domain }))) return;
+    if (!confirm(this.t.translate('org.confirmRemoveDomain', { domain })))
+      return;
     await this.domainState.run(async () =>
-      this.applyDomains(await firstValueFrom(this.http.delete<DomainList>(`api/v1/org/domains/${encodeURIComponent(domain)}`))),
+      this.applyDomains(
+        await firstValueFrom(
+          this.http.delete<DomainList>(
+            `api/v1/org/domains/${encodeURIComponent(domain)}`,
+          ),
+        ),
+      ),
     );
   }
 
   private apply(s: Settings): void {
-    if (!this.timezones.includes(s.timezone)) this.timezones.unshift(s.timezone);
+    if (!this.timezones.includes(s.timezone))
+      this.timezones.unshift(s.timezone);
     this.enabled.set(s.languages);
     this.form.reset({
       name: s.name,
@@ -200,7 +324,9 @@ export class OrganizationPage implements OnInit {
 
   toggle(lang: string): void {
     const now = this.enabled();
-    this.enabled.set(now.includes(lang) ? now.filter((l) => l !== lang) : [...now, lang]);
+    this.enabled.set(
+      now.includes(lang) ? now.filter((l) => l !== lang) : [...now, lang],
+    );
     this.form.markAsDirty();
   }
 
@@ -219,7 +345,10 @@ export class OrganizationPage implements OnInit {
       );
     });
     if (!ok || !saved) return;
-    this.apply({ ...(saved as Settings), supportedLanguages: this.supported() });
+    this.apply({
+      ...(saved as Settings),
+      supportedLanguages: this.supported(),
+    });
     await this.store.loadMe(); // the organization name in the top bar
     this.toast.success(this.t.translate('org.saved'));
   }

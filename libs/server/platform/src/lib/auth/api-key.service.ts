@@ -31,7 +31,10 @@ export class ApiKeyService {
 
   async list(by: AuthContext) {
     const rows = await this.prisma.withOrg(by.orgId, (tx) =>
-      tx.apiKey.findMany({ where: { orgId: by.orgId }, orderBy: { createdAt: 'desc' } }),
+      tx.apiKey.findMany({
+        where: { orgId: by.orgId },
+        orderBy: { createdAt: 'desc' },
+      }),
     );
     return {
       items: rows.map((k) => ({
@@ -51,11 +54,18 @@ export class ApiKeyService {
 
   /** Returns the key ONCE; afterwards only its prefix is known. */
   async create(by: AuthContext, input: CreateApiKeyInput) {
-    const denied = input.permissions.filter((p) => !hasPermission(by.permissions, p));
+    const denied = input.permissions.filter(
+      (p) => !hasPermission(by.permissions, p),
+    );
     if (denied.length)
-      throw DomainError.forbidden(`You cannot grant: ${denied.join(', ')}`, 'cannot_grant');
+      throw DomainError.forbidden(
+        `You cannot grant: ${denied.join(', ')}`,
+        'cannot_grant',
+      );
     const key = API_KEY_PREFIX + randomBytes(32).toString('base64url');
-    const expiresAt = input.expiresInDays ? new Date(Date.now() + input.expiresInDays * 86_400_000) : null;
+    const expiresAt = input.expiresInDays
+      ? new Date(Date.now() + input.expiresInDays * 86_400_000)
+      : null;
     const row = await this.prisma.withOrg(by.orgId, async (tx) => {
       const created = await tx.apiKey.create({
         data: {
@@ -72,12 +82,28 @@ export class ApiKeyService {
         entityType: 'api_key',
         entityId: created.id,
         action: 'created',
-        after: { name: created.name, permissions: created.permissions, expiresAt },
+        after: {
+          name: created.name,
+          permissions: created.permissions,
+          expiresAt,
+        },
       });
-      await emitEvent(tx, PlatformEvents.ApiKeyCreated, { apiKeyId: created.id, name: created.name }, by.orgId);
+      await emitEvent(
+        tx,
+        PlatformEvents.ApiKeyCreated,
+        { apiKeyId: created.id, name: created.name },
+        by.orgId,
+      );
       return created;
     });
-    return { id: row.id, name: row.name, prefix: row.prefix, permissions: row.permissions, expiresAt, key };
+    return {
+      id: row.id,
+      name: row.name,
+      prefix: row.prefix,
+      permissions: row.permissions,
+      expiresAt,
+      key,
+    };
   }
 
   async revoke(by: AuthContext, id: string): Promise<void> {
@@ -85,9 +111,22 @@ export class ApiKeyService {
       const key = await tx.apiKey.findFirst({ where: { id, orgId: by.orgId } });
       if (!key) throw DomainError.notFound('API key not found');
       if (key.revokedAt) return;
-      await tx.apiKey.update({ where: { id }, data: { revokedAt: new Date() } });
-      await recordAudit(tx, { entityType: 'api_key', entityId: id, action: 'revoked', before: { name: key.name } });
-      await emitEvent(tx, PlatformEvents.ApiKeyRevoked, { apiKeyId: id, name: key.name }, by.orgId);
+      await tx.apiKey.update({
+        where: { id },
+        data: { revokedAt: new Date() },
+      });
+      await recordAudit(tx, {
+        entityType: 'api_key',
+        entityId: id,
+        action: 'revoked',
+        before: { name: key.name },
+      });
+      await emitEvent(
+        tx,
+        PlatformEvents.ApiKeyRevoked,
+        { apiKeyId: id, name: key.name },
+        by.orgId,
+      );
     });
   }
 
@@ -95,19 +134,36 @@ export class ApiKeyService {
   async authenticate(key: string): Promise<AuthContext | null> {
     if (!key.startsWith(API_KEY_PREFIX) || key.length > 100) return null;
     const db = this.prisma.system;
-    const row = await db.apiKey.findUnique({ where: { keyHash: TokenService.hash(key) } });
-    if (!row || row.revokedAt || (row.expiresAt && row.expiresAt <= new Date())) return null;
+    const row = await db.apiKey.findUnique({
+      where: { keyHash: TokenService.hash(key) },
+    });
+    if (!row || row.revokedAt || (row.expiresAt && row.expiresAt <= new Date()))
+      return null;
 
     const membership = await db.membership.findUnique({
       where: { orgId_userId: { orgId: row.orgId, userId: row.createdById } },
       include: { role: true, user: { select: { isActive: true } } },
     });
     if (!membership?.isActive || !membership.user.isActive) return null;
-    const permissions = row.permissions.filter((p) => hasPermission(membership.role.permissions, p));
+    const permissions = row.permissions.filter((p) =>
+      hasPermission(membership.role.permissions, p),
+    );
 
-    if (!row.lastUsedAt || Date.now() - row.lastUsedAt.getTime() > TOUCH_EVERY_MS)
-      await db.apiKey.update({ where: { id: row.id }, data: { lastUsedAt: new Date() } });
+    if (
+      !row.lastUsedAt ||
+      Date.now() - row.lastUsedAt.getTime() > TOUCH_EVERY_MS
+    )
+      await db.apiKey.update({
+        where: { id: row.id },
+        data: { lastUsedAt: new Date() },
+      });
 
-    return { userId: row.createdById, orgId: row.orgId, roleKey: 'api_key', permissions, apiKeyId: row.id };
+    return {
+      userId: row.createdById,
+      orgId: row.orgId,
+      roleKey: 'api_key',
+      permissions,
+      apiKeyId: row.id,
+    };
   }
 }

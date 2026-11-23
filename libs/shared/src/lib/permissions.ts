@@ -7,7 +7,10 @@
  *
  * Shared by the API (enforcement) and the admin (hiding what you can't do).
  */
-export function hasPermission(granted: readonly string[], required: string): boolean {
+export function hasPermission(
+  granted: readonly string[],
+  required: string,
+): boolean {
   const need = required.split(':');
   return granted.some((g) => {
     const have = g.split(':');

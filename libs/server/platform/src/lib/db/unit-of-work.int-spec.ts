@@ -18,11 +18,21 @@ describe('unit of work and cache', () => {
     app = await createTestApp();
     uow = app.get(UnitOfWork);
     prisma = app.get(PrismaService);
-    orgId = (await prisma.system.organization.create({ data: { slug: `uow-${run}`, name: 'UoW' } })).id;
-    otherOrg = (await prisma.system.organization.create({ data: { slug: `uow2-${run}`, name: 'UoW2' } })).id;
+    orgId = (
+      await prisma.system.organization.create({
+        data: { slug: `uow-${run}`, name: 'UoW' },
+      })
+    ).id;
+    otherOrg = (
+      await prisma.system.organization.create({
+        data: { slug: `uow2-${run}`, name: 'UoW2' },
+      })
+    ).id;
   });
   afterAll(async () => {
-    await prisma.system.organization.deleteMany({ where: { id: { in: [orgId, otherOrg] } } });
+    await prisma.system.organization.deleteMany({
+      where: { id: { in: [orgId, otherOrg] } },
+    });
     await app.get(CacheService).clearScope(`t-${run}`);
     await app.close();
   });
@@ -60,7 +70,9 @@ describe('unit of work and cache', () => {
   it('is tenant-scoped (RLS) and refuses to switch organization', async () => {
     const seen = await uow.run(otherOrg, () => uow.tx().role.count());
     expect(seen).toBe(0);
-    await expect(uow.run(orgId, () => uow.run(otherOrg, async () => 1))).rejects.toThrow(/switch organization/);
+    await expect(
+      uow.run(orgId, () => uow.run(otherOrg, async () => 1)),
+    ).rejects.toThrow(/switch organization/);
     expect(() => uow.tx()).toThrow(/No unit of work/);
   });
 

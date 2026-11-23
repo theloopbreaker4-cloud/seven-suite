@@ -1,5 +1,14 @@
 /** Seven Suite — github.com/theloopbreaker4-cloud/seven-suite */
-import { Body, Controller, Delete, Get, HttpCode, Param, Patch, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  Param,
+  Patch,
+  Post,
+} from '@nestjs/common';
 import { CurrentAuth, RequirePermission } from '../auth/decorators';
 import type { AuthContext } from '../auth/tokens';
 import { ZodPipe } from '../validation/zod.pipe';
@@ -22,21 +31,28 @@ export class OrganizationController {
   @Get('settings')
   @RequirePermission('platform:settings:read')
   async settings(@CurrentAuth() auth: AuthContext) {
-    return { ...(await this.org.settings(auth)), supportedLanguages: SUPPORTED_LANGUAGES };
+    return {
+      ...(await this.org.settings(auth)),
+      supportedLanguages: SUPPORTED_LANGUAGES,
+    };
   }
 
   @Patch('settings')
   @RequirePermission('platform:settings:update')
   update(
     @CurrentAuth() auth: AuthContext,
-    @Body(new ZodPipe(organizationSettingsSchema)) body: OrganizationSettingsInput,
+    @Body(new ZodPipe(organizationSettingsSchema))
+    body: OrganizationSettingsInput,
   ) {
     return this.org.updateSettings(auth, body);
   }
 
   @Post('roles')
   @RequirePermission('platform:role:create')
-  createRole(@CurrentAuth() auth: AuthContext, @Body(new ZodPipe(roleSchema)) body: RoleInput) {
+  createRole(
+    @CurrentAuth() auth: AuthContext,
+    @Body(new ZodPipe(roleSchema)) body: RoleInput,
+  ) {
     return this.org.createRole(auth, body);
   }
 
@@ -53,7 +69,10 @@ export class OrganizationController {
   @Delete('roles/:key')
   @HttpCode(204)
   @RequirePermission('platform:role:delete')
-  async deleteRole(@CurrentAuth() auth: AuthContext, @Param('key') key: string): Promise<void> {
+  async deleteRole(
+    @CurrentAuth() auth: AuthContext,
+    @Param('key') key: string,
+  ): Promise<void> {
     await this.org.deleteRole(auth, key);
   }
 }

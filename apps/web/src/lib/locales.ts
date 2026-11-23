@@ -22,13 +22,22 @@ export function isLocale(value: string | undefined | null): value is Locale {
  * Pick the best of `allowed` for an Accept-Language header (`ru-RU,ru;q=0.9,en;q=0.8`).
  * Falls back to `fallback` (the organization's default language).
  */
-export function negotiateLocale(acceptLanguage: string | null | undefined, allowed: readonly string[], fallback: string): string {
+export function negotiateLocale(
+  acceptLanguage: string | null | undefined,
+  allowed: readonly string[],
+  fallback: string,
+): string {
   const wanted = (acceptLanguage ?? '')
     .split(',')
     .map((part) => {
       const [tag, ...params] = part.trim().split(';');
-      const q = Number(params.find((p) => p.trim().startsWith('q='))?.split('=')[1] ?? '1');
-      return { lang: tag.toLowerCase().split('-')[0], q: Number.isFinite(q) ? q : 0 };
+      const q = Number(
+        params.find((p) => p.trim().startsWith('q='))?.split('=')[1] ?? '1',
+      );
+      return {
+        lang: tag.toLowerCase().split('-')[0],
+        q: Number.isFinite(q) ? q : 0,
+      };
     })
     .filter((x) => x.lang && x.q > 0)
     .sort((a, b) => b.q - a.q);

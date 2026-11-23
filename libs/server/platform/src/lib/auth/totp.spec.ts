@@ -34,9 +34,15 @@ describe('totp', () => {
   it('accepts ±1 step of drift and refuses reuse', () => {
     const now = 1111111109 * 1000;
     const step = totpStep(now);
-    expect(verifyTotp(RFC_SECRET, totpCode(RFC_SECRET, step - 1), null, now)).toBe(step - 1);
-    expect(verifyTotp(RFC_SECRET, totpCode(RFC_SECRET, step + 1), null, now)).toBe(step + 1);
-    expect(verifyTotp(RFC_SECRET, totpCode(RFC_SECRET, step - 2), null, now)).toBeNull();
+    expect(
+      verifyTotp(RFC_SECRET, totpCode(RFC_SECRET, step - 1), null, now),
+    ).toBe(step - 1);
+    expect(
+      verifyTotp(RFC_SECRET, totpCode(RFC_SECRET, step + 1), null, now),
+    ).toBe(step + 1);
+    expect(
+      verifyTotp(RFC_SECRET, totpCode(RFC_SECRET, step - 2), null, now),
+    ).toBeNull();
     expect(verifyTotp(RFC_SECRET, '081804', step, now)).toBeNull(); // already used
     expect(verifyTotp(RFC_SECRET, '12345', null, now)).toBeNull();
   });
@@ -61,6 +67,8 @@ describe('totp', () => {
     const codes = generateRecoveryCodes();
     expect(new Set(codes).size).toBe(10);
     expect(codes[0]).toMatch(/^[a-z2-9]{4}-[a-z2-9]{4}-[a-z2-9]{4}$/);
-    expect(normalizeRecoveryCode(codes[0].toUpperCase().replace(/-/g, ' '))).toBe(codes[0]);
+    expect(
+      normalizeRecoveryCode(codes[0].toUpperCase().replace(/-/g, ' ')),
+    ).toBe(codes[0]);
   });
 });

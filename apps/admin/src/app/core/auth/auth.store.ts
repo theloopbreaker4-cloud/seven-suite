@@ -85,7 +85,10 @@ export class AuthStore {
   /** Second step: an authenticator code or a recovery code. */
   async completeMfa(mfaToken: string, code: string): Promise<void> {
     await this.start(
-      this.http.post<SessionResponse>('api/v1/auth/login/2fa', { mfaToken, code }),
+      this.http.post<SessionResponse>('api/v1/auth/login/2fa', {
+        mfaToken,
+        code,
+      }),
     );
   }
 

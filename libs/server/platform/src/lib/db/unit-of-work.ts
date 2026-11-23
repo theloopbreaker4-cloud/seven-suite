@@ -33,10 +33,14 @@ export class UnitOfWork {
   async run<T>(orgId: string, fn: () => Promise<T>): Promise<T> {
     const outer = this.storage.getStore();
     if (outer) {
-      if (outer.orgId !== orgId) throw new Error('A unit of work cannot switch organization');
+      if (outer.orgId !== orgId)
+        throw new Error('A unit of work cannot switch organization');
       return fn();
     }
-    const scope: Omit<Scope, 'tx'> & { tx?: TenantTx } = { orgId, afterCommit: [] };
+    const scope: Omit<Scope, 'tx'> & { tx?: TenantTx } = {
+      orgId,
+      afterCommit: [],
+    };
     const result = await this.prisma.withOrg(orgId, (tx) => {
       scope.tx = tx;
       return this.storage.run(scope as Scope, fn);
@@ -45,7 +49,9 @@ export class UnitOfWork {
       try {
         await cb();
       } catch (err) {
-        this.logger.error(`afterCommit callback failed: ${(err as Error).message}`);
+        this.logger.error(
+          `afterCommit callback failed: ${(err as Error).message}`,
+        );
       }
     }
     return result;
@@ -54,7 +60,8 @@ export class UnitOfWork {
   /** The current transaction (throws outside `run()` — a repository must never run untransacted). */
   tx(): TenantTx {
     const scope = this.storage.getStore();
-    if (!scope) throw new Error('No unit of work: wrap the call in uow.run(orgId, …)');
+    if (!scope)
+      throw new Error('No unit of work: wrap the call in uow.run(orgId, …)');
     return scope.tx;
   }
 
@@ -66,6 +73,13 @@ export class UnitOfWork {
   afterCommit(cb: () => unknown | Promise<unknown>): void {
     const scope = this.storage.getStore();
     if (scope) scope.afterCommit.push(cb);
-    else void Promise.resolve().then(cb).catch((e) => this.logger.error(`afterCommit callback failed: ${(e as Error).message}`));
+    else
+      void Promise.resolve()
+        .then(cb)
+        .catch((e) =>
+          this.logger.error(
+            `afterCommit callback failed: ${(e as Error).message}`,
+          ),
+        );
   }
 }

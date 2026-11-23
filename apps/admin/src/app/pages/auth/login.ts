@@ -37,7 +37,9 @@ import { FormState } from '../../ui/form-state';
       }
       @if (mfaToken()) {
         <form [formGroup]="codeForm" (ngSubmit)="submitCode()" novalidate>
-          <p class="mb-4 text-sm text-muted">{{ 'auth.mfa.hint' | transloco }}</p>
+          <p class="mb-4 text-sm text-muted">
+            {{ 'auth.mfa.hint' | transloco }}
+          </p>
           <sv-field
             [label]="'auth.mfa.code' | transloco"
             for="code"
@@ -54,70 +56,85 @@ import { FormState } from '../../ui/form-state';
               required
             />
           </sv-field>
-          <p class="mb-4 text-xs text-muted">{{ 'auth.mfa.recoveryHint' | transloco }}</p>
+          <p class="mb-4 text-xs text-muted">
+            {{ 'auth.mfa.recoveryHint' | transloco }}
+          </p>
           @if (state.message()) {
-            <p class="mb-4 rounded-md bg-surface-2 px-3 py-2 text-sm text-danger" role="alert">
+            <p
+              class="mb-4 rounded-md bg-surface-2 px-3 py-2 text-sm text-danger"
+              role="alert"
+            >
               {{ state.message() }}
             </p>
           }
-          <button type="submit" class="sv-btn-primary w-full" [disabled]="state.busy() || codeForm.invalid">
+          <button
+            type="submit"
+            class="sv-btn-primary w-full"
+            [disabled]="state.busy() || codeForm.invalid"
+          >
             {{ (state.busy() ? 'common.wait' : 'auth.mfa.submit') | transloco }}
           </button>
-          <button type="button" class="sv-link mt-4 block w-full text-center text-sm" (click)="restart()">
+          <button
+            type="button"
+            class="sv-link mt-4 block w-full text-center text-sm"
+            (click)="restart()"
+          >
             {{ 'auth.mfa.back' | transloco }}
           </button>
         </form>
       } @else {
-      <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
-        <sv-field
-          [label]="'auth.email' | transloco"
-          for="email"
-          [error]="state.fields()['email']"
-        >
-          <input
-            id="email"
-            type="email"
-            autocomplete="username"
-            class="sv-input"
-            formControlName="email"
-            required
-          />
-        </sv-field>
-        <sv-field
-          [label]="'auth.password' | transloco"
-          for="password"
-          [error]="state.fields()['password']"
-        >
-          <input
-            id="password"
-            type="password"
-            autocomplete="current-password"
-            class="sv-input"
-            formControlName="password"
-            required
-          />
-        </sv-field>
-        <div class="mb-4 text-right text-sm">
-          <a class="sv-link" routerLink="/forgot-password">{{
-            'auth.login.forgot' | transloco
-          }}</a>
-        </div>
-        @if (state.message()) {
-          <p
-            class="mb-4 rounded-md bg-surface-2 px-3 py-2 text-sm text-danger"
-            role="alert"
+        <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+          <sv-field
+            [label]="'auth.email' | transloco"
+            for="email"
+            [error]="state.fields()['email']"
           >
-            {{ state.message() }}
-          </p>
-        }
-        <button
-          type="submit"
-          class="sv-btn-primary w-full"
-          [disabled]="state.busy() || form.invalid"
-        >
-          {{ (state.busy() ? 'common.wait' : 'auth.login.submit') | transloco }}
-        </button>
-      </form>
+            <input
+              id="email"
+              type="email"
+              autocomplete="username"
+              class="sv-input"
+              formControlName="email"
+              required
+            />
+          </sv-field>
+          <sv-field
+            [label]="'auth.password' | transloco"
+            for="password"
+            [error]="state.fields()['password']"
+          >
+            <input
+              id="password"
+              type="password"
+              autocomplete="current-password"
+              class="sv-input"
+              formControlName="password"
+              required
+            />
+          </sv-field>
+          <div class="mb-4 text-right text-sm">
+            <a class="sv-link" routerLink="/forgot-password">{{
+              'auth.login.forgot' | transloco
+            }}</a>
+          </div>
+          @if (state.message()) {
+            <p
+              class="mb-4 rounded-md bg-surface-2 px-3 py-2 text-sm text-danger"
+              role="alert"
+            >
+              {{ state.message() }}
+            </p>
+          }
+          <button
+            type="submit"
+            class="sv-btn-primary w-full"
+            [disabled]="state.busy() || form.invalid"
+          >
+            {{
+              (state.busy() ? 'common.wait' : 'auth.login.submit') | transloco
+            }}
+          </button>
+        </form>
       }
       @if (!demo()) {
         <p class="mt-5 text-center text-sm text-muted">
@@ -191,7 +208,8 @@ export class LoginPage {
     );
     if (ok) await this.done();
     // An expired challenge (5 min) means starting over with the password.
-    else if (this.state.message() && !this.state.fields()['code']) this.codeForm.reset();
+    else if (this.state.message() && !this.state.fields()['code'])
+      this.codeForm.reset();
   }
 
   restart(): void {

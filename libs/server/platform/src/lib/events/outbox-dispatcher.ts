@@ -1,7 +1,11 @@
 /** Seven Suite — github.com/theloopbreaker4-cloud/seven-suite */
 import { Injectable, Logger, OnApplicationShutdown } from '@nestjs/common';
 import { PrismaService } from '../db/prisma.service';
-import { EVENT_JOB_OPTIONS, QUEUES, QueueService } from '../queue/queue.service';
+import {
+  EVENT_JOB_OPTIONS,
+  QUEUES,
+  QueueService,
+} from '../queue/queue.service';
 
 interface OutboxRow {
   id: string;
@@ -33,37 +37,46 @@ export class OutboxDispatcher implements OnApplicationShutdown {
   /** Dispatch up to `limit` pending events; returns how many were queued. */
   async dispatchBatch(limit = 100): Promise<number> {
     const queue = this.queues.queue(QUEUES.events);
-    return this.prisma.system.$transaction(async (tx) => {
-      const rows = await tx.$queryRaw<OutboxRow[]>`
+    return this.prisma.system.$transaction(
+      async (tx) => {
+        const rows = await tx.$queryRaw<OutboxRow[]>`
         SELECT id, org_id, name, payload, occurred_at
         FROM platform.outbox_event
         WHERE dispatched_at IS NULL AND attempts < ${OUTBOX_MAX_ATTEMPTS}
         ORDER BY occurred_at
         LIMIT ${limit}
         FOR UPDATE SKIP LOCKED`;
-      let queued = 0;
-      for (const row of rows) {
-        try {
-          const payload = (row.payload ?? {}) as Record<string, unknown>;
-          await queue.add(
-            row.name,
-            { ...payload, orgId: row.org_id, occurredAt: row.occurred_at.toISOString() },
-            { ...EVENT_JOB_OPTIONS, jobId: row.id },
-          );
-          await tx.$executeRaw`
+        let queued = 0;
+        for (const row of rows) {
+          try {
+            const payload = (row.payload ?? {}) as Record<string, unknown>;
+            await queue.add(
+              row.name,
+              {
+                ...payload,
+                orgId: row.org_id,
+                occurredAt: row.occurred_at.toISOString(),
+              },
+              { ...EVENT_JOB_OPTIONS, jobId: row.id },
+            );
+            await tx.$executeRaw`
             UPDATE platform.outbox_event SET dispatched_at = now(), attempts = attempts + 1, last_error = NULL
             WHERE id = ${row.id}::uuid`;
-          queued++;
-        } catch (err) {
-          const message = (err as Error).message.slice(0, 1000);
-          await tx.$executeRaw`
+            queued++;
+          } catch (err) {
+            const message = (err as Error).message.slice(0, 1000);
+            await tx.$executeRaw`
             UPDATE platform.outbox_event SET attempts = attempts + 1, last_error = ${message}
             WHERE id = ${row.id}::uuid`;
-          this.logger.warn(`outbox ${row.name} ${row.id} not queued: ${message}`);
+            this.logger.warn(
+              `outbox ${row.name} ${row.id} not queued: ${message}`,
+            );
+          }
         }
-      }
-      return queued;
-    }, { timeout: 30_000 });
+        return queued;
+      },
+      { timeout: 30_000 },
+    );
   }
 
   /**

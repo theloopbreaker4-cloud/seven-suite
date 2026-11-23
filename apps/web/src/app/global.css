@@ -38,7 +38,14 @@ body {
   min-height: 100vh;
   background: var(--bg);
   color: var(--text);
-  font-family: 'Noto Sans', 'Noto Sans Georgian', 'Noto Sans Armenian', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-family:
+    'Noto Sans',
+    'Noto Sans Georgian',
+    'Noto Sans Armenian',
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    sans-serif;
   line-height: 1.6;
 }
 a {

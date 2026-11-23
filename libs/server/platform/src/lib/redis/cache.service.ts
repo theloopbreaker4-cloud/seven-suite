@@ -30,18 +30,33 @@ export class CacheService {
     }
   }
 
-  async set(scope: string, key: string, value: unknown, ttlSeconds: number): Promise<void> {
+  async set(
+    scope: string,
+    key: string,
+    value: unknown,
+    ttlSeconds: number,
+  ): Promise<void> {
     if (value === undefined) return;
     try {
       await this.ready();
-      await this.redis.client.set(this.key(scope, key), JSON.stringify(value), 'EX', Math.max(1, Math.round(ttlSeconds)));
+      await this.redis.client.set(
+        this.key(scope, key),
+        JSON.stringify(value),
+        'EX',
+        Math.max(1, Math.round(ttlSeconds)),
+      );
     } catch (err) {
       this.logger.warn(`cache set failed: ${(err as Error).message}`);
     }
   }
 
   /** Cached value, or compute it with `load`, store for `ttlSeconds` and return it. */
-  async wrap<T>(scope: string, key: string, ttlSeconds: number, load: () => Promise<T>): Promise<T> {
+  async wrap<T>(
+    scope: string,
+    key: string,
+    ttlSeconds: number,
+    load: () => Promise<T>,
+  ): Promise<T> {
     const hit = await this.get<T>(scope, key);
     if (hit !== undefined) return hit;
     const full = this.key(scope, key);
@@ -73,7 +88,13 @@ export class CacheService {
       await this.ready();
       let cursor = '0';
       do {
-        const [next, keys] = await this.redis.client.scan(cursor, 'MATCH', `cache:${scope}:*`, 'COUNT', 200);
+        const [next, keys] = await this.redis.client.scan(
+          cursor,
+          'MATCH',
+          `cache:${scope}:*`,
+          'COUNT',
+          200,
+        );
         cursor = next;
         if (keys.length) removed += await this.redis.client.del(...keys);
       } while (cursor !== '0');

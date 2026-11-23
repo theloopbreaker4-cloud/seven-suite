@@ -108,7 +108,12 @@ export class MemberService {
       await emitEvent(
         tx,
         PlatformEvents.MemberRoleChanged,
-        { membershipId: member.id, userId: member.userId, from: member.role.key, to: role.key },
+        {
+          membershipId: member.id,
+          userId: member.userId,
+          from: member.role.key,
+          to: role.key,
+        },
         by.orgId,
       );
     });

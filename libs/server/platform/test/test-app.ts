@@ -52,7 +52,9 @@ export async function cleanupTestRun(
   const orgIds = memberships.map((m) => m.orgId);
   // Outbox and audit rows have no foreign keys (they outlive what they describe): clean them too.
   await db.outboxEvent.deleteMany({ where: { orgId: { in: orgIds } } });
-  await db.auditLog.deleteMany({ where: { OR: [{ orgId: { in: orgIds } }, { actorId: { in: ids } }] } });
+  await db.auditLog.deleteMany({
+    where: { OR: [{ orgId: { in: orgIds } }, { actorId: { in: ids } }] },
+  });
   await db.$executeRaw`DELETE FROM platform.outbox_event WHERE org_id IS NULL AND payload->'data'->>'userId' = ANY(${ids}::text[])`;
   await db.organization.deleteMany({
     where: { id: { in: orgIds } },

@@ -1,5 +1,10 @@
 /** Seven Suite — github.com/theloopbreaker4-cloud/seven-suite */
-import { CanActivate, ExecutionContext, Inject, Injectable } from '@nestjs/common';
+import {
+  CanActivate,
+  ExecutionContext,
+  Inject,
+  Injectable,
+} from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import type { Request } from 'express';
 import { RequestContext } from '../context/request-context';
@@ -8,7 +13,13 @@ import { ApiKeyService, API_KEY_PREFIX } from './api-key.service';
 import { timingSafeEqual } from 'node:crypto';
 import { ENV } from '../config/config.module';
 import type { Env } from '../config/env';
-import { IS_PUBLIC, REQUIRED_MODULE, REQUIRED_PERMISSION, SERVICE_ONLY, USER_ONLY } from './decorators';
+import {
+  IS_PUBLIC,
+  REQUIRED_MODULE,
+  REQUIRED_PERMISSION,
+  SERVICE_ONLY,
+  USER_ONLY,
+} from './decorators';
 import { ModuleRegistry } from '../modules/module-registry';
 import { hasPermission } from './permissions';
 import { TokenService, type AuthContext } from './tokens';
@@ -35,7 +46,10 @@ export class AuthGuard implements CanActivate {
       const given = Buffer.from(String(req.headers['x-service-key'] ?? ''));
       const expected = Buffer.from(this.env.WEB_SERVICE_KEY);
       if (given.length !== expected.length || !timingSafeEqual(given, expected))
-        throw DomainError.unauthorized('Service key required', 'service_key_required');
+        throw DomainError.unauthorized(
+          'Service key required',
+          'service_key_required',
+        );
       RequestContext.patch({ actorType: 'system' });
       return true;
     }
@@ -49,15 +63,26 @@ export class AuthGuard implements CanActivate {
     const header = req.headers.authorization ?? '';
     const bearer = /^Bearer\s+(\S+)$/i.exec(header)?.[1];
     const xKey = req.headers['x-api-key'];
-    const apiKey = typeof xKey === 'string' ? xKey : bearer?.startsWith(API_KEY_PREFIX) ? bearer : undefined;
+    const apiKey =
+      typeof xKey === 'string'
+        ? xKey
+        : bearer?.startsWith(API_KEY_PREFIX)
+          ? bearer
+          : undefined;
     const auth = apiKey
       ? await this.apiKeys.authenticate(apiKey)
       : bearer
         ? await this.tokens.verifyAccess(bearer)
         : null;
     if (!auth) throw DomainError.unauthorized();
-    if (auth.apiKeyId && this.reflector.getAllAndOverride<boolean>(USER_ONLY, targets))
-      throw DomainError.forbidden('Not available with an API key', 'api_key_not_allowed');
+    if (
+      auth.apiKeyId &&
+      this.reflector.getAllAndOverride<boolean>(USER_ONLY, targets)
+    )
+      throw DomainError.forbidden(
+        'Not available with an API key',
+        'api_key_not_allowed',
+      );
     req.auth = auth;
     RequestContext.patch({
       userId: auth.userId,
@@ -72,9 +97,15 @@ export class AuthGuard implements CanActivate {
     );
     if (required && !hasPermission(auth.permissions, required))
       throw DomainError.forbidden();
-    const moduleId = this.reflector.getAllAndOverride<string | undefined>(REQUIRED_MODULE, targets);
+    const moduleId = this.reflector.getAllAndOverride<string | undefined>(
+      REQUIRED_MODULE,
+      targets,
+    );
     if (moduleId && !(await this.modules.isEnabled(auth.orgId, moduleId)))
-      throw DomainError.forbidden('This module is not enabled for your organization', 'module_disabled');
+      throw DomainError.forbidden(
+        'This module is not enabled for your organization',
+        'module_disabled',
+      );
     return true;
   }
 }

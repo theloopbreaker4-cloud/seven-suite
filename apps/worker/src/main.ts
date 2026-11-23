@@ -8,7 +8,9 @@ import { AppModule } from './app/app.module';
 
 /** No HTTP server: the worker only talks to PostgreSQL and Redis. */
 async function bootstrap() {
-  const app = await NestFactory.createApplicationContext(AppModule, { bufferLogs: true });
+  const app = await NestFactory.createApplicationContext(AppModule, {
+    bufferLogs: true,
+  });
   app.useLogger(app.get(Logger));
   app.enableShutdownHooks();
   app.get(Logger).log('Worker started: outbox dispatcher + event consumers');

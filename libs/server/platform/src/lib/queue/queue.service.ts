@@ -70,7 +70,13 @@ export class QueueService implements OnModuleDestroy {
     return Promise.all(
       Object.values(QUEUES).map(async (name) => {
         const q = this.queue(name);
-        const c = await q.getJobCounts('waiting', 'active', 'delayed', 'completed', 'failed');
+        const c = await q.getJobCounts(
+          'waiting',
+          'active',
+          'delayed',
+          'completed',
+          'failed',
+        );
         return {
           name,
           waiting: c['waiting'] ?? 0,

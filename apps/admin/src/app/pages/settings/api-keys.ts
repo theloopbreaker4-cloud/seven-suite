@@ -31,16 +31,32 @@ interface ApiKey {
   imports: [ReactiveFormsModule, TranslocoPipe, DatePipe, Field, CanDirective],
   template: `
     <h1 class="mb-2 text-2xl font-semibold">{{ 'nav.apiKeys' | transloco }}</h1>
-    <p class="mb-6 max-w-2xl text-sm text-muted">{{ 'apiKeys.hint' | transloco }}</p>
+    <p class="mb-6 max-w-2xl text-sm text-muted">
+      {{ 'apiKeys.hint' | transloco }}
+    </p>
 
     @if (created(); as c) {
       <section class="sv-card mb-6 border-success p-5" role="status">
-        <p class="mb-2 font-medium">{{ 'apiKeys.createdTitle' | transloco: { name: c.name } }}</p>
-        <p class="mb-3 text-sm text-muted">{{ 'apiKeys.createdHint' | transloco }}</p>
-        <p class="mb-3 break-all rounded-md bg-surface-2 p-3 font-mono text-sm">{{ c.key }}</p>
+        <p class="mb-2 font-medium">
+          {{ 'apiKeys.createdTitle' | transloco: { name: c.name } }}
+        </p>
+        <p class="mb-3 text-sm text-muted">
+          {{ 'apiKeys.createdHint' | transloco }}
+        </p>
+        <p class="mb-3 break-all rounded-md bg-surface-2 p-3 font-mono text-sm">
+          {{ c.key }}
+        </p>
         <div class="flex gap-2">
-          <button type="button" class="sv-btn-ghost" (click)="copy(c.key)">{{ 'security.copy' | transloco }}</button>
-          <button type="button" class="sv-btn-primary" (click)="created.set(null)">{{ 'security.saved' | transloco }}</button>
+          <button type="button" class="sv-btn-ghost" (click)="copy(c.key)">
+            {{ 'security.copy' | transloco }}
+          </button>
+          <button
+            type="button"
+            class="sv-btn-primary"
+            (click)="created.set(null)"
+          >
+            {{ 'security.saved' | transloco }}
+          </button>
         </div>
       </section>
     }
@@ -49,36 +65,73 @@ interface ApiKey {
       <h2 class="mb-4 font-medium">{{ 'apiKeys.new' | transloco }}</h2>
       <form [formGroup]="form" (ngSubmit)="create()" novalidate>
         <div class="grid gap-x-4 md:grid-cols-[1fr_12rem]">
-          <sv-field [label]="'apiKeys.name' | transloco" for="key-name" [error]="state.fields()['name']">
-            <input id="key-name" class="sv-input" formControlName="name" maxlength="80" />
+          <sv-field
+            [label]="'apiKeys.name' | transloco"
+            for="key-name"
+            [error]="state.fields()['name']"
+          >
+            <input
+              id="key-name"
+              class="sv-input"
+              formControlName="name"
+              maxlength="80"
+            />
           </sv-field>
-          <sv-field [label]="'apiKeys.expires' | transloco" for="key-expiry" [error]="state.fields()['expiresInDays']">
-            <select id="key-expiry" class="sv-input" formControlName="expiresInDays">
-              <option [ngValue]="30">{{ 'apiKeys.days' | transloco: { n: 30 } }}</option>
-              <option [ngValue]="90">{{ 'apiKeys.days' | transloco: { n: 90 } }}</option>
-              <option [ngValue]="365">{{ 'apiKeys.days' | transloco: { n: 365 } }}</option>
+          <sv-field
+            [label]="'apiKeys.expires' | transloco"
+            for="key-expiry"
+            [error]="state.fields()['expiresInDays']"
+          >
+            <select
+              id="key-expiry"
+              class="sv-input"
+              formControlName="expiresInDays"
+            >
+              <option [ngValue]="30">
+                {{ 'apiKeys.days' | transloco: { n: 30 } }}
+              </option>
+              <option [ngValue]="90">
+                {{ 'apiKeys.days' | transloco: { n: 90 } }}
+              </option>
+              <option [ngValue]="365">
+                {{ 'apiKeys.days' | transloco: { n: 365 } }}
+              </option>
               <option [ngValue]="0">{{ 'apiKeys.never' | transloco }}</option>
             </select>
           </sv-field>
         </div>
         <fieldset class="mb-4">
-          <legend class="sv-label mb-2">{{ 'apiKeys.permissions' | transloco }}</legend>
+          <legend class="sv-label mb-2">
+            {{ 'apiKeys.permissions' | transloco }}
+          </legend>
           <div class="grid gap-1 sm:grid-cols-2">
             @for (p of grantable(); track p) {
               <label class="flex items-center gap-2 text-sm">
-                <input type="checkbox" [checked]="picked().has(p)" (change)="toggle(p)" />
+                <input
+                  type="checkbox"
+                  [checked]="picked().has(p)"
+                  (change)="toggle(p)"
+                />
                 <span class="font-mono text-xs">{{ p }}</span>
               </label>
             }
           </div>
           @if (state.fields()['permissions']) {
-            <p class="mt-1 text-sm text-danger">{{ state.fields()['permissions'] }}</p>
+            <p class="mt-1 text-sm text-danger">
+              {{ state.fields()['permissions'] }}
+            </p>
           }
         </fieldset>
         @if (state.message()) {
-          <p class="mb-4 text-sm text-danger" role="alert">{{ state.message() }}</p>
+          <p class="mb-4 text-sm text-danger" role="alert">
+            {{ state.message() }}
+          </p>
         }
-        <button type="submit" class="sv-btn-primary" [disabled]="state.busy() || form.invalid || picked().size === 0">
+        <button
+          type="submit"
+          class="sv-btn-primary"
+          [disabled]="state.busy() || form.invalid || picked().size === 0"
+        >
           {{ 'apiKeys.create' | transloco }}
         </button>
       </form>
@@ -88,35 +141,64 @@ interface ApiKey {
       <table class="w-full text-left text-sm">
         <thead class="border-b border-border text-muted">
           <tr>
-            <th class="px-4 py-2 font-medium">{{ 'apiKeys.name' | transloco }}</th>
-            <th class="px-4 py-2 font-medium">{{ 'apiKeys.key' | transloco }}</th>
-            <th class="px-4 py-2 font-medium">{{ 'apiKeys.permissions' | transloco }}</th>
-            <th class="px-4 py-2 font-medium">{{ 'apiKeys.lastUsed' | transloco }}</th>
+            <th class="px-4 py-2 font-medium">
+              {{ 'apiKeys.name' | transloco }}
+            </th>
+            <th class="px-4 py-2 font-medium">
+              {{ 'apiKeys.key' | transloco }}
+            </th>
+            <th class="px-4 py-2 font-medium">
+              {{ 'apiKeys.permissions' | transloco }}
+            </th>
+            <th class="px-4 py-2 font-medium">
+              {{ 'apiKeys.lastUsed' | transloco }}
+            </th>
             <th class="px-4 py-2"></th>
           </tr>
         </thead>
         <tbody>
           @for (k of keys(); track k.id) {
-            <tr class="border-b border-border last:border-0" [class.opacity-50]="!k.active">
+            <tr
+              class="border-b border-border last:border-0"
+              [class.opacity-50]="!k.active"
+            >
               <td class="px-4 py-2">
                 {{ k.name }}
                 @if (!k.active) {
-                  <span class="ml-1 text-xs text-muted">({{ (k.revokedAt ? 'apiKeys.revoked' : 'apiKeys.expired') | transloco }})</span>
+                  <span class="ml-1 text-xs text-muted"
+                    >({{
+                      (k.revokedAt ? 'apiKeys.revoked' : 'apiKeys.expired')
+                        | transloco
+                    }})</span
+                  >
                 }
               </td>
               <td class="px-4 py-2 font-mono text-xs">{{ k.prefix }}…</td>
-              <td class="px-4 py-2 font-mono text-xs">{{ k.permissions.join(', ') }}</td>
-              <td class="px-4 py-2 text-muted">{{ k.lastUsedAt ? (k.lastUsedAt | date: 'short') : '—' }}</td>
+              <td class="px-4 py-2 font-mono text-xs">
+                {{ k.permissions.join(', ') }}
+              </td>
+              <td class="px-4 py-2 text-muted">
+                {{ k.lastUsedAt ? (k.lastUsedAt | date: 'short') : '—' }}
+              </td>
               <td class="px-4 py-2 text-right">
                 @if (k.active) {
-                  <button *svCan="'platform:api_key:delete'" type="button" class="sv-btn-danger px-2 py-1" (click)="revoke(k)">
+                  <button
+                    *svCan="'platform:api_key:delete'"
+                    type="button"
+                    class="sv-btn-danger px-2 py-1"
+                    (click)="revoke(k)"
+                  >
                     {{ 'members.revoke' | transloco }}
                   </button>
                 }
               </td>
             </tr>
           } @empty {
-            <tr><td colspan="5" class="px-4 py-6 text-center text-muted">{{ 'apiKeys.empty' | transloco }}</td></tr>
+            <tr>
+              <td colspan="5" class="px-4 py-6 text-center text-muted">
+                {{ 'apiKeys.empty' | transloco }}
+              </td>
+            </tr>
           }
         </tbody>
       </table>
@@ -130,7 +212,9 @@ export class ApiKeysPage implements OnInit {
   private readonly store = inject(AuthStore);
 
   protected readonly keys = signal<ApiKey[]>([]);
-  protected readonly created = signal<{ name: string; key: string } | null>(null);
+  protected readonly created = signal<{ name: string; key: string } | null>(
+    null,
+  );
   protected readonly picked = signal(new Set<string>());
   protected readonly state = new FormState();
   protected readonly form = inject(FormBuilder).nonNullable.group({
@@ -143,7 +227,9 @@ export class ApiKeysPage implements OnInit {
    */
   protected readonly grantable = computed(() =>
     PERMISSION_CATALOG.map((p) => p.key).filter(
-      (k) => !k.startsWith('platform:api_key:') && hasPermission(this.store.permissions(), k),
+      (k) =>
+        !k.startsWith('platform:api_key:') &&
+        hasPermission(this.store.permissions(), k),
     ),
   );
 
@@ -152,7 +238,9 @@ export class ApiKeysPage implements OnInit {
   }
 
   private async load(): Promise<void> {
-    const res = await firstValueFrom(this.http.get<{ items: ApiKey[] }>('api/v1/api-keys'));
+    const res = await firstValueFrom(
+      this.http.get<{ items: ApiKey[] }>('api/v1/api-keys'),
+    );
     this.keys.set(res.items);
   }
 
@@ -182,7 +270,8 @@ export class ApiKeysPage implements OnInit {
   }
 
   async revoke(k: ApiKey): Promise<void> {
-    if (!confirm(this.t.translate('apiKeys.confirmRevoke', { name: k.name }))) return;
+    if (!confirm(this.t.translate('apiKeys.confirmRevoke', { name: k.name })))
+      return;
     try {
       await firstValueFrom(this.http.delete(`api/v1/api-keys/${k.id}`));
       this.toast.success(this.t.translate('apiKeys.revokedToast'));

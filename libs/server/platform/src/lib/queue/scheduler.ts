@@ -1,5 +1,10 @@
 /** Seven Suite — github.com/theloopbreaker4-cloud/seven-suite */
-import { Inject, Injectable, Logger, OnApplicationShutdown } from '@nestjs/common';
+import {
+  Inject,
+  Injectable,
+  Logger,
+  OnApplicationShutdown,
+} from '@nestjs/common';
 import { Worker, type Job } from 'bullmq';
 import { ENV } from '../config/config.module';
 import type { Env } from '../config/env';
@@ -33,20 +38,29 @@ export class SchedulerService implements OnApplicationShutdown {
   ) {}
 
   register(task: ScheduledTask): void {
-    if (!task.cron === !task.every) throw new Error(`${task.name}: give exactly one of cron / every`);
-    if (this.tasks.has(task.name)) throw new Error(`Duplicate scheduled task ${task.name}`);
+    if (!task.cron === !task.every)
+      throw new Error(`${task.name}: give exactly one of cron / every`);
+    if (this.tasks.has(task.name))
+      throw new Error(`Duplicate scheduled task ${task.name}`);
     this.tasks.set(task.name, task);
   }
 
   list(): { name: string; cron?: string; every?: number }[] {
-    return [...this.tasks.values()].map(({ name, cron, every }) => ({ name, cron, every }));
+    return [...this.tasks.values()].map(({ name, cron, every }) => ({
+      name,
+      cron,
+      every,
+    }));
   }
 
   /** Run one task now, outside its schedule (operators, tests). */
   async runNow(name: string): Promise<unknown> {
     const task = this.tasks.get(name);
     if (!task) throw new Error(`Unknown task ${name}`);
-    return RequestContext.run({ requestId: `task:${name}:${Date.now()}`, actorType: 'system' }, task.run);
+    return RequestContext.run(
+      { requestId: `task:${name}:${Date.now()}`, actorType: 'system' },
+      task.run,
+    );
   }
 
   async start(): Promise<void> {
@@ -56,23 +70,36 @@ export class SchedulerService implements OnApplicationShutdown {
       await queue.upsertJobScheduler(
         t.name,
         t.cron ? { pattern: t.cron, tz: 'UTC' } : { every: t.every ?? 60_000 },
-        { name: t.name, opts: { removeOnComplete: 50, removeOnFail: 200, attempts: 3, backoff: { type: 'exponential', delay: 10_000 } } },
+        {
+          name: t.name,
+          opts: {
+            removeOnComplete: 50,
+            removeOnFail: 200,
+            attempts: 3,
+            backoff: { type: 'exponential', delay: 10_000 },
+          },
+        },
       );
     }
     for (const s of await queue.getJobSchedulers()) {
-      if (s.key && !this.tasks.has(s.key)) await queue.removeJobScheduler(s.key);
+      if (s.key && !this.tasks.has(s.key))
+        await queue.removeJobScheduler(s.key);
     }
     this.worker = new Worker(
       QUEUES.scheduler,
       async (job: Job) => {
         const started = Date.now();
         const result = await this.runNow(job.name);
-        this.logger.log(`task ${job.name} done in ${Date.now() - started} ms ${result === undefined ? '' : JSON.stringify(result)}`);
+        this.logger.log(
+          `task ${job.name} done in ${Date.now() - started} ms ${result === undefined ? '' : JSON.stringify(result)}`,
+        );
         return result;
       },
       { ...bullOptions(this.env), concurrency: 1 },
     );
-    this.worker.on('failed', (job, err) => this.logger.warn(`task ${job?.name} failed: ${err.message}`));
+    this.worker.on('failed', (job, err) =>
+      this.logger.warn(`task ${job?.name} failed: ${err.message}`),
+    );
   }
 
   async onApplicationShutdown(): Promise<void> {

@@ -1,7 +1,19 @@
 /** Seven Suite — github.com/theloopbreaker4-cloud/seven-suite */
-import { Body, Controller, Delete, Get, Param, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { z } from 'zod';
-import { CurrentAuth, RequirePermission, ServiceOnly } from '../auth/decorators';
+import {
+  CurrentAuth,
+  RequirePermission,
+  ServiceOnly,
+} from '../auth/decorators';
 import type { AuthContext } from '../auth/tokens';
 import { DomainError } from '../errors/domain-error';
 import { DomainService } from '../org/domain.service';
@@ -20,7 +32,8 @@ export class WebController {
   @Get('site')
   async site(@Query(new ZodPipe(hostQuery)) q: z.infer<typeof hostQuery>) {
     const site = await this.domains.resolve(q.host);
-    if (!site) throw DomainError.notFound('No site for this host', 'site_not_found');
+    if (!site)
+      throw DomainError.notFound('No site for this host', 'site_not_found');
     return site;
   }
 }
@@ -38,7 +51,10 @@ export class DomainController {
 
   @Post()
   @RequirePermission('platform:settings:update')
-  add(@CurrentAuth() auth: AuthContext, @Body(new ZodPipe(domainBody)) body: z.infer<typeof domainBody>) {
+  add(
+    @CurrentAuth() auth: AuthContext,
+    @Body(new ZodPipe(domainBody)) body: z.infer<typeof domainBody>,
+  ) {
     return this.domains.add(auth, body.domain);
   }
 

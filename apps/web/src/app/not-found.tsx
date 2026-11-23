@@ -5,7 +5,15 @@ export default function RootNotFound() {
   return (
     <html lang="en">
       <body>
-        <main style={{ fontFamily: 'system-ui, sans-serif', maxWidth: 560, margin: '15vh auto', padding: 16, textAlign: 'center' }}>
+        <main
+          style={{
+            fontFamily: 'system-ui, sans-serif',
+            maxWidth: 560,
+            margin: '15vh auto',
+            padding: 16,
+            textAlign: 'center',
+          }}
+        >
           <p style={{ fontSize: 48, margin: 0, opacity: 0.4 }}>404</p>
           <h1>Page not found</h1>
           <a href="/">Home</a>

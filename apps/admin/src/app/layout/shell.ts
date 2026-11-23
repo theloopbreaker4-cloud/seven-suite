@@ -65,7 +65,14 @@ const NAV: NavSection[] = [
   },
   {
     label: 'nav.system',
-    items: [{ label: 'nav.queues', path: '/system/queues', icon: '⚙', operator: true }],
+    items: [
+      {
+        label: 'nav.queues',
+        path: '/system/queues',
+        icon: '⚙',
+        operator: true,
+      },
+    ],
   },
 ];
 

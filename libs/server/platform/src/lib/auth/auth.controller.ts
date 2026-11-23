@@ -106,7 +106,11 @@ export class AuthController {
   ) {
     return sessionResponse(
       res,
-      await this.auth.completeMfaLogin(body.mfaToken, body.code, clientInfo(req)),
+      await this.auth.completeMfaLogin(
+        body.mfaToken,
+        body.code,
+        clientInfo(req),
+      ),
       this.env,
     );
   }
