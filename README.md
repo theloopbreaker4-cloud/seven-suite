@@ -13,6 +13,19 @@
 > **Live demo:** https://seven.toolpix.dev/suite/ — `demo@example.com` / `seven-demo-2026`
 > (shared account, reset every hour; sign-up, mail and membership changes are off).
 
+## Try it with Docker
+
+The whole stack (PostgreSQL, Redis, Mailpit, API, worker, admin, storefront), built from source:
+
+```bash
+docker compose -f docker/compose.yml up --build -d
+bash e2e/stack/stack-smoke.sh   # optional: checks every service end to end
+```
+
+Admin at http://localhost:8080 (sign-up emails land in Mailpit, http://localhost:8025); the
+organization's storefront at `http://<org-slug>.localhost:3000`. The built-in secrets are for your
+own machine only — put real ones in `docker/.env` before exposing anything (see the file header).
+
 ## Quick start (development)
 
 Requirements: Node 22, pnpm, Docker (Docker Desktop or Docker inside WSL).
@@ -36,7 +49,7 @@ pnpm check               # lint + typecheck + test + build, all projects
 | `libs/shared`          | isomorphic types and helpers (`@seven/shared`)                              |
 | `libs/server/platform` | server kernel: config, db, events, auth, tenancy (`@seven/server-platform`) |
 | `libs/server/core`     | Party, Product, numbering, timeline (`@seven/server-core`)                  |
-| `docker/`              | dev services                                                                |
+| `docker/`              | dev services, app images (`app.Dockerfile`), full stack (`compose.yml`)     |
 
 Module boundaries are enforced by lint (`eslint.config.mjs`): server, admin and web code can only
 import their own layer plus `shared`; `platform` sits below `core`, and `core` below every module.

@@ -17,7 +17,10 @@ export const envSchema = z.object({
 
   REDIS_URL: url,
   /** Key prefix for BullMQ queues (tests use their own, so they never touch a running worker). */
-  QUEUE_PREFIX: z.string().regex(/^[a-z0-9-]+$/).default('seven'),
+  QUEUE_PREFIX: z
+    .string()
+    .regex(/^[a-z0-9-]+$/)
+    .default('seven'),
 
   API_PORT: z.coerce.number().int().positive().default(4000),
   /** Interface to listen on: loopback by default (nginx proxies); 0.0.0.0 inside a bridged container. */
@@ -47,7 +50,11 @@ export const envSchema = z.object({
    */
   WEB_BASE_DOMAIN: z
     .string()
-    .regex(/^([a-z0-9-]+\.)+[a-z0-9-]+$|^$/, 'WEB_BASE_DOMAIN must be a hostname')
+    // `localhost` too: browsers resolve `<slug>.localhost` to loopback (the local Docker stack).
+    .regex(
+      /^([a-z0-9-]+\.)+[a-z0-9-]+$|^localhost$|^$/,
+      'WEB_BASE_DOMAIN must be a hostname',
+    )
     .default(''),
 
   S3_ENDPOINT: url.optional(),

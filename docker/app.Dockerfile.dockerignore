@@ -1,0 +1,15 @@
+# Build context for docker/app.Dockerfile: sources only (dependencies are installed in the image).
+**/node_modules
+dist
+tmp
+out-tsc
+coverage
+.git
+.nx
+.angular
+apps/web/.next
+**/.env
+**/.env.*
+!.env.example
+**/*.log
+libs/server/platform/src/generated

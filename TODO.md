@@ -50,10 +50,10 @@ the VPS works with one command.
 - [x] Scaffold NX 24 workspace at the repo root (pnpm, integrated layout): `apps/api`, `apps/worker`, `apps/admin`, `apps/web`
 - [ ] Libraries: `libs/shared`, `libs/api-client`, `libs/server/platform`, `libs/server/core`, `libs/admin/ui`, `libs/admin/meta-ui`, `libs/web/ui` — _done: shared, server/platform, server/core; rest when first used_
 - [x] NX tags + `enforce-module-boundaries` rules per layer and scope (verified to fail on a violation)
-- [ ] TS strict, ESLint, Prettier, commit hooks (lint-staged), conventional commits
+- [x] TS strict, ESLint, Prettier, commit hooks (lint-staged), conventional commits — _`.githooks/` (enabled by `prepare`): lint-staged runs eslint --fix + prettier on staged files; `scripts/check-commit-msg.mjs` enforces `type(scope): subject`_
 - [x] `docker/compose.dev.yml`: PostgreSQL 16 (+ RLS app role, test DB), Redis 7, S3 (SeaweedFS), Mailpit
 - [x] `.env.example`; config module with zod schema validation (fails fast, lists every problem)
-- [ ] GitHub Actions: lint · typecheck · unit · integration · build · fresh-install — _done: everything except the fresh-install job; integration runs on a real PostgreSQL + Redis service as the RLS-bound app role_
+- [x] GitHub Actions: lint · typecheck · unit · integration · build · fresh-install — _integration on a real PostgreSQL + Redis as the RLS-bound app role; `fresh-install` builds the Docker stack from a clean checkout and runs `e2e/stack/stack-smoke.sh`_
 
 ### Platform kernel (`libs/server/platform`)
 
@@ -100,7 +100,7 @@ the VPS works with one command.
 
 ### Deploy
 
-- [ ] Docker images — _done: `docker/api.Dockerfile` (Node 22 slim + pruned prod deps + Prisma CLI, healthcheck); admin is static behind nginx; worker and web images pending_
+- [x] Docker images — _`docker/app.Dockerfile` builds every app from source (targets api [+worker.js], web [Next standalone], admin [nginx + /api proxy]); `docker/compose.yml` runs the whole stack (`docker compose -f docker/compose.yml up --build`); the VPS deploy keeps the smaller prebuilt `docker/api.Dockerfile`_
 - [x] nginx site (SPA fallback, `/api` proxy, Cloudflare real IP, security headers, cache rules); API container on host network with memory limit — _live at https://seven.toolpix.dev/suite/ (path on the showcase domain: `PUBLIC_BASE_PATH=/suite`, admin built with `--base-href=/suite/`, nginx strips the prefix for the API); Playwright smoke passes against production_
 - [x] Deploy script `d:/Works/tools/seven-suite-deploy.sh` (local build → ~300 KB upload → image built on the server → migrate → container swap → health wait → admin swap); server setup `seven-suite-server-setup.sh` (DB + roles in shared PostgreSQL, secrets generated on the server). Rollback: `docker run` the previous `seven-suite-api:<sha>` tag
 - [ ] Nightly backups — _done: `/usr/local/bin/vps-db-backup` (source `d:/Works/tools/vps-db-backup.sh`) dumps every database in the shared PostgreSQL at 03:30, verifies each archive, keeps 14 days (min 3), `--drill <db>` restores into a scratch DB and compares tables (passed for toolpix, seven_projects, seven_suite); off-site copy pending (needs a bucket, e.g. Cloudflare R2)_

@@ -1,0 +1,114 @@
+# Seven Suite — the whole stack on one machine, built from source.
+#
+#   docker compose -f docker/compose.yml up --build -d
+#
+#   admin       http://localhost:8080   (sign up there — confirmation emails land in Mailpit)
+#   storefront  http://<org-slug>.localhost:3000
+#   API         http://localhost:4000/api/v1/health/ready   ·   OpenAPI /api/v1/openapi.json
+#   Mailpit     http://localhost:8025
+#
+# The secrets below are for trying it out on your own machine only. For anything reachable from
+# the internet, put real ones in docker/.env (JWT_SECRET, WEB_SERVICE_KEY, POSTGRES_PASSWORD,
+# APP_DB_PASSWORD) — compose reads that file automatically. All ports listen on 127.0.0.1;
+# change them with ADMIN_PORT / WEB_PORT / API_PORT / MAILPIT_PORT if they are taken.
+name: seven-suite-stack
+
+x-app-env: &app-env
+  NODE_ENV: production
+  DATABASE_URL: postgresql://seven:${POSTGRES_PASSWORD:-seven_local_password}@postgres:5432/seven_suite
+  DATABASE_APP_URL: postgresql://seven_app:${APP_DB_PASSWORD:-seven_app_local_password}@postgres:5432/seven_suite
+  REDIS_URL: redis://redis:6379
+  JWT_SECRET: ${JWT_SECRET:-local-only-jwt-secret-replace-me-local-only-jwt-secret-replace-me}
+  WEB_SERVICE_KEY: ${WEB_SERVICE_KEY:-local-only-web-service-key-replace-me-0001}
+  API_PUBLIC_URL: http://localhost:4000
+  ADMIN_URL: http://localhost:8080
+  WEB_BASE_DOMAIN: ${WEB_BASE_DOMAIN:-localhost}
+  SMTP_URL: smtp://mailpit:1025
+  MAIL_FROM: Seven Suite <no-reply@seven.local>
+  PLATFORM_ADMINS: ${PLATFORM_ADMINS:-}
+  LOG_LEVEL: info
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: seven_suite
+      POSTGRES_USER: seven
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-seven_local_password}
+      APP_DB_PASSWORD: ${APP_DB_PASSWORD:-seven_app_local_password}
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+      - ./postgres/stack-init.sh:/docker-entrypoint-initdb.d/stack-init.sh:ro
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U seven -d seven_suite']
+      interval: 5s
+      retries: 20
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    command: ['redis-server', '--appendonly', 'yes']
+    volumes: [redis-data:/data]
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      retries: 20
+    restart: unless-stopped
+
+  mailpit:
+    image: axllent/mailpit:latest
+    ports: ['127.0.0.1:${MAILPIT_PORT:-8025}:8025']
+    restart: unless-stopped
+
+  # One-shot: applies migrations as the owner role, then exits; the API waits for it.
+  migrate:
+    image: seven-suite-api:local
+    build: { context: .., dockerfile: docker/app.Dockerfile, target: api }
+    environment: *app-env
+    command: ['prisma', 'migrate', 'deploy']
+    depends_on:
+      postgres: { condition: service_healthy }
+
+  api:
+    image: seven-suite-api:local
+    build: { context: .., dockerfile: docker/app.Dockerfile, target: api }
+    environment: *app-env
+    ports: ['127.0.0.1:${API_PORT:-4000}:4000']
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+      redis: { condition: service_healthy }
+    restart: unless-stopped
+
+  worker:
+    image: seven-suite-api:local
+    build: { context: .., dockerfile: docker/app.Dockerfile, target: api }
+    environment: *app-env
+    command: ['node', '--enable-source-maps', 'worker.js']
+    healthcheck: { disable: true }
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+      redis: { condition: service_healthy }
+    restart: unless-stopped
+
+  admin:
+    image: seven-suite-admin:local
+    build: { context: .., dockerfile: docker/app.Dockerfile, target: admin }
+    environment:
+      API_UPSTREAM: http://api:4000
+    ports: ['127.0.0.1:${ADMIN_PORT:-8080}:8080']
+    depends_on: [api]
+    restart: unless-stopped
+
+  web:
+    image: seven-suite-web:local
+    build: { context: .., dockerfile: docker/app.Dockerfile, target: web }
+    environment:
+      API_INTERNAL_URL: http://api:4000/api/v1
+      WEB_SERVICE_KEY: ${WEB_SERVICE_KEY:-local-only-web-service-key-replace-me-0001}
+    ports: ['127.0.0.1:${WEB_PORT:-3000}:3000']
+    depends_on: [api]
+    restart: unless-stopped
+
+volumes:
+  pg-data:
+  redis-data:
